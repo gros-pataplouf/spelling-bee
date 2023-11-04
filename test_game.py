@@ -89,7 +89,41 @@ def test_incorrect_word(game_with_players):
         game_with_players.solutions = list(filter(lambda solution: set(solution).issubset(set(game_with_players.letterset)) and game_with_players.letterset[0] == "s", all_solutions))
     game_with_players.play("player1", "spln")
     assert "spln" not in game_with_players.guesses
+
 def test_4_letters_1_point(game_with_players):
+    game_with_players.letterset = "speling"
+    with open("solutions.json", "r", encoding="utf-8") as f:
+        all_solutions =  json.load(f)
+        game_with_players.solutions = list(filter(lambda solution: set(solution).issubset(set(game_with_players.letterset)) and game_with_players.letterset[0] == "s", all_solutions))
     points_before = game_with_players.players["player1"]
     game_with_players.play("player1", "lens")
+    assert game_with_players.players["player1"] - points_before == 1
+
+ 
+def test_5_or_more_letters(game_with_players):
+    game_with_players.letterset = "speling"
+    points_before = game_with_players.players["player1"]
+    with open("solutions.json", "r", encoding="utf-8") as f:
+        all_solutions =  json.load(f)
+        game_with_players.solutions = list(filter(lambda solution: set(solution).issubset(set(game_with_players.letterset)) and game_with_players.letterset[0] == "s", all_solutions))
+    game_with_players.play("player1", "selling") #7 letters, should give 3 points
+    assert game_with_players.players["player1"] - points_before == 4
+
+def test_pangram(game_with_players):
+    game_with_players.letterset = "speling"
+    points_before = game_with_players.players["player1"]
+    with open("solutions.json", "r", encoding="utf-8") as f:
+        all_solutions =  json.load(f)
+        game_with_players.solutions = list(filter(lambda solution: set(solution).issubset(set(game_with_players.letterset)), all_solutions))
+    game_with_players.play("player1", "spelling")
+    assert game_with_players.players["player1"] - points_before == len('spelling') + 4
+"aceiloz"
+
+def test_aceiloz(game_with_players):
+    game_with_players.letterset = "aceiloz"
+    points_before = game_with_players.players["player1"]
+    with open("solutions.json", "r", encoding="utf-8") as f:
+        all_solutions =  json.load(f)
+        game_with_players.solutions = list(filter(lambda solution: set(solution).issubset(set(game_with_players.letterset)) and game_with_players.letterset[0] == "a", all_solutions))
+    game_with_players.play("player1", "lice") # 1
     assert game_with_players.players["player1"] - points_before == 1

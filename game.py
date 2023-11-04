@@ -33,12 +33,27 @@ class Game:
     def play(self, player, guess):
         if len(guess) > 3 and guess not in self.guesses and guess in self.solutions:
             if self.letterset[0] in guess:
-                if set(guess).issubset(self.letterset):
+                if set(guess).issubset(self.letterset) and set(self.letterset).issubset(guess):
+                    print("Pangram!!!")
                     self.guesses.append(guess)
-                    self.players[player] += 1
+                    self.players[player] += ((len(guess) - 3) + 7)
+                elif set(guess).issubset(self.letterset):
+                    self.guesses.append(guess)
+                    self.players[player] += len(guess) - 3
+        elif len(guess) < 4:
+            print("Too short")
+        elif guess in self.guesses:
+            print("Tell me something new...")
+        elif self.letterset[0] not in guess:
+            print(self.letterset[0])
+            print("Please always use letter", self.letterset[0])
+        elif not set(guess).issubset(self.letterset):
+            print("Letter not allowed")
+        else:
+            print("Sorry, not a word")
 
 def main():
-    player = input("Please enter your name\n")
+    player = "player1"
     game = Game(player)
     print(game.letterset)
     while True:
