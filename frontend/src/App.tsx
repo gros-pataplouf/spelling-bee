@@ -1,5 +1,5 @@
 import {useState} from "react"
-
+import Game from "./components/Game"
 
 
 
@@ -22,7 +22,7 @@ function App() {
  <><p>How many words can you make with 7 letters?</p>
     <button className="btn btn-rounded text-white font-bold bg-black" onClick={showGame}>Play</button>
     </> : 
-    <div >Playing</div>
+    <Game/>
   }    
 </div>
   )

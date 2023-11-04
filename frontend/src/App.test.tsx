@@ -29,7 +29,7 @@ describe('<App />', () => {
     const button = wrapper.container.querySelector('button')
     expect(button?.textContent).toBe('Play')
   })
-  it('Button disappears after clicking on it', () => {
+  it('After clicking on play button, you get input field', () => {
     const wrapper = render(<App />)
     const button = wrapper.container.querySelector('button')
     fireEvent(
@@ -37,11 +37,9 @@ describe('<App />', () => {
       new MouseEvent('click', {
         bubbles: true
       }),
-    )
-    setTimeout(() => {
-      expect(button).toBeNull()
-    }, 100
-    )
+      )
+    const inputField = wrapper.container.querySelector('input#input')
+    expect(inputField).toBeInTheDocument()
   })
 
 });
