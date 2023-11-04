@@ -42,4 +42,17 @@ describe('<App />', () => {
     expect(inputField).toBeInTheDocument()
   })
 
+  it('After clicking on play button, 7 polygons are visible', () => {
+    const wrapper = render(<App />)
+    const button = wrapper.container.querySelector('button')
+    fireEvent(
+      getByText(button, 'Play'),
+      new MouseEvent('click', {
+        bubbles: true
+      }),
+      )
+    const polygons = wrapper.container.querySelectorAll('#hive>svg>polygon')
+    expect(polygons.length).toBe(7)
+  })
+
 });
