@@ -22,7 +22,6 @@ describe('<App />', () => {
     expect(text.textContent).toBeTruthy()
   })
 
-  // Get by text using the React testing library
   test('Play button displayed', () => {
     const wrapper = render(<App />)
     const button = wrapper.container.querySelector('button')

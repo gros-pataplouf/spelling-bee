@@ -4,15 +4,10 @@ import Game from "./components/Game"
 
 
 function App() {
-
-
   const [stateOfGame, setStateOfGame] = useState("welcome")
-
   function showGame() {
-    console.log("hello")
     setStateOfGame("playing");
         }
-
   return (
     <div className="bg-yellow-400 h-screen">
     <h1 className="font-semibold">Spelling Bee</h1>

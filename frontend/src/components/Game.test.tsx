@@ -13,6 +13,10 @@ describe('<Game/>', () => {
         const game = render(<Game />)
         const polygons = game.container.querySelectorAll('#hive>svg>polygon')
         expect(polygons.length).toBe(7)
-      })
-    
+    })
+    test('Each svg contains a text element', () => {
+        const game = render(<Game />)
+        const textBoxes = game.container.querySelectorAll('#hive>svg>text')
+        expect(textBoxes.length).toBe(7)
+    })
 })
