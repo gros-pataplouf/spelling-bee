@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { render } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 
 import Game from './Game'
 
@@ -28,5 +28,39 @@ describe('<Game/>', () => {
             expect(textBox).toHaveAttribute("font-family")
             expect(textBox).toHaveAttribute("font-size")
         })
+    })
+    test('The text elements are rendered with svg text attributes', () => {
+        const game = render(<Game />)
+        const textBoxes = game.container.querySelectorAll('#hive>svg>text')
+        textBoxes.forEach(textBox => {
+            expect(textBox).toHaveAttribute("x")
+            expect(textBox).toHaveAttribute("y")
+            expect(textBox).toHaveAttribute("font-family")
+            expect(textBox).toHaveAttribute("font-size")
+        })
+    })
+
+
+    test('There is one svg with class middleLetter', () => {
+        const game = render(<Game />)
+        const middleLetterSvg = game.container.querySelectorAll('#hive>.middleLetter')
+        expect(middleLetterSvg.length).toBe(1)
+    })
+
+    test('If you click one letter / hive, the clicked letter appears in the input field', () => {
+        const game = render(<Game />)
+        const randomLetter = game.container.querySelectorAll('#hive>svg>text')[Math.floor(Math.random()*7)]
+        let inputField = game.container.querySelector('input') as HTMLInputElement
+        const valueBefore = inputField.value || ""
+     
+        fireEvent(
+            randomLetter,
+            new MouseEvent('click', {
+              bubbles: true
+            }),
+            )
+        inputField = game.container.querySelector('input') as HTMLInputElement
+        const valueAfter = randomLetter.textContent + valueBefore
+        expect(inputField).toHaveAttribute("value",  valueAfter)
     })
 })

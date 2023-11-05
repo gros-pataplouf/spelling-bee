@@ -1,3 +1,6 @@
 export interface CellProps {
-    letter: string
+    letter: string,
+    middleLetter: boolean, 
+    input: string[],
+    setInput: React.Dispatch<React.SetStateAction<string[]>>
 }
