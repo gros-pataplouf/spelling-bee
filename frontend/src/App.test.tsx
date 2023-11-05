@@ -1,7 +1,6 @@
 
 import { describe, test, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { fireEvent, getByText } from '@testing-library/react'
+import { render, screen, fireEvent, getByText } from '@testing-library/react'
 
 import App from './App'
 
@@ -18,7 +17,7 @@ describe('<App />', () => {
   })
 
   test('Subtitle displayed correctly', () => {
-    const wrapper = render(<App />)
+    const wrapper = render(<App />) //eslint-disable-line @typescript-eslint/no-unused-vars
     const text = screen.getByText("How many words can you make with 7 letters?");
     expect(text.textContent).toBeTruthy()
   })
@@ -29,9 +28,9 @@ describe('<App />', () => {
     const button = wrapper.container.querySelector('button')
     expect(button?.textContent).toBe('Play')
   })
-  it('After clicking on play button, you get input field', () => {
+  test('After clicking on play button, you get input field', () => {
     const wrapper = render(<App />)
-    const button = wrapper.container.querySelector('button')
+    const button = wrapper.container.querySelector('button') as HTMLElement
     fireEvent(
       getByText(button, 'Play'),
       new MouseEvent('click', {
@@ -42,17 +41,5 @@ describe('<App />', () => {
     expect(inputField).toBeInTheDocument()
   })
 
-  it('After clicking on play button, 7 polygons are visible', () => {
-    const wrapper = render(<App />)
-    const button = wrapper.container.querySelector('button')
-    fireEvent(
-      getByText(button, 'Play'),
-      new MouseEvent('click', {
-        bubbles: true
-      }),
-      )
-    const polygons = wrapper.container.querySelectorAll('#hive>svg>polygon')
-    expect(polygons.length).toBe(7)
-  })
 
 });

@@ -6,4 +6,4 @@ def search_pangram(letterset):
                 solutions.append(line.strip())
     return solutions
 
-print(search_pangram("iloqstu"))
+print(search_pangram("bikemlo"))

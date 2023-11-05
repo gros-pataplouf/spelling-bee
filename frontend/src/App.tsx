@@ -8,9 +8,8 @@ function App() {
 
   const [stateOfGame, setStateOfGame] = useState("welcome")
 
-  function showGame(e) {
+  function showGame() {
     console.log("hello")
-    e.preventDefault();
     setStateOfGame("playing");
         }
 
