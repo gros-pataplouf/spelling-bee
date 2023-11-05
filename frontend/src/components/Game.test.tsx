@@ -19,4 +19,14 @@ describe('<Game/>', () => {
         const textBoxes = game.container.querySelectorAll('#hive>svg>text')
         expect(textBoxes.length).toBe(7)
     })
+    test('The text elements are rendered with svg text attributes', () => {
+        const game = render(<Game />)
+        const textBoxes = game.container.querySelectorAll('#hive>svg>text')
+        textBoxes.forEach(textBox => {
+            expect(textBox).toHaveAttribute("x")
+            expect(textBox).toHaveAttribute("y")
+            expect(textBox).toHaveAttribute("font-family")
+            expect(textBox).toHaveAttribute("font-size")
+        })
+    })
 })

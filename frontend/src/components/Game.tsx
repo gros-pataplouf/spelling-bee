@@ -1,7 +1,7 @@
 import Cell from './Cell'
 
 
-const letterArray = Array.from("iloqstu")
+const letterArray = Array.from("iloqstu".toUpperCase())
 console.log(letterArray)
 
 function Game() {
