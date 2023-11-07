@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Cell from './Cell'
 import { BaseSyntheticEvent } from 'react'
 const strg = "iloqstu"
@@ -32,8 +32,8 @@ function Game() {
     <div id="hive">
         {letters.map(letter => <Cell letter={letter} middleLetter={letter === strg[0].toUpperCase()} key={letter} input={input} setInput={setInput}/>)}
     </div>
+    <button id="clear">Shuffle</button>
     <button id="shuffle" onClick={shuffle}>Shuffle</button>
-
     </div>)
 }
 

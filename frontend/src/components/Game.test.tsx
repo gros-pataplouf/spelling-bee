@@ -77,4 +77,22 @@ describe('<Game/>', () => {
         expect(letterArrayBefore[0]).toEqual(letterArrayAfter[0])
         expect(letterArrayBefore.slice(1,7)).not.toEqual(letterArrayAfter.slice(1,7))
     })
+
+    test('Clicking the shuffle button will shuffle the letters, except for #middleLetter, which will stay the first Node', async () => {
+        const game = render(<Game/>)
+        const shuffleButton = game.container.querySelector("#shuffle") as HTMLButtonElement
+        expect(shuffleButton).toBeInTheDocument()
+        const letterArrayBefore = Array.from(game.container.querySelectorAll('#hive>svg>text')).map(node => node.textContent)
+        await userEvent.click(shuffleButton)
+        const letterArrayAfter = Array.from(game.container.querySelectorAll('#hive>svg>text')).map(node => node.textContent)
+        expect(letterArrayBefore[0]).toEqual(letterArrayAfter[0])
+        expect(letterArrayBefore.slice(1,7)).not.toEqual(letterArrayAfter.slice(1,7))
+    })
+    test('There is a clear button', () => {
+        const game = render(<Game/>)
+        const shuffleButton = game.container.querySelector("button#clear") as HTMLButtonElement
+        expect(shuffleButton).toBeInTheDocument()
+    })
+    
+
 })
