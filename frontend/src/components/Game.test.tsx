@@ -1,6 +1,6 @@
-import { describe, test, expect } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
-
+import { describe, test, expect, it } from 'vitest'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Game from './Game'
 
 
@@ -63,4 +63,13 @@ describe('<Game/>', () => {
         const valueAfter = randomLetter.textContent + valueBefore
         expect(inputField).toHaveAttribute("value",  valueAfter)
     })
+
+    test('If you press one letter, (key down), it appears in the input field if it is part of the letter set', async () => {
+        const game = render(<Game/>)
+        await userEvent.click(screen.getByRole("input") as HTMLInputElement)
+        await userEvent.type(screen.getByRole("input") as HTMLInputElement, "ABCSOLI")
+        expect(screen.getByRole("input") as HTMLInputElement).toHaveAttribute("value",  "SOLI")
+    })
+
+
 })
