@@ -1,8 +1,8 @@
-import { describe, test, expect, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, beforeEach } from 'vitest'
 import { render, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Server, WebSocket } from 'mock-socket';
-import { ClientMessage, ClientMessageType } from '../types/types';
+import { ClientMessage } from '../types/types';
 import Game from './Game'
 global.WebSocket = WebSocket
 const websocketServer = new Server('ws://localhost:5000');
@@ -135,6 +135,21 @@ describe('<Game/>', () => {
         return waitFor(async () => {
             await expect(JSON.parse(clientMessages.at(-1)).content).toBe(
               "SOLILOQUIST"
+            );
+          });
+
+    })
+    test('a < 4 letter input is not transmitted to ws://localhost:5000', async () => {
+        const game = render(<Game/>)
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await userEvent.type(inputForm, "SIT")
+        await userEvent.click(enterButton)
+        await new Promise((r) => setTimeout(r, 2000));
+        return waitFor(async () => {
+            await expect(clientMessages).toStrictEqual(
+              []
             );
           });
 

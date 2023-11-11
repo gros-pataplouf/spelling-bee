@@ -1,15 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
-
 const strg = "iloqstu"
 const letterArray = Array.from(strg.toUpperCase())
 function Game() {
-
     const socket = new WebSocket("ws://localhost:5000")
-                      
-
-
     const [input, setInput] = useState([""])
     const [letters, setLetters ] = useState(letterArray)
     function handleChange(e: BaseSyntheticEvent){
@@ -38,6 +33,10 @@ function Game() {
 
 
     function submitWord() {
+        console.log(input)
+        if (input.join("").length < 4) {
+            return
+        }
         const solution = JSON.stringify(
             {
                 type: "submission",
