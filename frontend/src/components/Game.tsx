@@ -16,7 +16,6 @@ function Game() {
     }, [input])
     function handleChange(e: BaseSyntheticEvent){
         const inputEvent = e.nativeEvent as InputEvent
-        console.log(message)
         if (inputEvent.data && strg.includes(inputEvent.data.toLowerCase())) {
             setInput([...input, inputEvent.data.toUpperCase()])
         } else if (inputEvent.inputType === "deleteContentBackward") {
@@ -51,12 +50,19 @@ function Game() {
                 content: input.join(""), 
             }
         )
+        console.log("sending")
         socket.send(solution)
-    } 
+    }
+    
+    function handleKeyDown(event:React.KeyboardEvent<HTMLInputElement>) {
+        if (event.code == "Enter") {
+            submitWord()
+        }}
+    
 
     return (
     <div>
-    <input id="input" role="input" placeholder="Type or click" onChange={handleChange} value={input.join("")}/>
+    <input id="input" role="input" placeholder="Type or click" onChange={handleChange} onKeyDown={handleKeyDown} value={input.join("")}/>
     <p>{message.content}</p>
     <div id="hive">
         {letters.map(letter => <Cell letter={letter} middleLetter={letter === strg[0].toUpperCase()} key={letter} input={input} setInput={setInput}/>)}

@@ -135,8 +135,20 @@ describe('<Game/>', () => {
               "SOLILOQUIST"
             );
           });
-
     })
+
+    test('Pressing enter (not the button) also submits the  >= 4 to ws://localhost:5000', async () => {
+        const game = render(<Game/>)
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await userEvent.type(inputForm, "SOLILOQUIST{enter}")
+        return waitFor(async () => {
+            await expect(JSON.parse(clientMessages.at(-1)).content).toBe(
+              "SOLILOQUIST"
+            );
+          });
+    })
+
     test('a < 4 letter input is not transmitted to ws://localhost:5000', async () => {
         const game = render(<Game/>)
         const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
@@ -181,5 +193,7 @@ describe('<Game/>', () => {
         await userEvent.type(inputForm, "IO")
         expect(game.container.querySelector("input#input+p")).not.toHaveTextContent("too short")
     })
+
+
 
 })
