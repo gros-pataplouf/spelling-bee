@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import { GameMessage } from '../types/types'
@@ -10,8 +10,13 @@ function Game() {
     const [letters, setLetters ] = useState(letterArray)
     const initialGameMessage: GameMessage = {category: null, content: ""}
     const [message, setMessage] = useState(initialGameMessage)
+    useEffect(() => {
+        setMessage(initialGameMessage)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [input])
     function handleChange(e: BaseSyntheticEvent){
         const inputEvent = e.nativeEvent as InputEvent
+        console.log(message)
         if (inputEvent.data && strg.includes(inputEvent.data.toLowerCase())) {
             setInput([...input, inputEvent.data.toUpperCase()])
         } else if (inputEvent.inputType === "deleteContentBackward") {

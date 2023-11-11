@@ -169,7 +169,17 @@ describe('<Game/>', () => {
         await userEvent.type(inputForm, "SIT")
         await userEvent.click(enterButton)
         expect(screen.getByText("too short")).toBeInTheDocument()
+    })
 
+    test('if the input field changes and there is no submission, the message is deleted', async () => {
+        const game = render(<Game/>)
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await userEvent.type(inputForm, "SIT")
+        await userEvent.click(enterButton)
+        await userEvent.type(inputForm, "IO")
+        expect(game.container.querySelector("input#input+p")).not.toHaveTextContent("too short")
     })
 
 })
