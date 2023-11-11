@@ -1,6 +1,10 @@
 
 import { describe, test, expect } from 'vitest'
 import { render, screen, fireEvent, getByText } from '@testing-library/react'
+import { WebSocket } from 'mock-socket';
+global.WebSocket = WebSocket
+
+
 
 import App from './App'
 

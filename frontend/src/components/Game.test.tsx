@@ -1,10 +1,25 @@
-import { describe, test, expect } from 'vitest'
-import { render, fireEvent, screen } from '@testing-library/react'
+import { describe, test, expect, beforeEach, afterEach } from 'vitest'
+import { render, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Server, WebSocket } from 'mock-socket';
+import { ClientMessage, ClientMessageType } from '../types/types';
 import Game from './Game'
+global.WebSocket = WebSocket
+const websocketServer = new Server('ws://localhost:5000');
+let clientMessages: ClientMessage[] = []
 
 
 describe('<Game/>', () => {
+    beforeEach(() => {
+        clientMessages = []
+        websocketServer.on('connection', (socket) => {
+            socket.on('message', (message) => {
+                const parsedData: ClientMessage = JSON.parse(JSON.stringify(message));
+                clientMessages.push(parsedData);
+            }
+            )
+        })
+    })
     test('Game component monts properly', () => {
         const game = render(<Game/>)
         expect(game).toBeTruthy()
@@ -78,21 +93,50 @@ describe('<Game/>', () => {
         expect(letterArrayBefore.slice(1,7)).not.toEqual(letterArrayAfter.slice(1,7))
     })
 
-    test('Clicking the shuffle button will shuffle the letters, except for #middleLetter, which will stay the first Node', async () => {
+    test('There is a delete button', () => {
         const game = render(<Game/>)
-        const shuffleButton = game.container.querySelector("#shuffle") as HTMLButtonElement
-        expect(shuffleButton).toBeInTheDocument()
-        const letterArrayBefore = Array.from(game.container.querySelectorAll('#hive>svg>text')).map(node => node.textContent)
-        await userEvent.click(shuffleButton)
-        const letterArrayAfter = Array.from(game.container.querySelectorAll('#hive>svg>text')).map(node => node.textContent)
-        expect(letterArrayBefore[0]).toEqual(letterArrayAfter[0])
-        expect(letterArrayBefore.slice(1,7)).not.toEqual(letterArrayAfter.slice(1,7))
-    })
-    test('There is a clear button', () => {
-        const game = render(<Game/>)
-        const shuffleButton = game.container.querySelector("button#clear") as HTMLButtonElement
+        const shuffleButton = game.container.querySelector("button#delete") as HTMLButtonElement
         expect(shuffleButton).toBeInTheDocument()
     })
-    
 
+    test('Clicking the delete button clears one letter from the input form', async () => {
+        const game = render(<Game/>)
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.type(inputForm, "SOIL")
+        const deleteButton = game.container.querySelector("button#delete") as HTMLButtonElement
+        await userEvent.click(deleteButton)
+        expect(inputForm).toHaveAttribute("value", "SOI")
+    })
+
+
+    test('Clicking the delete button clears one letter from the input form', async () => {
+        const game = render(<Game/>)
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.type(inputForm, "SOIL")
+        const deleteButton = game.container.querySelector("button#delete") as HTMLButtonElement
+        await userEvent.click(deleteButton)
+        expect(inputForm).toHaveAttribute("value", "SOI")
+    })
+
+    test('There is an enter button', () => {
+        const game = render(<Game/>)
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        expect(enterButton).toBeTruthy()
+    })
+
+    test('Pressing the enter button sends the >= 4 letter value of the input field to ws://localhost:5000', async () => {
+        const game = render(<Game/>)
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await userEvent.type(inputForm, "SOLILOQUIST")
+        await userEvent.click(enterButton)
+        await new Promise((r) => setTimeout(r, 2000));
+        return waitFor(async () => {
+            await expect(JSON.parse(clientMessages.at(-1)).content).toBe(
+              "SOLILOQUIST"
+            );
+          });
+
+    })
 })

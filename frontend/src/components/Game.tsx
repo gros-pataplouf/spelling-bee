@@ -1,13 +1,17 @@
-import { useState } from 'react'
-import Cell from './Cell'
+import { useState, useEffect } from 'react'
 import { BaseSyntheticEvent } from 'react'
+import Cell from './Cell'
+
 const strg = "iloqstu"
 const letterArray = Array.from(strg.toUpperCase())
-
 function Game() {
+
+    const socket = new WebSocket("ws://localhost:5000")
+                      
+
+
     const [input, setInput] = useState([""])
     const [letters, setLetters ] = useState(letterArray)
-
     function handleChange(e: BaseSyntheticEvent){
         const inputEvent = e.nativeEvent as InputEvent
         if (inputEvent.data && strg.includes(inputEvent.data.toLowerCase())) {
@@ -16,6 +20,12 @@ function Game() {
             setInput(input.slice(0, input.length-1))
         }
     }
+    function deleteLetter() {
+        if(input.length) {
+            setInput(input.slice(0, input.length-1))
+        }
+    }
+
     function shuffle() {
         const otherLettersOld = letters.slice(1,7)
         const otherLettersNew:string[] = []
@@ -26,14 +36,27 @@ function Game() {
         setLetters([letterArray[0], ...otherLettersNew])
     }
 
+
+    function submitWord() {
+        const solution = JSON.stringify(
+            {
+                type: "submission",
+                content: input.join(""), 
+            }
+        )
+        socket.send(solution)
+    } 
+
     return (
     <div>
     <input id="input" role="input" placeholder="Type or click" onChange={handleChange} value={input.join("")}/>
     <div id="hive">
         {letters.map(letter => <Cell letter={letter} middleLetter={letter === strg[0].toUpperCase()} key={letter} input={input} setInput={setInput}/>)}
     </div>
-    <button id="clear">Shuffle</button>
+    <button id="delete" onClick={deleteLetter}>Delete</button>
     <button id="shuffle" onClick={shuffle}>Shuffle</button>
+    <button id="enter" onClick={submitWord}>Enter</button>
+
     </div>)
 }
 
