@@ -7,18 +7,19 @@ import Game from './Game'
 global.WebSocket = WebSocket
 const websocketServer = new Server('ws://localhost:5000');
 let clientMessages: ClientMessage[] = []
+websocketServer.on('connection', (socket) => {
+    socket.on('message', (message) => {
+        const parsedData: ClientMessage = JSON.parse(JSON.stringify(message));
+        clientMessages.push(parsedData);
+    }
+    )
+})
+
 
 
 describe('<Game/>', () => {
     beforeEach(() => {
         clientMessages = []
-        websocketServer.on('connection', (socket) => {
-            socket.on('message', (message) => {
-                const parsedData: ClientMessage = JSON.parse(JSON.stringify(message));
-                clientMessages.push(parsedData);
-            }
-            )
-        })
     })
     test('Game component monts properly', () => {
         const game = render(<Game/>)
@@ -152,6 +153,16 @@ describe('<Game/>', () => {
               []
             );
           });
-
+    })
+    test('one click generates exactly one socket message', async () => {
+        const game = render(<Game/>)
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await userEvent.type(inputForm, "SOIL")
+        await userEvent.click(enterButton)
+        return waitFor(async () => {
+            await expect(clientMessages.length).toBe(1);
+          });
     })
 })
