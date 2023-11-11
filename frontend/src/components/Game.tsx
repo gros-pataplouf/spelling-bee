@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
+import { GameMessage } from '../types/types'
 const strg = "iloqstu"
 const letterArray = Array.from(strg.toUpperCase())
 function Game() {
     const socket = new WebSocket("ws://localhost:5000")
     const [input, setInput] = useState([""])
     const [letters, setLetters ] = useState(letterArray)
+    const initialGameMessage: GameMessage = {category: null, content: ""}
+    const [message, setMessage] = useState(initialGameMessage)
     function handleChange(e: BaseSyntheticEvent){
         const inputEvent = e.nativeEvent as InputEvent
         if (inputEvent.data && strg.includes(inputEvent.data.toLowerCase())) {
@@ -33,8 +36,8 @@ function Game() {
 
 
     function submitWord() {
-        console.log(input)
         if (input.join("").length < 4) {
+            setMessage({category: "warning", content: "too short"})
             return
         }
         const solution = JSON.stringify(
@@ -49,6 +52,7 @@ function Game() {
     return (
     <div>
     <input id="input" role="input" placeholder="Type or click" onChange={handleChange} value={input.join("")}/>
+    <p>{message.content}</p>
     <div id="hive">
         {letters.map(letter => <Cell letter={letter} middleLetter={letter === strg[0].toUpperCase()} key={letter} input={input} setInput={setInput}/>)}
     </div>

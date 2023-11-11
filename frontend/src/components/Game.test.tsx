@@ -15,8 +15,6 @@ websocketServer.on('connection', (socket) => {
     )
 })
 
-
-
 describe('<Game/>', () => {
     beforeEach(() => {
         clientMessages = []
@@ -132,7 +130,6 @@ describe('<Game/>', () => {
         await userEvent.click(inputForm)
         await userEvent.type(inputForm, "SOLILOQUIST")
         await userEvent.click(enterButton)
-        await new Promise((r) => setTimeout(r, 2000));
         return waitFor(async () => {
             await expect(JSON.parse(clientMessages.at(-1)).content).toBe(
               "SOLILOQUIST"
@@ -147,7 +144,6 @@ describe('<Game/>', () => {
         await userEvent.click(inputForm)
         await userEvent.type(inputForm, "SIT")
         await userEvent.click(enterButton)
-        await new Promise((r) => setTimeout(r, 2000));
         return waitFor(async () => {
             await expect(clientMessages).toStrictEqual(
               []
@@ -165,4 +161,15 @@ describe('<Game/>', () => {
             await expect(clientMessages.length).toBe(1);
           });
     })
+    test('a < 4 letter input generates a "too short" message"', async () => {
+        const game = render(<Game/>)
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await userEvent.type(inputForm, "SIT")
+        await userEvent.click(enterButton)
+        expect(screen.getByText("too short")).toBeInTheDocument()
+
+    })
+
 })

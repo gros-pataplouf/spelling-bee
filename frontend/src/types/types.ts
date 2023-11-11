@@ -5,12 +5,24 @@ export interface CellProps {
     setInput: React.Dispatch<React.SetStateAction<string[]>>
 }
 
+export enum GameMessageCategory {
+  warning = 'warning',
+  info = 'info',
+  success = 'success',
+  null = 'null'
+}
+
+export interface GameMessage {
+  category: string | null,
+  content: string
+}
 
 export enum ServerMessageType {
     Log = 'Log',
     NoMoreLogs = 'NoMoreLogs',
   }
    
+
 export interface ServerMessage {
     id: number;
     type: ServerMessageType;
