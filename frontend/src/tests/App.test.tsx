@@ -4,7 +4,7 @@ import { render, screen, fireEvent, getByText } from '@testing-library/react'
 import { WebSocket } from 'mock-socket';
 global.WebSocket = WebSocket
 
-import App from './App'
+import App from '../App'
 
 describe('<App />', () => {
   test('App mounts properly', () => {

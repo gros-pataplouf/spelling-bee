@@ -6,6 +6,13 @@ const strg = "iloqstu"
 const letterArray = Array.from(strg.toUpperCase())
 function Game() {
     const socket = new WebSocket("ws://localhost:5000")
+    socket.onmessage = (message) => {
+        const parsedData = JSON.parse(message.data)
+        if (parsedData.letters) {
+            setLetters(Array.from(parsedData.letters))
+        }
+
+    }
     const [input, setInput] = useState([""])
     const [letters, setLetters ] = useState(letterArray)
     const initialGameMessage: GameMessage = {category: null, content: ""}

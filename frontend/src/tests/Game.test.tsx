@@ -3,7 +3,7 @@ import { render, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Server, WebSocket } from 'mock-socket';
 import { ClientMessage } from '../types/types';
-import Game from './Game'
+import Game from '../components/Game'
 global.WebSocket = WebSocket
 const websocketServer = new Server('ws://localhost:5000');
 let clientMessages: ClientMessage[] = []
@@ -194,6 +194,12 @@ describe('<Game/>', () => {
         expect(game.container.querySelector("input#input+p")).not.toHaveTextContent("too short")
     })
 
-
+    test('the frontend renders random from the websocket servers into the polygons', async () => {
+        const game = render(<Game/>)
+        websocketServer.emit("message", JSON.stringify({letters: "ABCDEFG"}))
+        await waitFor(() => expect(game.container.querySelector("text")?.textContent).toBe("A"))
+        const letterArrayBefore = Array.from(game.container.querySelectorAll('#hive>svg>text')).map(node => node.textContent)
+        expect(letterArrayBefore.join("")).toBe("ABCDEFG")
+    })
 
 })
