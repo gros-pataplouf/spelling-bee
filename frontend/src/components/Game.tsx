@@ -7,9 +7,9 @@ function Game() {
     const [letters, setLetters ] = useState(Array.from("ILOQUST"))
     const [points, setPoints ] = useState(0)
     const [words, setWords] = useState([])
+    const [success, setSuccess] = useState({})
     socket.onmessage = (message) => {
         const parsedData = JSON.parse(message.data)
-        console.log(parsedData)
         if (parsedData.letters) {
             setLetters(Array.from(parsedData.letters))
         } 
@@ -21,6 +21,10 @@ function Game() {
         }
         if (parsedData.words) {
             setWords(parsedData.words)
+        }
+        if (parsedData.success) {
+            setSuccess({success: parsedData.success, points: parsedData.points })
+            setTimeout(() => setSuccess({}), 2000)
         }
     }
     const [input, setInput] = useState([""])
@@ -80,6 +84,7 @@ function Game() {
 
     return (
     <div>
+    {success.points && <p><span id="successMessage">{success.success}</span> <span id="successPoints">+{success.points}</span></p>}
     <input id="input" role="input" placeholder="Type or click" onChange={handleChange} onKeyDown={handleKeyDown} value={input.join("")}/>
     <p id="message">{message.content}</p>
     <div id="hive">
