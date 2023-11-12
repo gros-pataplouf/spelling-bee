@@ -51,6 +51,8 @@ function Game() {
         if (input.join("").length < 4) {
             setMessage({category: "warning", content: "too short"})
             return
+        } else if (!input.join("").includes(letters[0])) {
+            setMessage({category: "warning", content: "middleletter missing"})
         }
         const solution = JSON.stringify(
             {

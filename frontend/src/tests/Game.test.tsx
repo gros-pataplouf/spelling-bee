@@ -214,9 +214,21 @@ describe('<Game/>', () => {
         waitFor(async () => expect(JSON.parse(clientMessages[0]).content).toBe("KOBE"));
         websocketServer.emit("message", JSON.stringify({warning: "not a word"}))
         return waitFor(async () => {
-            expect(game.container.querySelector("#message")).toHaveTextContent("nota word");
+            expect(game.container.querySelector("#message")).toHaveTextContent("not a word");
           });
+    })
 
+    test('If the middleletter is missing, nothing is submitted to the server and a warning "middleletter missing" is displayed', async () => {
+        const game = render(<Game/>)
+        websocketServer.emit("message", JSON.stringify({letters: "EBCKPTO"}))
+        await waitFor(() => expect(game.container.querySelector("text")?.textContent).toBe("E"))
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await act(async () => await userEvent.type(inputForm, "KOBB"))
+        await userEvent.click(enterButton)
+        waitFor(async () => expect(clientMessages.length).toBe(0));
+        expect(game.container.querySelector("#message")).toHaveTextContent("middleletter missing");
     })
 
 })
