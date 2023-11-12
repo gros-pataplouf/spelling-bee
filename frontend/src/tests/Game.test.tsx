@@ -247,4 +247,46 @@ describe('<Game/>', () => {
         })
     })
 
+
+    test('Points are added up', async () => {
+        const game = render(<Game/>)
+        websocketServer.emit("message", JSON.stringify({letters: "EBCKPTO"}))
+        await waitFor(() => expect(game.container.querySelector("text")?.textContent).toBe("E"))
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await act(async () => await userEvent.type(inputForm, "POCKET"))
+        await userEvent.click(enterButton)
+        waitFor(async () => expect(clientMessages.length).toBe(1));
+        websocketServer.emit("message", JSON.stringify({points: 3}))
+        await act(async () => await userEvent.type(inputForm, "POKE"))
+        await userEvent.click(enterButton)
+        waitFor(async () => expect(clientMessages.length).toBe(1));
+        websocketServer.emit("message", JSON.stringify({points: 1}))
+        return waitFor(async () => {
+            expect(game.container.querySelector("#points")).toHaveTextContent("4");
+        })
+    })
+
+    test('There is a list of already guessed words', async () => {
+        const game = render(<Game/>)
+        websocketServer.emit("message", JSON.stringify({letters: "EBCKPTO"}))
+        await waitFor(() => expect(game.container.querySelector("text")?.textContent).toBe("E"))
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await act(async () => await userEvent.type(inputForm, "POCKET"))
+        await userEvent.click(enterButton)
+        waitFor(async () => expect(clientMessages.length).toBe(1));
+        websocketServer.emit("message", JSON.stringify({points: 3}))
+        websocketServer.emit("message", JSON.stringify({words: ["POCKET"]}))
+        await act(async () => await userEvent.type(inputForm, "POKE"))
+        await userEvent.click(enterButton)
+        waitFor(async () => expect(clientMessages.length).toBe(1));
+        websocketServer.emit("message", JSON.stringify({points: 1}))
+        websocketServer.emit("message", JSON.stringify({words: ["POCKET", "POKE"]}))
+        return waitFor(async () => {
+            expect(game.container.querySelectorAll("#words>li").length).toBe(2);
+        })
+    })
 })

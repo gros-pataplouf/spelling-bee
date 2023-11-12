@@ -6,6 +6,7 @@ function Game() {
     const socket = new WebSocket("ws://localhost:5000")
     const [letters, setLetters ] = useState(Array.from("ILOQUST"))
     const [points, setPoints ] = useState(0)
+    const [words, setWords] = useState([])
     socket.onmessage = (message) => {
         const parsedData = JSON.parse(message.data)
         console.log(parsedData)
@@ -17,6 +18,9 @@ function Game() {
         }
         if (parsedData.points) {
             setPoints(points + parsedData.points)
+        }
+        if (parsedData.words) {
+            setWords(parsedData.words)
         }
     }
     const [input, setInput] = useState([""])
@@ -84,8 +88,17 @@ function Game() {
     <button id="delete" onClick={deleteLetter}>Delete</button>
     <button id="shuffle" onClick={shuffle}>Shuffle</button>
     <button id="enter" onClick={submitWord}>Enter</button>
+    <div>
     <p><span id="points">{points}</span> points</p>
-
+    </div>
+    {words && 
+    <ul id="words">
+       { words.map(word => {
+            return (
+                <li key={word}>{word}</li>
+            )
+        })}
+        </ul>}
     </div>)
 }
 

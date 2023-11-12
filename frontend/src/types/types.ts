@@ -9,7 +9,9 @@ export enum GameMessageCategory {
   warning = 'warning',
   info = 'info',
   success = 'success',
-  null = 'null'
+  null = 'null',
+  points = 'points',
+  word = 'word'
 }
 
 export interface GameMessage {
