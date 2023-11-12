@@ -5,6 +5,7 @@ import { GameMessage } from '../types/types'
 function Game() {
     const socket = new WebSocket("ws://localhost:5000")
     const [letters, setLetters ] = useState(Array.from("ILOQUST"))
+    const [points, setPoints ] = useState(0)
     socket.onmessage = (message) => {
         const parsedData = JSON.parse(message.data)
         console.log(parsedData)
@@ -13,6 +14,9 @@ function Game() {
         } 
         if (parsedData.warning) {
             setMessage({category: "warning", content: parsedData.warning})
+        }
+        if (parsedData.points) {
+            setPoints(points + parsedData.points)
         }
     }
     const [input, setInput] = useState([""])
@@ -80,6 +84,7 @@ function Game() {
     <button id="delete" onClick={deleteLetter}>Delete</button>
     <button id="shuffle" onClick={shuffle}>Shuffle</button>
     <button id="enter" onClick={submitWord}>Enter</button>
+    <p><span id="points">{points}</span> points</p>
 
     </div>)
 }

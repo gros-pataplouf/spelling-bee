@@ -231,4 +231,20 @@ describe('<Game/>', () => {
         expect(game.container.querySelector("#message")).toHaveTextContent("middleletter missing");
     })
 
+    test('A 4 letter word earns 1 point', async () => {
+        const game = render(<Game/>)
+        websocketServer.emit("message", JSON.stringify({letters: "EBCKPTO"}))
+        await waitFor(() => expect(game.container.querySelector("text")?.textContent).toBe("E"))
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await act(async () => await userEvent.type(inputForm, "POKE"))
+        await userEvent.click(enterButton)
+        waitFor(async () => expect(clientMessages.length).toBe(1));
+        websocketServer.emit("message", JSON.stringify({points: 1}))
+        return waitFor(async () => {
+            expect(game.container.querySelector("#points")).toHaveTextContent("1");
+        })
+    })
+
 })
