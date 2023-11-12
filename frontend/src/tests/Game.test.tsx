@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'vitest'
-import { render, fireEvent, screen, waitFor } from '@testing-library/react'
+import { render, fireEvent, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Server, WebSocket } from 'mock-socket';
 import { ClientMessage } from '../types/types';
@@ -143,7 +143,7 @@ describe('<Game/>', () => {
         await userEvent.click(inputForm)
         await userEvent.type(inputForm, "SOLILOQUIST{enter}")
         return waitFor(async () => {
-            await expect(JSON.parse(clientMessages.at(-1)).content).toBe(
+            expect(JSON.parse(clientMessages.at(-1)).content).toBe(
               "SOLILOQUIST"
             );
           });
@@ -157,7 +157,7 @@ describe('<Game/>', () => {
         await userEvent.type(inputForm, "SIT")
         await userEvent.click(enterButton)
         return waitFor(async () => {
-            await expect(clientMessages).toStrictEqual(
+            expect(clientMessages).toStrictEqual(
               []
             );
           });
@@ -170,7 +170,7 @@ describe('<Game/>', () => {
         await userEvent.type(inputForm, "SOIL")
         await userEvent.click(enterButton)
         return waitFor(async () => {
-            await expect(clientMessages.length).toBe(1);
+            expect(clientMessages.length).toBe(1);
           });
     })
     test('a < 4 letter input generates a "too short" message"', async () => {
@@ -200,6 +200,23 @@ describe('<Game/>', () => {
         await waitFor(() => expect(game.container.querySelector("text")?.textContent).toBe("A"))
         const letterArrayBefore = Array.from(game.container.querySelectorAll('#hive>svg>text')).map(node => node.textContent)
         expect(letterArrayBefore.join("")).toBe("ABCDEFG")
+    })
+
+    test('If user enters something that is not in the wordlist, message "not a word" is displayed', async () => {
+        const game = render(<Game/>)
+        websocketServer.emit("message", JSON.stringify({letters: "EBCKPTO"}))
+        await waitFor(() => expect(game.container.querySelector("text")?.textContent).toBe("E"))
+        const enterButton = game.container.querySelector("button#enter") as HTMLButtonElement
+        const inputForm = game.container.querySelector("input#input") as HTMLInputElement
+        await userEvent.click(inputForm)
+        await act(async () => await userEvent.type(inputForm, "KOBE"))
+        await userEvent.click(enterButton)
+        waitFor(async () => expect(JSON.parse(clientMessages[0]).content).toBe("KOBE"));
+        websocketServer.emit("message", JSON.stringify({warning: "not a word"}))
+        return waitFor(async () => {
+            expect(game.container.querySelector("#message")).toHaveTextContent("nota word");
+          });
+
     })
 
 })
