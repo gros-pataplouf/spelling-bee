@@ -1,65 +1,56 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { BaseSyntheticEvent } from "react";
 import Cell from "./Cell";
-import { ServerMessage, SuccessMessage, QueryDict } from "../types/types";
+import { QueryDict, GameProps } from '../types/types';
 
-function Game() {
+function Game({props} : GameProps ) {
+  const {stateOfGame, setStateOfGame} = props;
   const socket = new WebSocket("ws://localhost:5000");
-
-  const [letters, setLetters] = useState(Array.from("ILOQUST"));
-  const [points, setPoints] = useState(0);
-  const [words, setWords] = useState([]);
-  const initialSuccessMessage: SuccessMessage = { success: null, points: null };
-  const [success, setSuccess] = useState(initialSuccessMessage);
-  const [input, setInput] = useState([""]);
-  const initialServerMessage: ServerMessage = { category: null, content: "" };
-  const [message, setMessage] = useState(initialServerMessage);
-  
   const location = useLocation();
 
 
   socket.onmessage = (message) => {
     const parsedData = JSON.parse(message.data);
     if (parsedData.letters) {
-      setLetters(Array.from(parsedData.letters));
+      setStateOfGame({...stateOfGame, letters: Array.from(parsedData.letters)});
     }
     if (parsedData.warning) {
-      setMessage({ category: parsedData.warning, content: parsedData.warning });
+      setStateOfGame({...stateOfGame, message: { category: parsedData.warning, content: parsedData.warning }});
     }
     if (parsedData.points) {
-      setPoints(points + parsedData.points);
+      setStateOfGame({...stateOfGame, points: stateOfGame.points + parsedData["points"]})
     }
     if (parsedData.words) {
-      setWords(parsedData.words);
+      setStateOfGame({...stateOfGame, guessedWords: [...stateOfGame.guessedWords, ...parsedData.words]});
     }
     if (parsedData.success) {
-      setSuccess({ success: parsedData.success, points: parsedData.points });
-      setTimeout(() => setSuccess(initialSuccessMessage), 2000);
+      setStateOfGame({...stateOfGame, success: {success: parsedData.success, points: parsedData.points}})
+      setTimeout(() => setStateOfGame({...stateOfGame, success: {success: null, points: null}}), 2000);
     }
   };
   useEffect(() => {
-    setMessage(initialServerMessage);
+    setStateOfGame({...stateOfGame, message: {category: null, content: null}});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [input]);
+  }, [stateOfGame.input]);
   function handleChange(e: BaseSyntheticEvent) {
     const inputEvent = e.nativeEvent as InputEvent;
     if (
       inputEvent.data &&
-      letters.join("").toLowerCase().includes(inputEvent.data.toLowerCase())
+      stateOfGame.letters.join("").toLowerCase().includes(inputEvent.data.toLowerCase())
     ) {
-      setInput([...input, inputEvent.data.toUpperCase()]);
+      setStateOfGame({...stateOfGame, input: [...stateOfGame.input, inputEvent.data.toUpperCase()]})
     } else if (inputEvent.inputType === "deleteContentBackward") {
-      setInput(input.slice(0, input.length - 1));
+      setStateOfGame({...stateOfGame, input: stateOfGame.input.slice(0, stateOfGame.input.length -1)})
     }
   }
   function deleteLetter() {
-    if (input.length) {
-      setInput(input.slice(0, input.length - 1));
+    if (stateOfGame.input.length) {
+      setStateOfGame({...stateOfGame, input: stateOfGame.input.slice(0, stateOfGame.input.length - 1)});
     }
   }
   function shuffle() {
-    const otherLettersOld = letters.slice(1, 7);
+    const otherLettersOld = stateOfGame.letters.slice(1, 7);
     const otherLettersNew: string[] = [];
     while (otherLettersOld.length) {
       const [removedLetter] = otherLettersOld.splice(
@@ -68,7 +59,7 @@ function Game() {
       );
       otherLettersNew.push(removedLetter);
     }
-    setLetters([letters[0], ...otherLettersNew]);
+    setStateOfGame({...stateOfGame, letters: [stateOfGame.letters[0], ...otherLettersNew]});
   }
 
   function parseQueryParams(queryString: string): QueryDict {
@@ -102,15 +93,15 @@ function Game() {
   }
 
   function submitWord() {
-    if (input.join("").length < 4) {
-      setMessage({ category: "warning", content: "too short" });
+    if (stateOfGame.input.join("").length < 4) {
+      setStateOfGame({...stateOfGame, message: { category: "warning", content: "too short" }})
       return;
-    } else if (!input.join("").includes(letters[0])) {
-      setMessage({ category: "warning", content: "middleletter missing" });
+    } else if (!stateOfGame.input.join("").includes(stateOfGame.letters[0])) {
+      setStateOfGame({...stateOfGame, message: { category: "warning", content: "middleletter missing"}})
     }
     const solution = JSON.stringify({
       type: "submission",
-      content: input.join(""),
+      content: stateOfGame.input.join(""),
     });
     socket.send(solution);
   }
@@ -123,10 +114,10 @@ function Game() {
 
   return (
     <div>
-      {success.points && (
+      {stateOfGame.success.points && (
         <p>
-          <span id="successMessage">{success.success}</span>{" "}
-          <span id="successPoints">+{success.points}</span>
+          <span id="successMessage">{stateOfGame.success.success}</span>{" "}
+          <span id="successPoints">+{stateOfGame.success.points}</span>
         </p>
       )}
       <input
@@ -135,17 +126,17 @@ function Game() {
         placeholder="Type or click"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        value={input.join("")}
+        value={stateOfGame.input && stateOfGame.input.join("")}
       />
-      <p id="message">{message.content}</p>
+      <p id="message">{stateOfGame.message.content}</p>
       <div id="hive">
-        {letters.map((letter) => (
+        {stateOfGame.letters.map((letter:string) => (
           <Cell
             letter={letter}
-            middleLetter={letter === letters[0]}
+            middleLetter={letter === stateOfGame.letters[0]}
             key={letter}
-            input={input}
-            setInput={setInput}
+            stateOfGame={stateOfGame}
+            setStateOfGame={setStateOfGame}
           />
         ))}
       </div>
@@ -161,12 +152,12 @@ function Game() {
       <div>
         <p>{parseQueryParams(location.search).player1}</p>
         <p>
-          <span id="points">{points}</span> points
+          <span id="points">{stateOfGame.points}</span> points
         </p>
       </div>
-      {words && (
+      {stateOfGame.guessedWords.length && (
         <ul id="words">
-          {words.map((word) => {
+          {stateOfGame.guessedWords.map((word) => {
             return <li key={word}>{word}</li>;
           })}
         </ul>

@@ -7,12 +7,12 @@ function Cell(props: CellProps): JSX.Element {
   } else {
     sortOfLetter = "otherLetter";
   }
-  const { input, setInput } = props;
+  const { stateOfGame, setStateOfGame } = props;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function selectLetter(event: any) {
     const svg = event.currentTarget as SVGElement;
     const selectedLetter = svg.lastChild?.textContent as string;
-    setInput([...input, selectedLetter]);
+    setStateOfGame({...stateOfGame, input: [...stateOfGame.input, selectedLetter]});
   }
 
   return (

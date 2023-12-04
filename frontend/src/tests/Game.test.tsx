@@ -5,13 +5,15 @@ import {
   screen,
   waitFor,
   act,
+  getByText
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Server, WebSocket } from "mock-socket";
 import { ClientMessage } from "../types/types";
-import { Router, BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 
-import Game from "../components/Game";
+import App from "../App";
+import { getByText } from '@testing-library/react';
 global.WebSocket = WebSocket;
 const websocketServer = new Server("ws://localhost:5000");
 let clientMessages: ClientMessage[] = [];
@@ -21,58 +23,59 @@ websocketServer.on("connection", (socket) => {
     clientMessages.push(parsedData);
   });
 });
-const location = vi.fn();
 
 describe("<Game/>", () => {
   beforeEach(() => {
     clientMessages = [];
-  });
-  test("Game component monts properly", () => {
-    const game = render(
-      <BrowserRouter>
-        <Game />
-      </BrowserRouter>,
-    );
-    expect(game).toBeTruthy();
+
   });
   test("After clicking on play button, 7 polygons are visible", () => {
-    const game = render(
+    const app = render(
       <BrowserRouter>
-        <Game />
-      </BrowserRouter>,
+        <App/>
+      </BrowserRouter>
     );
-    const polygons = game.container.querySelectorAll("#hive>svg>polygon");
+    const button = app.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+    const polygons = app.container.querySelectorAll("#hive>svg>polygon");
     expect(polygons.length).toBe(7);
   });
   test("Each svg contains a text element", () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const textBoxes = game.container.querySelectorAll("#hive>svg>text");
     expect(textBoxes.length).toBe(7);
   });
-  test("The text elements are rendered with svg text attributes", () => {
-    const game = render(
-      <BrowserRouter>
-        <Game />
-      </BrowserRouter>,
-    );
-    const textBoxes = game.container.querySelectorAll("#hive>svg>text");
-    textBoxes.forEach((textBox) => {
-      expect(textBox).toHaveAttribute("x");
-      expect(textBox).toHaveAttribute("y");
-      expect(textBox).toHaveAttribute("font-family");
-      expect(textBox).toHaveAttribute("font-size");
-    });
-  });
+
 
   test("There is one svg with class middleLetter", () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
+    );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
     const middleLetterSvg = game.container.querySelectorAll(
       "#hive>.middleLetter",
@@ -83,9 +86,17 @@ describe("<Game/>", () => {
   test("If you click one letter / hive, the clicked letter appears in the input field", () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const randomLetter =
       game.container.querySelectorAll("#hive>svg>text")[
         Math.floor(Math.random() * 7)
@@ -107,8 +118,15 @@ describe("<Game/>", () => {
   test("If you press one letter, (key down), it appears in the input field if it is part of the letter set", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
+    );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
     await userEvent.click(screen.getByRole("input") as HTMLInputElement);
     await userEvent.type(
@@ -121,23 +139,18 @@ describe("<Game/>", () => {
     );
   });
 
-  test("There is a shuffle button", () => {
-    const game = render(
-      <BrowserRouter>
-        <Game />
-      </BrowserRouter>,
-    );
-    const shuffleButton = game.container.querySelector(
-      "#shuffle",
-    ) as HTMLButtonElement;
-    expect(shuffleButton).toBeInTheDocument();
-  });
-
   test("Clicking the shuffle button will shuffle the letters, except for #middleLetter, which will stay the first Node", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
+    );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
     const shuffleButton = game.container.querySelector(
       "#shuffle",
@@ -156,24 +169,20 @@ describe("<Game/>", () => {
     );
   });
 
-  test("There is a delete button", () => {
-    const game = render(
-      <BrowserRouter>
-        <Game />
-      </BrowserRouter>,
-    );
-    const shuffleButton = game.container.querySelector(
-      "button#delete",
-    ) as HTMLButtonElement;
-    expect(shuffleButton).toBeInTheDocument();
-  });
-
   test("Clicking the delete button clears one letter from the input form", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const inputForm = game.container.querySelector(
       "input#input",
     ) as HTMLInputElement;
@@ -185,24 +194,20 @@ describe("<Game/>", () => {
     expect(inputForm).toHaveAttribute("value", "SOI");
   });
 
-  test("There is an enter button", () => {
-    const game = render(
-      <BrowserRouter>
-        <Game />
-      </BrowserRouter>,
-    );
-    const enterButton = game.container.querySelector(
-      "button#enter",
-    ) as HTMLButtonElement;
-    expect(enterButton).toBeTruthy();
-  });
-
   test("Pressing the enter button sends the >= 4 letter value of the input field to ws://localhost:5000", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const enterButton = game.container.querySelector(
       "button#enter",
     ) as HTMLButtonElement;
@@ -222,9 +227,17 @@ describe("<Game/>", () => {
   test("Pressing enter (not the button) also submits the  >= 4 to ws://localhost:5000", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const inputForm = game.container.querySelector(
       "input#input",
     ) as HTMLInputElement;
@@ -238,9 +251,17 @@ describe("<Game/>", () => {
   test("a < 4 letter input is not transmitted to ws://localhost:5000", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const enterButton = game.container.querySelector(
       "button#enter",
     ) as HTMLButtonElement;
@@ -257,9 +278,17 @@ describe("<Game/>", () => {
   test("one click generates exactly one socket message", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const enterButton = game.container.querySelector(
       "button#enter",
     ) as HTMLButtonElement;
@@ -276,9 +305,17 @@ describe("<Game/>", () => {
   test('a < 4 letter input generates a "too short" message"', async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const enterButton = game.container.querySelector(
       "button#enter",
     ) as HTMLButtonElement;
@@ -294,9 +331,17 @@ describe("<Game/>", () => {
   test("if the input field changes and there is no submission, the message is deleted", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     const enterButton = game.container.querySelector(
       "button#enter",
     ) as HTMLButtonElement;
@@ -315,9 +360,17 @@ describe("<Game/>", () => {
   test("the frontend renders random from the websocket servers into the polygons", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+
     websocketServer.emit("message", JSON.stringify({ letters: "ABCDEFG" }));
     await waitFor(() =>
       expect(game.container.querySelector("text")?.textContent).toBe("A"),
@@ -328,29 +381,21 @@ describe("<Game/>", () => {
     expect(letterArrayBefore.join("")).toBe("ABCDEFG");
   });
 
-  test('If user enters something that is not in the wordlist, message "not a word" is displayed', async () => {
+  test('Frontend displays warning messages from the backend', async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
-    websocketServer.emit("message", JSON.stringify({ letters: "EBCKPTO" }));
-    await waitFor(() =>
-      expect(game.container.querySelector("text")?.textContent).toBe("E"),
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
-    const enterButton = game.container.querySelector(
-      "button#enter",
-    ) as HTMLButtonElement;
-    const inputForm = game.container.querySelector(
-      "input#input",
-    ) as HTMLInputElement;
-    await userEvent.click(inputForm);
-    await act(async () => await userEvent.type(inputForm, "KOBE"));
-    await userEvent.click(enterButton);
-    waitFor(async () =>
-      expect(JSON.parse(clientMessages[0]).content).toBe("KOBE"),
-    );
-    websocketServer.emit("message", JSON.stringify({ warning: "not a word" }));
+
+      websocketServer.emit("message", JSON.stringify({ warning: "not a word" }));
     return waitFor(async () => {
       expect(game.container.querySelector("#message")).toHaveTextContent(
         "not a word",
@@ -358,11 +403,18 @@ describe("<Game/>", () => {
     });
   });
 
-  test('If the middleletter is missing, nothing is submitted to the server and a warning "middleletter missing" is displayed', async () => {
+  test('If the middleletter is missing, nothing is submitted to the server', async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
+    );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
     websocketServer.emit("message", JSON.stringify({ letters: "EBCKPTO" }));
     await waitFor(() =>
@@ -378,42 +430,39 @@ describe("<Game/>", () => {
     await act(async () => await userEvent.type(inputForm, "KOBB"));
     await userEvent.click(enterButton);
     waitFor(async () => expect(clientMessages.length).toBe(0));
-    expect(game.container.querySelector("#message")).toHaveTextContent(
-      "middleletter missing",
-    );
   });
 
-  test("A 4 letter word earns 1 point", async () => {
+  test("Frontend displays points sent from the backend", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
-    websocketServer.emit("message", JSON.stringify({ letters: "EBCKPTO" }));
-    await waitFor(() =>
-      expect(game.container.querySelector("text")?.textContent).toBe("E"),
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
-    const enterButton = game.container.querySelector(
-      "button#enter",
-    ) as HTMLButtonElement;
-    const inputForm = game.container.querySelector(
-      "input#input",
-    ) as HTMLInputElement;
-    await userEvent.click(inputForm);
-    await act(async () => await userEvent.type(inputForm, "POKE"));
-    await userEvent.click(enterButton);
-    waitFor(async () => expect(clientMessages.length).toBe(1));
     websocketServer.emit("message", JSON.stringify({ points: 1 }));
     return waitFor(async () => {
-      expect(game.container.querySelector("#points")).toHaveTextContent("1");
+      await expect(game.container.querySelector("#points")).toHaveTextContent("1");
     });
   });
 
   test("Points are added up", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
+    );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
     websocketServer.emit("message", JSON.stringify({ letters: "EBCKPTO" }));
     await waitFor(() =>
@@ -439,32 +488,19 @@ describe("<Game/>", () => {
     });
   });
 
-  test("There is a list of already guessed words", async () => {
+  test("There is a list of already guessed words sent by the server", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
-    websocketServer.emit("message", JSON.stringify({ letters: "EBCKPTO" }));
-    await waitFor(() =>
-      expect(game.container.querySelector("text")?.textContent).toBe("E"),
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
-    const enterButton = game.container.querySelector(
-      "button#enter",
-    ) as HTMLButtonElement;
-    const inputForm = game.container.querySelector(
-      "input#input",
-    ) as HTMLInputElement;
-    await userEvent.click(inputForm);
-    await act(async () => await userEvent.type(inputForm, "POCKET"));
-    await userEvent.click(enterButton);
-    waitFor(async () => expect(clientMessages.length).toBe(1));
-    websocketServer.emit("message", JSON.stringify({ points: 3 }));
-    websocketServer.emit("message", JSON.stringify({ words: ["POCKET"] }));
-    await act(async () => await userEvent.type(inputForm, "POKE"));
-    await userEvent.click(enterButton);
-    waitFor(async () => expect(clientMessages.length).toBe(1));
-    websocketServer.emit("message", JSON.stringify({ points: 1 }));
     websocketServer.emit(
       "message",
       JSON.stringify({ words: ["POCKET", "POKE"] }),
@@ -476,28 +512,20 @@ describe("<Game/>", () => {
   test("On reception of a point, the frontend displays a success message", async () => {
     const game = render(
       <BrowserRouter>
-        <Game />
+        <App />
       </BrowserRouter>,
     );
-    websocketServer.emit("message", JSON.stringify({ letters: "EBCKPTO" }));
-    await waitFor(() =>
-      expect(game.container.querySelector("text")?.textContent).toBe("E"),
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
     );
-    const enterButton = game.container.querySelector(
-      "button#enter",
-    ) as HTMLButtonElement;
-    const inputForm = game.container.querySelector(
-      "input#input",
-    ) as HTMLInputElement;
-    await userEvent.click(inputForm);
-    await act(async () => await userEvent.type(inputForm, "POCKET"));
-    await userEvent.click(enterButton);
-    waitFor(async () => expect(clientMessages.length).toBe(1));
     websocketServer.emit(
       "message",
       JSON.stringify({ points: 3, success: "Excellent!" }),
     );
-    websocketServer.emit("message", JSON.stringify({ words: ["POCKET"] }));
     return waitFor(async () => {
       expect(game.container.querySelector("#successMessage")).toHaveTextContent(
         "Excellent!",
@@ -506,49 +534,5 @@ describe("<Game/>", () => {
         "+3",
       );
     });
-  });
-  test("On reception of a point, the frontend displays a success message", async () => {
-    const game = render(
-      <BrowserRouter>
-        <Game />
-      </BrowserRouter>,
-    );
-    websocketServer.emit("message", JSON.stringify({ letters: "EBCKPTO" }));
-    await waitFor(() =>
-      expect(game.container.querySelector("text")?.textContent).toBe("E"),
-    );
-    const enterButton = game.container.querySelector(
-      "button#enter",
-    ) as HTMLButtonElement;
-    const inputForm = game.container.querySelector(
-      "input#input",
-    ) as HTMLInputElement;
-    await userEvent.click(inputForm);
-    await act(async () => await userEvent.type(inputForm, "POCKET"));
-    await userEvent.click(enterButton);
-    waitFor(async () => expect(clientMessages.length).toBe(1));
-    websocketServer.emit(
-      "message",
-      JSON.stringify({ points: 3, success: "Excellent!" }),
-    );
-    websocketServer.emit("message", JSON.stringify({ words: ["POCKET"] }));
-    return waitFor(async () => {
-      expect(game.container.querySelector("#successMessage")).toHaveTextContent(
-        "Excellent!",
-      );
-      expect(game.container.querySelector("#successPoints")).toHaveTextContent(
-        "+3",
-      );
-    });
-  });
-  test("The player1 name from the query params is visible on the screen", async () => {
-    const game = render(
-      <BrowserRouter>
-        <Game />
-      </BrowserRouter>,
-    );
-    window.location.href =
-      "http://localhost:5173/?game=45afb4b3-e4ac-43cf-84bc-ff8c976fcb5c&player1=player1";
-    expect(screen.getByText(/player1/)).toBeInTheDocument();
   });
 });

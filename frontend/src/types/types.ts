@@ -8,7 +8,7 @@ export interface GameState {
   letters: string[];
   guessedWords: string[]|[];
   points: number;
-  input: string;
+  input: string[];
   message: ServerMessage;
   success: SuccessMessage;
   multiPlayer: boolean;
@@ -17,12 +17,20 @@ export interface GameState {
   player2Points: number|null;
 }
 
+export interface GameProps {
+  props : {
+    stateOfGame: GameState,
+    setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
+  }
+
+}
 
 export interface CellProps {
   letter: string;
   middleLetter: boolean;
-  input: string[];
-  setInput: React.Dispatch<React.SetStateAction<string[]>>;
+  stateOfGame: GameState;
+  setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
+  ;
 }
 
 export interface ServerMessage {
