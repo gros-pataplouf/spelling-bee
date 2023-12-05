@@ -6,6 +6,7 @@ export enum PhaseOfGame {
 export interface GameState {
   phaseOfGame: PhaseOfGame;
   letters: string[];
+  playerName: string,
   guessedWords: string[] | [];
   points: number;
   input: string[];

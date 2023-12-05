@@ -8,6 +8,7 @@ function App() {
   const initialStateOfGame: GameState = {
     phaseOfGame: PhaseOfGame.welcome,
     letters: Array.from("ILOQUST"),
+    playerName: "Player 1",
     guessedWords: [],
     points: 0,
     input: [],

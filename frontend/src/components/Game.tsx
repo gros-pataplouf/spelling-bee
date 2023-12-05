@@ -1,13 +1,11 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { BaseSyntheticEvent } from "react";
 import Cell from "./Cell";
-import { QueryDict, GameProps } from "../types/types";
+import { GameProps } from "../types/types";
 
 function Game({ props }: GameProps) {
   const { stateOfGame, setStateOfGame } = props;
   const socket = new WebSocket("ws://localhost:5000");
-  const location = useLocation();
 
   socket.onmessage = (message) => {
     const parsedData = JSON.parse(message.data);
@@ -101,36 +99,6 @@ function Game({ props }: GameProps) {
     });
   }
 
-  function parseQueryParams(queryString: string): QueryDict {
-    const parsedStringArray = queryString
-      .slice(1, queryString.length)
-      .split("&");
-    const parsedDictArray = parsedStringArray.map((elt) => {
-      const key = elt.split("=")[0];
-      const value = elt.split("=")[1];
-      return { [key]: value };
-    });
-    const queryDict: QueryDict = {
-      game: null,
-      player1: null,
-      player2: null,
-    };
-    for (const item of parsedDictArray) {
-      const key = Object.keys(item)[0];
-      const value = Object.values(item)[0];
-      if (key == "game") {
-        queryDict[key] = value;
-      }
-      if (key == "player1") {
-        queryDict[key] = value;
-      }
-      if (key == "player2") {
-        queryDict[key] = value;
-      }
-    }
-    return queryDict;
-  }
-
   function submitWord() {
     if (stateOfGame.input.join("").length < 4) {
       setStateOfGame({
@@ -211,6 +179,7 @@ function Game({ props }: GameProps) {
       </div>
       <div>
         <div>
+          <input id="playerName" value={stateOfGame.playerName}/>
           <p>
             <span id="points">{stateOfGame.points}</span> points
           </p>

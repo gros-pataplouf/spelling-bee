@@ -535,4 +535,24 @@ describe("<Game/>", () => {
       );
     });
   });
+  test("The frontend displays an input form with value 'Player 1'", async () => {
+    const game = render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>,
+    );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+    return waitFor(async () => {
+      expect(game.container.querySelector("#playerName")).toHaveValue(
+        "Player 1",
+      );
+    });
+  });
+
 });
