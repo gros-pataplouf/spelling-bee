@@ -13,7 +13,6 @@ import { ClientMessage } from "../types/types";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "../App";
-import { getByText } from "@testing-library/react";
 global.WebSocket = WebSocket;
 const websocketServer = new Server("ws://localhost:5000");
 let clientMessages: ClientMessage[] = [];
@@ -550,7 +549,31 @@ describe("<Game/>", () => {
     );
     return waitFor(async () => {
       expect(game.container.querySelector("#playerName")).toHaveValue(
-        "Player 1",
+        "Player 1"
+      );
+    });
+  });
+  test("Player 1 can change their user name", async () => {
+    const game = render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>,
+    );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+    await userEvent.click(game.container.querySelector("input#playerName") as HTMLInputElement);
+    await userEvent.type(
+      game.container.querySelector("input#playerName") as HTMLInputElement,
+      "{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}Pataplouf",
+    );
+    return waitFor(async () => {
+      expect(game.container.querySelector("#playerName")).toHaveValue(
+        "Pataplouf"
       );
     });
   });

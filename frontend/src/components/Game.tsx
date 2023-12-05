@@ -125,6 +125,11 @@ function Game({ props }: GameProps) {
     }
   }
 
+  function changePlayerName(event: React.SyntheticEvent) {
+    event.preventDefault();
+    setStateOfGame({...stateOfGame, playerName: event.target.value})
+  }
+
   return (
     <div className="flex flex-col items-center">
       {stateOfGame.success.points && (
@@ -179,7 +184,7 @@ function Game({ props }: GameProps) {
       </div>
       <div>
         <div>
-          <input id="playerName" value={stateOfGame.playerName}/>
+          <input id="playerName" value={stateOfGame.playerName} onChange={changePlayerName}/>
           <p>
             <span id="points">{stateOfGame.points}</span> points
           </p>
