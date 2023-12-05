@@ -1,36 +1,34 @@
 export enum PhaseOfGame {
-  playing = "playing", 
-  welcome = "welcome"
+  playing = "playing",
+  welcome = "welcome",
 }
 
 export interface GameState {
   phaseOfGame: PhaseOfGame;
   letters: string[];
-  guessedWords: string[]|[];
+  guessedWords: string[] | [];
   points: number;
   input: string[];
   message: ServerMessage;
   success: SuccessMessage;
   multiPlayer: boolean;
   player2Name: string | null;
-  player2GuessedWords: string[]|[] | null;
-  player2Points: number|null;
+  player2GuessedWords: string[] | [] | null;
+  player2Points: number | null;
 }
 
 export interface GameProps {
-  props : {
-    stateOfGame: GameState,
-    setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
-  }
-
+  props: {
+    stateOfGame: GameState;
+    setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>;
+  };
 }
 
 export interface CellProps {
   letter: string;
   middleLetter: boolean;
   stateOfGame: GameState;
-  setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
-  ;
+  setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
 export interface ServerMessage {
@@ -51,7 +49,7 @@ export interface ClientMessage {
 export interface QueryDict {
   game: string | null;
   player1: string | null;
-  player2: string | null
+  player2: string | null;
 }
 
 export interface SuccessMessage {

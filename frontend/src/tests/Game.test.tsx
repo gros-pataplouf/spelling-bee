@@ -5,7 +5,7 @@ import {
   screen,
   waitFor,
   act,
-  getByText
+  getByText,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Server, WebSocket } from "mock-socket";
@@ -13,7 +13,7 @@ import { ClientMessage } from "../types/types";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "../App";
-import { getByText } from '@testing-library/react';
+import { getByText } from "@testing-library/react";
 global.WebSocket = WebSocket;
 const websocketServer = new Server("ws://localhost:5000");
 let clientMessages: ClientMessage[] = [];
@@ -27,13 +27,12 @@ websocketServer.on("connection", (socket) => {
 describe("<Game/>", () => {
   beforeEach(() => {
     clientMessages = [];
-
   });
   test("After clicking on play button, 7 polygons are visible", () => {
     const app = render(
       <BrowserRouter>
-        <App/>
-      </BrowserRouter>
+        <App />
+      </BrowserRouter>,
     );
     const button = app.container.querySelector("button") as HTMLElement;
     fireEvent(
@@ -62,7 +61,6 @@ describe("<Game/>", () => {
     const textBoxes = game.container.querySelectorAll("#hive>svg>text");
     expect(textBoxes.length).toBe(7);
   });
-
 
   test("There is one svg with class middleLetter", () => {
     const game = render(
@@ -381,7 +379,7 @@ describe("<Game/>", () => {
     expect(letterArrayBefore.join("")).toBe("ABCDEFG");
   });
 
-  test('Frontend displays warning messages from the backend', async () => {
+  test("Frontend displays warning messages from the backend", async () => {
     const game = render(
       <BrowserRouter>
         <App />
@@ -395,7 +393,7 @@ describe("<Game/>", () => {
       }),
     );
 
-      websocketServer.emit("message", JSON.stringify({ warning: "not a word" }));
+    websocketServer.emit("message", JSON.stringify({ warning: "not a word" }));
     return waitFor(async () => {
       expect(game.container.querySelector("#message")).toHaveTextContent(
         "not a word",
@@ -403,7 +401,7 @@ describe("<Game/>", () => {
     });
   });
 
-  test('If the middleletter is missing, nothing is submitted to the server', async () => {
+  test("If the middleletter is missing, nothing is submitted to the server", async () => {
     const game = render(
       <BrowserRouter>
         <App />
@@ -447,7 +445,9 @@ describe("<Game/>", () => {
     );
     websocketServer.emit("message", JSON.stringify({ points: 1 }));
     return waitFor(async () => {
-      await expect(game.container.querySelector("#points")).toHaveTextContent("1");
+      await expect(game.container.querySelector("#points")).toHaveTextContent(
+        "1",
+      );
     });
   });
 

@@ -12,7 +12,10 @@ function Cell(props: CellProps): JSX.Element {
   function selectLetter(event: any) {
     const svg = event.currentTarget as SVGElement;
     const selectedLetter = svg.lastChild?.textContent as string;
-    setStateOfGame({...stateOfGame, input: [...stateOfGame.input, selectedLetter]});
+    setStateOfGame({
+      ...stateOfGame,
+      input: [...stateOfGame.input, selectedLetter],
+    });
   }
 
   return (
@@ -20,7 +23,7 @@ function Cell(props: CellProps): JSX.Element {
       onClick={selectLetter}
       height="50"
       viewBox="0 0 120 103.92304845413263"
-      className={sortOfLetter}
+      className={`${sortOfLetter} absolute`}
       key={props.letter}
     >
       <polygon

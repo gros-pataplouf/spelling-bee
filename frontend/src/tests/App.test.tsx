@@ -73,7 +73,7 @@ describe("<App />", () => {
     expect(inputField).toBeInTheDocument();
   });
 
-  test("Clicking the play button modifies the url to contain ?game=uuid&player=player1", async () => {
+  test("Clicking the play button modifies the url to contain ?game=uuid", async () => {
     const wrapper = render(
       <BrowserRouter>
         <App />
@@ -88,7 +88,7 @@ describe("<App />", () => {
     );
     expect(navigate).toHaveBeenCalledWith(
       expect.stringMatching(
-        /game=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}&player1=[0-9a-zA-Z]+/,
+        /game=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/,
       ),
     );
   });
