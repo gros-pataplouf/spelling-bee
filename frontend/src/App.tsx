@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { GameState, PhaseOfGame } from "./types/types";
 import { v4 as uuidv4 } from "uuid";
@@ -26,6 +26,13 @@ function App() {
   };
   const [stateOfGame, setStateOfGame] = useState(initialStateOfGame);
   const location = useLocation();
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:5000");
+    socket.onopen = () => socket.send(JSON.stringify(stateOfGame))
+    
+    return () => socket.close()
+
+  }, [stateOfGame])
   const [localStorage, setLocalStorage] = useLocalStorage("spellingBee", {
     gameId: "",
     playerId: "",
@@ -79,21 +86,26 @@ function App() {
 
     if (gameQueryParam && isValidUuid(gameQueryParam)) {
       if (localStorage.gameId === gameQueryParam) {
+        console.log("gameId from localStrorage matches queryParam")
         if (localStorage.timeStamp + 24 * 60 * 60 * 1000 > Date.now()) {
+          console.log("timestamp is less than one day")
           gameId = localStorage.gameId;
           playerId = localStorage.playerId;
           timeStamp = localStorage.timeStamp;
         } else {
+          console.log("timestamp is too old")
           gameId = uuidv4();
           playerId = uuidv4();
           timeStamp = Date.now();
         }
       } else {
+        console.log("the valid uuid does not match gameId from local storage ", gameQueryParam)
         gameId = gameQueryParam;
         playerId = uuidv4();
         timeStamp = Date.now();
       }
     } else {
+      console.log("there is no query param or it is not a valid uuid")
       if (
         localStorage.gameId &&
         localStorage.playerId &&
@@ -103,6 +115,8 @@ function App() {
         playerId = localStorage.playerId;
         timeStamp = localStorage.timeStamp;
       } else {
+        console.log("but there is still a valid entry in local storage")
+
         gameId = uuidv4();
         playerId = uuidv4();
         timeStamp = Date.now();
@@ -121,9 +135,10 @@ function App() {
       playerId: playerId,
       timeStamp: timeStamp,
     });
+  
   }
   return (
-    <div className="bg-yellow-400 h-screen flex flex-col justify-center items-center">
+    <div className="bg-yellow-200 h-screen flex flex-col justify-center items-center">
       <h1 className="font-semibold text-center pb-6">Spelling Bee</h1>
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome ? (
         <>

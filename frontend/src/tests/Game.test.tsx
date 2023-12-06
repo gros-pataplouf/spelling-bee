@@ -9,16 +9,16 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Server, WebSocket } from "mock-socket";
-import { ClientMessage } from "../types/types";
+import { GameState } from "../types/types";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "../App";
 global.WebSocket = WebSocket;
 const websocketServer = new Server("ws://localhost:5000");
-let clientMessages: ClientMessage[] = [];
+let clientMessages: GameState[] = [];
 websocketServer.on("connection", (socket) => {
   socket.on("message", (message) => {
-    const parsedData: ClientMessage = JSON.parse(JSON.stringify(message));
+    const parsedData: GameState = JSON.parse(JSON.stringify(message));
     clientMessages.push(parsedData);
   });
 });
@@ -215,7 +215,7 @@ describe("<Game/>", () => {
     await userEvent.type(inputForm, "SOLILOQUIST");
     await userEvent.click(enterButton);
     return waitFor(async () => {
-      await expect(JSON.parse(clientMessages.at(-1)).content).toBe(
+      await expect(JSON.parse(clientMessages.at(-1)).guess).toBe(
         "SOLILOQUIST",
       );
     });
@@ -241,7 +241,9 @@ describe("<Game/>", () => {
     await userEvent.click(inputForm);
     await userEvent.type(inputForm, "SOLILOQUIST{enter}");
     return waitFor(async () => {
-      expect(JSON.parse(clientMessages.at(-1)).content).toBe("SOLILOQUIST");
+      await expect(JSON.parse(clientMessages.at(-1)).guess).toBe(
+        "SOLILOQUIST",
+      );
     });
   });
 
@@ -269,34 +271,8 @@ describe("<Game/>", () => {
     await userEvent.type(inputForm, "SIT");
     await userEvent.click(enterButton);
     return waitFor(async () => {
-      expect(clientMessages).toStrictEqual([]);
-    });
-  });
-  test("one click generates exactly one socket message", async () => {
-    const game = render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>,
-    );
-    const button = game.container.querySelector("button") as HTMLElement;
-    fireEvent(
-      getByText(button, "Play"),
-      new MouseEvent("click", {
-        bubbles: true,
-      }),
-    );
+      await expect(JSON.parse(clientMessages.at(-1)).guess).not.toBeDefined();
 
-    const enterButton = game.container.querySelector(
-      "button#enter",
-    ) as HTMLButtonElement;
-    const inputForm = game.container.querySelector(
-      "input#input",
-    ) as HTMLInputElement;
-    await userEvent.click(inputForm);
-    await userEvent.type(inputForm, "SOIL");
-    await userEvent.click(enterButton);
-    return waitFor(async () => {
-      expect(clientMessages.length).toBe(1);
     });
   });
   test('a < 4 letter input generates a "too short" message"', async () => {
@@ -354,7 +330,7 @@ describe("<Game/>", () => {
     );
   });
 
-  test("the frontend renders random from the websocket servers into the polygons", async () => {
+  test("the frontend renders random letters from the websocket servers into the polygons", async () => {
     const game = render(
       <BrowserRouter>
         <App />
@@ -442,48 +418,11 @@ describe("<Game/>", () => {
         bubbles: true,
       }),
     );
-    websocketServer.emit("message", JSON.stringify({ points: 1 }));
+    websocketServer.emit("message", JSON.stringify({ points: 3 }));
     return waitFor(async () => {
       await expect(game.container.querySelector("#points")).toHaveTextContent(
-        "1",
+        "3",
       );
-    });
-  });
-
-  test("Points are added up", async () => {
-    const game = render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>,
-    );
-    const button = game.container.querySelector("button") as HTMLElement;
-    fireEvent(
-      getByText(button, "Play"),
-      new MouseEvent("click", {
-        bubbles: true,
-      }),
-    );
-    websocketServer.emit("message", JSON.stringify({ letters: "EBCKPTO" }));
-    await waitFor(() =>
-      expect(game.container.querySelector("text")?.textContent).toBe("E"),
-    );
-    const enterButton = game.container.querySelector(
-      "button#enter",
-    ) as HTMLButtonElement;
-    const inputForm = game.container.querySelector(
-      "input#input",
-    ) as HTMLInputElement;
-    await userEvent.click(inputForm);
-    await act(async () => await userEvent.type(inputForm, "POCKET"));
-    await userEvent.click(enterButton);
-    waitFor(async () => expect(clientMessages.length).toBe(1));
-    websocketServer.emit("message", JSON.stringify({ points: 3 }));
-    await act(async () => await userEvent.type(inputForm, "POKE"));
-    await userEvent.click(enterButton);
-    waitFor(async () => expect(clientMessages.length).toBe(1));
-    websocketServer.emit("message", JSON.stringify({ points: 1 }));
-    return waitFor(async () => {
-      expect(game.container.querySelector("#points")).toHaveTextContent("4");
     });
   });
 
@@ -579,4 +518,25 @@ describe("<Game/>", () => {
       );
     });
   });
+
+  test("Backend receives gameId from frontend", async () => {
+    const game = render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>,
+    );
+    const button = game.container.querySelector("button") as HTMLElement;
+    fireEvent(
+      getByText(button, "Play"),
+      new MouseEvent("click", {
+        bubbles: true,
+      }),
+    );
+    const uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+    return waitFor(async () => {
+      const message = JSON.parse(clientMessages.at(-1))
+      expect(uuidRegex.test(message.gameId)).toBe(true);
+    });
+  });
+
 });

@@ -5,56 +5,14 @@ import { GameProps } from "../types/types";
 
 function Game({ props }: GameProps) {
   const { stateOfGame, setStateOfGame } = props;
-  const socket = new WebSocket("ws://localhost:5000");
 
-  socket.onmessage = (message) => {
-    const parsedData = JSON.parse(message.data);
-    if (parsedData.letters) {
-      setStateOfGame({
-        ...stateOfGame,
-        letters: Array.from(parsedData.letters),
-      });
-    }
-    if (parsedData.warning) {
-      setStateOfGame({
-        ...stateOfGame,
-        message: { category: parsedData.warning, content: parsedData.warning },
-      });
-    }
-    if (parsedData.points) {
-      setStateOfGame({
-        ...stateOfGame,
-        points: stateOfGame.points + parsedData["points"],
-      });
-    }
-    if (parsedData.words) {
-      setStateOfGame({
-        ...stateOfGame,
-        guessedWords: [...stateOfGame.guessedWords, ...parsedData.words],
-      });
-    }
-    if (parsedData.success) {
-      setStateOfGame({
-        ...stateOfGame,
-        success: { success: parsedData.success, points: parsedData.points },
-      });
-      setTimeout(
-        () =>
-          setStateOfGame({
-            ...stateOfGame,
-            success: { success: null, points: null },
-          }),
-        2000,
-      );
-    }
-  };
   useEffect(() => {
     setStateOfGame({
       ...stateOfGame,
       message: { category: null, content: null },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateOfGame.input]);
+  }, [stateOfGame.input, stateOfGame.points]);
   function handleChange(e: BaseSyntheticEvent) {
     const inputEvent = e.nativeEvent as InputEvent;
     if (
@@ -111,12 +69,9 @@ function Game({ props }: GameProps) {
         ...stateOfGame,
         message: { category: "warning", content: "middleletter missing" },
       });
+    } else {
+      setStateOfGame({...stateOfGame, guess: stateOfGame.input.join("")})
     }
-    const solution = JSON.stringify({
-      type: "submission",
-      content: stateOfGame.input.join(""),
-    });
-    socket.send(solution);
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
