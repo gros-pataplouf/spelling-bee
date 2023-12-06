@@ -4,15 +4,19 @@ export enum PhaseOfGame {
 }
 
 export interface GameState {
+  gameId: string | null;
+  gameTimeStamp: number | null;
   phaseOfGame: PhaseOfGame;
   letters: string[];
-  playerName: string,
+  playerId: string | null;
+  playerName: string;
   guessedWords: string[] | [];
   points: number;
   input: string[];
   message: ServerMessage;
   success: SuccessMessage;
   multiPlayer: boolean;
+  player2Id: string | null;
   player2Name: string | null;
   player2GuessedWords: string[] | [] | null;
   player2Points: number | null;
@@ -45,12 +49,6 @@ export enum ClientMessageType {
 export interface ClientMessage {
   type: ClientMessageType;
   content: string;
-}
-
-export interface QueryDict {
-  game: string | null;
-  player1: string | null;
-  player2: string | null;
 }
 
 export interface SuccessMessage {

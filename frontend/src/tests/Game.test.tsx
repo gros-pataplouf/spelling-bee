@@ -549,7 +549,7 @@ describe("<Game/>", () => {
     );
     return waitFor(async () => {
       expect(game.container.querySelector("#playerName")).toHaveValue(
-        "Player 1"
+        "Player 1",
       );
     });
   });
@@ -566,16 +566,17 @@ describe("<Game/>", () => {
         bubbles: true,
       }),
     );
-    await userEvent.click(game.container.querySelector("input#playerName") as HTMLInputElement);
+    await userEvent.click(
+      game.container.querySelector("input#playerName") as HTMLInputElement,
+    );
     await userEvent.type(
       game.container.querySelector("input#playerName") as HTMLInputElement,
       "{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}Pataplouf",
     );
     return waitFor(async () => {
       expect(game.container.querySelector("#playerName")).toHaveValue(
-        "Pataplouf"
+        "Pataplouf",
       );
     });
   });
-
 });

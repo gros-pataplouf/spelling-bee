@@ -125,9 +125,8 @@ function Game({ props }: GameProps) {
     }
   }
 
-  function changePlayerName(event: React.SyntheticEvent) {
-    event.preventDefault();
-    setStateOfGame({...stateOfGame, playerName: event.target.value})
+  function changePlayerName(event: React.BaseSyntheticEvent) {
+    setStateOfGame({ ...stateOfGame, playerName: event.target.value });
   }
 
   return (
@@ -184,7 +183,11 @@ function Game({ props }: GameProps) {
       </div>
       <div>
         <div>
-          <input id="playerName" value={stateOfGame.playerName} onChange={changePlayerName}/>
+          <input
+            id="playerName"
+            value={stateOfGame.playerName}
+            onChange={changePlayerName}
+          />
           <p>
             <span id="points">{stateOfGame.points}</span> points
           </p>
