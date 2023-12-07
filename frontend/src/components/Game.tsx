@@ -70,7 +70,7 @@ function Game({ props }: GameProps) {
         message: { category: "warning", content: "middleletter missing" },
       });
     } else {
-      setStateOfGame({...stateOfGame, guess: stateOfGame.input.join("")})
+      setStateOfGame({ ...stateOfGame, guess: stateOfGame.input.join("") });
     }
   }
 

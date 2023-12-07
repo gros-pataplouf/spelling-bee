@@ -20,7 +20,7 @@ export interface GameState {
   player2Name: string | null;
   player2GuessedWords: string[] | [] | null;
   player2Points: number | null;
-  guess?: string
+  guess?: string;
 }
 
 export interface GameProps {

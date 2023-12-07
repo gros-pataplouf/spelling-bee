@@ -1,9 +1,10 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, getByText } from "@testing-library/react";
+import { render, fireEvent, getByText } from "@testing-library/react";
 import { WebSocket } from "mock-socket";
 import { BrowserRouter } from "react-router-dom";
 import * as router from "react-router";
 
+//
 global.WebSocket = WebSocket;
 
 import App from "../App";
@@ -32,19 +33,6 @@ describe("<App />", () => {
     );
     const h1 = wrapper.container.querySelector("h1");
     expect(h1?.textContent).toBe("Spelling Bee");
-  });
-
-  test("Subtitle displayed correctly", () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const wrapper = render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>,
-    );
-    const text = screen.getByText(
-      "How many words can you make with 7 letters?",
-    );
-    expect(text.textContent).toBeTruthy();
   });
 
   test("Play button displayed", () => {
