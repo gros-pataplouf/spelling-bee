@@ -1,21 +1,22 @@
-import { CellProps } from "../types/types";
+import type React from 'react'
+import { type CellProps } from '../types/types'
 
-function Cell(props: CellProps): JSX.Element {
-  let sortOfLetter: string = "";
+function Cell (props: CellProps): React.JSX.Element {
+  let sortOfLetter: string = ''
   if (props.middleLetter) {
-    sortOfLetter = "middleLetter";
+    sortOfLetter = 'middleLetter'
   } else {
-    sortOfLetter = "otherLetter";
+    sortOfLetter = 'otherLetter'
   }
-  const { stateOfGame, setStateOfGame } = props;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function selectLetter(event: any) {
-    const svg = event.currentTarget as SVGElement;
-    const selectedLetter = svg.lastChild?.textContent as string;
+  const { stateOfGame, setStateOfGame } = props
+
+  function selectLetter (event: any) {
+    const svg = event.currentTarget as SVGElement
+    const selectedLetter = svg.lastChild?.textContent!
     setStateOfGame({
       ...stateOfGame,
-      input: [...stateOfGame.input, selectedLetter],
-    });
+      input: [...stateOfGame.input, selectedLetter]
+    })
   }
 
   return (
@@ -35,7 +36,7 @@ function Cell(props: CellProps): JSX.Element {
         {props.letter}
       </text>
     </svg>
-  );
+  )
 }
 
-export default Cell;
+export default Cell

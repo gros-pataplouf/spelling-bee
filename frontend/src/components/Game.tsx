@@ -1,94 +1,94 @@
-import { useEffect } from "react";
-import { BaseSyntheticEvent } from "react";
-import Cell from "./Cell";
-import { GameProps } from "../types/types";
+import type React from 'react'
 
-function Game({ props }: GameProps) {
-  const { stateOfGame, setStateOfGame } = props;
+import { useEffect, type BaseSyntheticEvent } from 'react'
+import Cell from './Cell'
+import { type GameProps } from '../types/types'
+
+function Game ({ props }: GameProps) {
+  const { stateOfGame, setStateOfGame } = props
 
   useEffect(() => {
     setStateOfGame({
       ...stateOfGame,
-      message: { category: null, content: null },
-    });
+      message: { category: null, content: null }
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateOfGame.input, stateOfGame.points]);
-  function handleChange(e: BaseSyntheticEvent) {
-    const inputEvent = e.nativeEvent as InputEvent;
+  }, [stateOfGame.input, stateOfGame.points])
+  function handleChange (e: BaseSyntheticEvent) {
+    const inputEvent = e.nativeEvent as InputEvent
     if (
       inputEvent.data &&
       stateOfGame.letters
-        .join("")
+        .join('')
         .toLowerCase()
         .includes(inputEvent.data.toLowerCase())
     ) {
       setStateOfGame({
         ...stateOfGame,
-        input: [...stateOfGame.input, inputEvent.data.toUpperCase()],
-      });
-    } else if (inputEvent.inputType === "deleteContentBackward") {
+        input: [...stateOfGame.input, inputEvent.data.toUpperCase()]
+      })
+    } else if (inputEvent.inputType === 'deleteContentBackward') {
       setStateOfGame({
         ...stateOfGame,
-        input: stateOfGame.input.slice(0, stateOfGame.input.length - 1),
-      });
+        input: stateOfGame.input.slice(0, stateOfGame.input.length - 1)
+      })
     }
   }
-  function deleteLetter() {
-    if (stateOfGame.input.length) {
+  function deleteLetter () {
+    if (stateOfGame.input.length > 0) {
       setStateOfGame({
         ...stateOfGame,
-        input: stateOfGame.input.slice(0, stateOfGame.input.length - 1),
-      });
+        input: stateOfGame.input.slice(0, stateOfGame.input.length - 1)
+      })
     }
   }
-  function shuffle() {
-    const otherLettersOld = stateOfGame.letters.slice(1, 7);
-    const otherLettersNew: string[] = [];
-    while (otherLettersOld.length) {
+  function shuffle () {
+    const otherLettersOld = stateOfGame.letters.slice(1, 7)
+    const otherLettersNew: string[] = []
+    while (otherLettersOld.length > 0) {
       const [removedLetter] = otherLettersOld.splice(
         Math.floor(Math.random() * otherLettersOld.length),
-        1,
-      );
-      otherLettersNew.push(removedLetter);
+        1
+      )
+      otherLettersNew.push(removedLetter)
     }
     setStateOfGame({
       ...stateOfGame,
-      letters: [stateOfGame.letters[0], ...otherLettersNew],
-    });
+      letters: [stateOfGame.letters[0], ...otherLettersNew]
+    })
   }
 
-  function submitWord() {
-    if (stateOfGame.input.join("").length < 4) {
+  function submitWord () {
+    if (stateOfGame.input.join('').length < 4) {
       setStateOfGame({
         ...stateOfGame,
-        message: { category: "warning", content: "too short" },
-      });
-      return;
-    } else if (!stateOfGame.input.join("").includes(stateOfGame.letters[0])) {
+        message: { category: 'warning', content: 'too short' }
+      })
+    } else if (!stateOfGame.input.join('').includes(stateOfGame.letters[0])) {
       setStateOfGame({
         ...stateOfGame,
-        message: { category: "warning", content: "middleletter missing" },
-      });
+        message: { category: 'warning', content: 'middleletter missing' }
+      })
     } else {
-      setStateOfGame({ ...stateOfGame, guess: stateOfGame.input.join("") });
+      setStateOfGame({ ...stateOfGame, guess: stateOfGame.input.join('') })
     }
   }
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.code == "Enter") {
-      submitWord();
+  function handleKeyDown (event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.code == 'Enter') {
+      submitWord()
     }
   }
 
-  function changePlayerName(event: React.BaseSyntheticEvent) {
-    setStateOfGame({ ...stateOfGame, playerName: event.target.value });
+  function changePlayerName (event: React.BaseSyntheticEvent) {
+    setStateOfGame({ ...stateOfGame, playerName: event.target.value })
   }
 
   return (
     <div className="flex flex-col items-center">
       {stateOfGame.success.points && (
         <p>
-          <span id="successMessage">{stateOfGame.success.success}</span>{" "}
+          <span id="successMessage">{stateOfGame.success.success}</span>{' '}
           <span id="successPoints">+{stateOfGame.success.points}</span>
         </p>
       )}
@@ -99,7 +99,7 @@ function Game({ props }: GameProps) {
         placeholder="Type or click"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        value={stateOfGame.input && stateOfGame.input.join("")}
+        value={stateOfGame.input && stateOfGame.input.join('')}
       />
       <p id="message">{stateOfGame.message.content}</p>
       <div id="hive" className="relative h-[33vh] w-full">
@@ -149,14 +149,14 @@ function Game({ props }: GameProps) {
           {stateOfGame.guessedWords.length && (
             <ul id="words">
               {stateOfGame.guessedWords.map((word) => {
-                return <li key={word}>{word}</li>;
+                return <li key={word}>{word}</li>
               })}
             </ul>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default Game;
+export default Game
