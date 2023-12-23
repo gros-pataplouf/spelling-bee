@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { GameState, PhaseOfGame } from "./types/types";
 import { v4 as uuidv4 } from "uuid";
 import { useLocalStorage } from "usehooks-ts";
+import { getQueryParam, isValidUuid } from "./helpers/helpers";
 import Game from "./components/Game";
 
 function App() {
+  const connection = useRef<WebSocket | null>(null);
   const initialStateOfGame: GameState = {
     gameId: null,
     gameTimeStamp: null,
@@ -28,45 +30,35 @@ function App() {
   const location = useLocation();
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:5000");
-    socket.onopen = () => socket.send(JSON.stringify(stateOfGame));
+    socket.onopen = () => {
+      if (connection.current) {
+       connection.current.send(JSON.stringify(stateOfGame));
+      }
+      }
+    socket.onmessage = (message) => {
+      if (connection.current) {
+        console.log(message.data)
+        console.log(JSON.parse(message.data))
+        setStateOfGame({...stateOfGame, ...JSON.parse(message.data)})
+      }
+    }
 
-    return () => socket.close();
-  }, [stateOfGame]);
+    connection.current = socket;
+
+    return () => {
+      if (connection.current) {
+        connection.current.close();
+      }
+    };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.playerName]);
   const [localStorage, setLocalStorage] = useLocalStorage("spellingBee", {
     gameId: "",
     playerId: "",
     timeStamp: 0,
   });
   const navigate = useNavigate();
-  function getQueryParam(
-    locationSearch: string,
-    keyWord: string,
-  ): string | null {
-    const cleanedLocationSearch = locationSearch
-      .replace("/", "")
-      .replace("?", "");
-    const parsedStringArray = cleanedLocationSearch.split("&");
-    const parsedDictArray = parsedStringArray.map((elt) => {
-      const key = elt.split("=")[0];
-      const value = elt.split("=")[1];
-      return { [key]: value };
-    });
-    const queryDict: { [index: string]: string | null } = { [keyWord]: null };
-    for (const item of parsedDictArray) {
-      const key = Object.keys(item)[0];
-      const value = Object.values(item)[0];
-      if (key === keyWord) {
-        queryDict[keyWord] = value;
-      }
-    }
-    return queryDict[keyWord];
-  }
-
-  function isValidUuid(uuid: string): boolean {
-    const uuidRegex =
-      /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
-    return uuidRegex.test(uuid);
-  }
 
   function showGame() {
     let gameId: string;

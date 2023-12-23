@@ -19,7 +19,7 @@ describe("<Game/>", () => {
   beforeEach(() => {
     clientMessages = [];
   });
-  test("the frontend renders random letters from the websocket servers into the polygons", async () => {
+  test("the frontend renders letters from the websocket servers into the polygons", async () => {
     const game = render(
       <BrowserRouter>
         <App />
@@ -32,7 +32,7 @@ describe("<Game/>", () => {
         bubbles: true,
       }),
     );
-    websocketServer.emit("message", JSON.stringify({ letters: "ABCDEFG" }));
+    websocketServer.emit("message", JSON.stringify({ letters: Array.from("ABCDEFG") }));
     await waitFor(() =>
       expect(game.container.querySelector("text")?.textContent).toBe("A"),
     );
@@ -56,7 +56,7 @@ describe("<Game/>", () => {
       }),
     );
 
-    websocketServer.emit("message", JSON.stringify({ warning: "not a word" }));
+    websocketServer.emit("message", JSON.stringify({ message: {category: "warning", content: "not a word"} }));
     return waitFor(async () => {
       expect(game.container.querySelector("#message")).toHaveTextContent(
         "not a word",
@@ -100,7 +100,7 @@ describe("<Game/>", () => {
     );
     websocketServer.emit(
       "message",
-      JSON.stringify({ words: ["POCKET", "POKE"] }),
+      JSON.stringify({ guessedWords: ["POCKET", "POKE"] }),
     );
     return waitFor(async () => {
       expect(game.container.querySelectorAll("#words>li").length).toBe(2);
@@ -121,7 +121,7 @@ describe("<Game/>", () => {
     );
     websocketServer.emit(
       "message",
-      JSON.stringify({ points: 3, success: "Excellent!" }),
+      JSON.stringify({ success: {points: 3, success: "Excellent!"} }),
     );
     return waitFor(async () => {
       expect(game.container.querySelector("#successMessage")).toHaveTextContent(
