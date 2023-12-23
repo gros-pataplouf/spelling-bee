@@ -1,5 +1,6 @@
 import type React from 'react'
 import { type CellProps } from '../types/types'
+import { type BaseSyntheticEvent } from 'react'
 
 function Cell (props: CellProps): React.JSX.Element {
   let sortOfLetter: string = ''
@@ -10,13 +11,17 @@ function Cell (props: CellProps): React.JSX.Element {
   }
   const { stateOfGame, setStateOfGame } = props
 
-  function selectLetter (event: any) {
+  function selectLetter (event: BaseSyntheticEvent): void {
     const svg = event.currentTarget as SVGElement
-    const selectedLetter = svg.lastChild?.textContent!
-    setStateOfGame({
-      ...stateOfGame,
-      input: [...stateOfGame.input, selectedLetter]
-    })
+    if (svg.lastChild?.textContent !== null) {
+      const selectedLetter = svg.lastChild?.textContent
+      if (selectedLetter !== undefined) {
+        setStateOfGame({
+          ...stateOfGame,
+          input: [...stateOfGame.input, selectedLetter]
+        })
+      }
+    }
   }
 
   return (

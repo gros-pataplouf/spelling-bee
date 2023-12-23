@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef } from 'react'
+import type React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { type GameState, PhaseOfGame } from './types/types'
+import { PhaseOfGame, type GameState } from './types/types'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from 'usehooks-ts'
 import { getQueryParam, isValidUuid } from './helpers/helpers'
 import Game from './components/Game'
 
-function App () {
+function App (): React.JSX.Element {
   const connection = useRef<WebSocket | null>(null)
   const initialStateOfGame: GameState = {
     gameId: null,
@@ -31,27 +32,24 @@ function App () {
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:5000')
     socket.onopen = () => {
-      if (connection.current) {
+      if (connection.current !== null) {
         connection.current.send(JSON.stringify(stateOfGame))
       }
     }
     socket.onmessage = (message) => {
-      if (connection.current) {
-        console.log(message.data)
-        console.log(JSON.parse(message.data))
-        setStateOfGame({ ...stateOfGame, ...JSON.parse(message.data) })
+      if (connection.current !== null) {
+        const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
+        setStateOfGame(newState)
       }
     }
 
     connection.current = socket
 
     return () => {
-      if (connection.current) {
+      if (connection.current !== null) {
         connection.current.close()
       }
     }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.playerName])
   const [localStorage, setLocalStorage] = useLocalStorage('spellingBee', {
     gameId: '',
@@ -60,7 +58,7 @@ function App () {
   })
   const navigate = useNavigate()
 
-  function showGame () {
+  function showGame (): void {
     let gameId: string
     let playerId: string
     let timeStamp: number
@@ -75,7 +73,7 @@ function App () {
     /// / if > 24h : reset timestamp, gameid, playerid
     /// / elseif < 24h: use gameid, and playerid to communicate with server
 
-    if (gameQueryParam && isValidUuid(gameQueryParam)) {
+    if (gameQueryParam !== null && isValidUuid(gameQueryParam)) {
       if (localStorage.gameId === gameQueryParam) {
         console.log('gameId from localStrorage matches queryParam')
         if (localStorage.timeStamp + 24 * 60 * 60 * 1000 > Date.now()) {
@@ -101,8 +99,8 @@ function App () {
     } else {
       console.log('there is no query param or it is not a valid uuid')
       if (
-        localStorage.gameId &&
-        localStorage.playerId &&
+        localStorage.gameId !== '' &&
+        localStorage.playerId !== '' &&
         localStorage.timeStamp + 24 * 60 * 60 * 1000 > Date.now()
       ) {
         gameId = localStorage.gameId

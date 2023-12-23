@@ -97,8 +97,8 @@ describe('<Game/>', () => {
       game.container.querySelectorAll('#hive>svg>text')[
         Math.floor(Math.random() * 7)
       ]
-    let inputField = game.container.querySelector('input')!
-    const valueBefore = inputField.value || ''
+    let inputField = game.container.querySelector('input')
+    const valueBefore = inputField?.value ?? ''
 
     fireEvent(
       randomLetter,
@@ -106,7 +106,7 @@ describe('<Game/>', () => {
         bubbles: true
       })
     )
-    inputField = game.container.querySelector('input')!
+    inputField = game.container.querySelector('input')
     const valueAfter = randomLetter.textContent + valueBefore
     expect(inputField).toHaveAttribute('value', valueAfter)
   })
@@ -150,7 +150,10 @@ describe('<Game/>', () => {
     )
     const shuffleButton = game.container.querySelector(
       '#shuffle'
-    )!
+    )
+    if (shuffleButton === null) {
+      throw new Error()
+    }
     expect(shuffleButton).toBeInTheDocument()
     const letterArrayBefore = Array.from(
       game.container.querySelectorAll('#hive>svg>text')
@@ -181,11 +184,18 @@ describe('<Game/>', () => {
 
     const inputForm = game.container.querySelector(
       'input#input'
-    )!
+    )
+    if (inputForm === null) {
+      throw new Error('inputForm is null')
+    }
     await userEvent.type(inputForm, 'SOIL')
     const deleteButton = game.container.querySelector(
       'button#delete'
-    )!
+    )
+    if (deleteButton === null) {
+      throw new Error('deleteButton is null')
+    }
+
     await userEvent.click(deleteButton)
     expect(inputForm).toHaveAttribute('value', 'SOI')
   })
@@ -196,7 +206,10 @@ describe('<Game/>', () => {
         <App />
       </BrowserRouter>
     )
-    const button = game.container.querySelector('button') as HTMLElement
+    const button = game.container.querySelector('button')
+    if (button === null) {
+      throw new Error('play button not present')
+    }
     fireEvent(
       getByText(button, 'Play'),
       new MouseEvent('click', {
@@ -206,10 +219,13 @@ describe('<Game/>', () => {
 
     const enterButton = game.container.querySelector(
       'button#enter'
-    )!
+    )
     const inputForm = game.container.querySelector(
       'input#input'
-    )!
+    )
+    if (inputForm === null || enterButton === null) {
+      throw new Error('inputform or enter button is null')
+    }
     await userEvent.click(inputForm)
     await userEvent.type(inputForm, 'SIT')
     await userEvent.click(enterButton)
@@ -232,10 +248,14 @@ describe('<Game/>', () => {
 
     const enterButton = game.container.querySelector(
       'button#enter'
-    )!
+    )
     const inputForm = game.container.querySelector(
       'input#input'
-    )!
+    )
+    if (enterButton === null || inputForm === null) {
+      throw new Error('enterButton or inputForm is null')
+    }
+
     await userEvent.click(inputForm)
     await userEvent.type(inputForm, 'SIT')
     await userEvent.click(enterButton)
@@ -277,11 +297,15 @@ describe('<Game/>', () => {
         bubbles: true
       })
     )
+    const playerField = game.container.querySelector('input#playerName')
+    if (playerField === null) {
+      throw new Error('playerField not present')
+    }
     await userEvent.click(
-      game.container.querySelector('input#playerName')!
+      playerField
     )
     await userEvent.type(
-      game.container.querySelector('input#playerName')!,
+      playerField,
       '{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}Pataplouf'
     )
     await waitFor(async () => {

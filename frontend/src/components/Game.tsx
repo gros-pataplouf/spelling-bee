@@ -4,7 +4,7 @@ import { useEffect, type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import { type GameProps } from '../types/types'
 
-function Game ({ props }: GameProps) {
+function Game ({ props }: GameProps): React.JSX.Element {
   const { stateOfGame, setStateOfGame } = props
 
   useEffect(() => {
@@ -12,12 +12,12 @@ function Game ({ props }: GameProps) {
       ...stateOfGame,
       message: { category: null, content: null }
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateOfGame.input, stateOfGame.points])
-  function handleChange (e: BaseSyntheticEvent) {
+  function handleChange (e: BaseSyntheticEvent): void {
     const inputEvent = e.nativeEvent as InputEvent
     if (
-      inputEvent.data &&
+      inputEvent.data !== null &&
+      stateOfGame.letters.length > 0 &&
       stateOfGame.letters
         .join('')
         .toLowerCase()
@@ -34,7 +34,7 @@ function Game ({ props }: GameProps) {
       })
     }
   }
-  function deleteLetter () {
+  function deleteLetter (): void {
     if (stateOfGame.input.length > 0) {
       setStateOfGame({
         ...stateOfGame,
@@ -42,7 +42,7 @@ function Game ({ props }: GameProps) {
       })
     }
   }
-  function shuffle () {
+  function shuffle (): void {
     const otherLettersOld = stateOfGame.letters.slice(1, 7)
     const otherLettersNew: string[] = []
     while (otherLettersOld.length > 0) {
@@ -58,7 +58,7 @@ function Game ({ props }: GameProps) {
     })
   }
 
-  function submitWord () {
+  function submitWord (): void {
     if (stateOfGame.input.join('').length < 4) {
       setStateOfGame({
         ...stateOfGame,
@@ -74,19 +74,19 @@ function Game ({ props }: GameProps) {
     }
   }
 
-  function handleKeyDown (event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.code == 'Enter') {
+  function handleKeyDown (event: React.KeyboardEvent<HTMLInputElement>): void {
+    if (event.code === 'Enter') {
       submitWord()
     }
   }
 
-  function changePlayerName (event: React.BaseSyntheticEvent) {
+  function changePlayerName (event: React.BaseSyntheticEvent): void {
     setStateOfGame({ ...stateOfGame, playerName: event.target.value })
   }
 
   return (
     <div className="flex flex-col items-center">
-      {stateOfGame.success.points && (
+      {stateOfGame.success.points !== null && (
         <p>
           <span id="successMessage">{stateOfGame.success.success}</span>{' '}
           <span id="successPoints">+{stateOfGame.success.points}</span>
@@ -99,7 +99,7 @@ function Game ({ props }: GameProps) {
         placeholder="Type or click"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        value={stateOfGame.input && stateOfGame.input.join('')}
+        value={stateOfGame?.input.join('')}
       />
       <p id="message">{stateOfGame.message.content}</p>
       <div id="hive" className="relative h-[33vh] w-full">
@@ -146,7 +146,7 @@ function Game ({ props }: GameProps) {
           <p>
             <span id="points">{stateOfGame.points}</span> points
           </p>
-          {stateOfGame.guessedWords.length && (
+          {stateOfGame.guessedWords?.length > 0 && (
             <ul id="words">
               {stateOfGame.guessedWords.map((word) => {
                 return <li key={word}>{word}</li>

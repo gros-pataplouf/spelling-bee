@@ -78,7 +78,7 @@ describe('<Game/>', () => {
     )
     websocketServer.emit('message', JSON.stringify({ points: 3 }))
     await waitFor(async () => {
-      await expect(game.container.querySelector('#points')).toHaveTextContent(
+      expect(game.container.querySelector('#points')).toHaveTextContent(
         '3'
       )
     })
