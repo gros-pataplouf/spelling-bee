@@ -3,10 +3,10 @@ import { render, fireEvent, waitFor, getByText } from '@testing-library/react'
 import { Server, WebSocket } from 'mock-socket'
 import { type GameState } from '../types/types'
 import { BrowserRouter } from 'react-router-dom'
-
 import App from '../App'
+
 global.WebSocket = WebSocket
-const websocketServer = new Server('ws://localhost:5000')
+const websocketServer = new Server('ws://localhost:8000')
 let clientMessages: GameState[] = []
 websocketServer.on('connection', (socket) => {
   socket.on('message', (message) => {

@@ -13,7 +13,7 @@ import { BrowserRouter } from 'react-router-dom'
 
 import App from '../App'
 global.WebSocket = WebSocket
-const websocketServer = new Server('ws://localhost:5000')
+const websocketServer = new Server('ws://localhost:8000')
 let clientMessages: GameState[] = []
 websocketServer.on('connection', (socket) => {
   socket.on(
@@ -32,7 +32,7 @@ describe('<Game/>', () => {
     clientMessages = []
   })
 
-  test('Pressing the enter button sends the >= 4 letter value of the input field to ws://localhost:5000', async () => {
+  test('Pressing the enter button sends the >= 4 letter value of the input field to ws://localhost:8000', async () => {
     const game = render(
       <BrowserRouter>
         <App />

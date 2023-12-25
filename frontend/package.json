@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "REACT_ENV='dev' vite",
+    "build": "REACT_ENV='' tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "REACT_ENV='test' vitest",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {

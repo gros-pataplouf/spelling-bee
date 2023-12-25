@@ -30,24 +30,29 @@ function App (): React.JSX.Element {
   const [stateOfGame, setStateOfGame] = useState(initialStateOfGame)
   const location = useLocation()
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:5000')
-    socket.onopen = () => {
-      if (connection.current !== null) {
-        connection.current.send(JSON.stringify(stateOfGame))
+    if (stateOfGame?.gameId !== null) {
+      let socket
+      if (import.meta.env.REACT_ENV === 'test') {
+        socket = new WebSocket('ws://localhost:8000')
+      } else {
+        socket = new WebSocket(`ws://localhost:8000/${stateOfGame.gameId}`)
       }
-    }
-    socket.onmessage = (message) => {
-      if (connection.current !== null) {
-        const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
-        setStateOfGame(newState)
+      socket.onopen = () => {
+        if (connection.current !== null) {
+          connection.current.send(JSON.stringify(stateOfGame))
+        }
       }
-    }
-
-    connection.current = socket
-
-    return () => {
-      if (connection.current !== null) {
-        connection.current.close()
+      socket.onmessage = (message) => {
+        if (connection.current !== null) {
+          const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
+          setStateOfGame(newState)
+        }
+      }
+      connection.current = socket
+      return () => {
+        if (connection.current !== null) {
+          connection.current.close()
+        }
       }
     }
   }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.playerName])
@@ -114,7 +119,7 @@ function App (): React.JSX.Element {
         timeStamp = Date.now()
       }
     }
-    navigate(`?game=${gameId}`)
+    navigate(`/${gameId}`)
     setStateOfGame({
       ...stateOfGame,
       phaseOfGame: PhaseOfGame.playing,
