@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { PhaseOfGame, type GameState } from './types/types'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalStorage } from 'usehooks-ts'
-import { getQueryParam, isValidUuid } from './helpers/helpers'
+import { isValidUuid } from './helpers/helpers'
 import Game from './components/Game'
 
 function App (): React.JSX.Element {
@@ -68,7 +68,9 @@ function App (): React.JSX.Element {
     let playerId: string
     let timeStamp: number
 
-    const gameQueryParam = getQueryParam(location.search, 'game')
+    const gamePath = location.pathname.slice(1)
+    console.log(gamePath)
+
     // if there is a search string with game id, look into local storage
     /// / if it exists in local storage, check the timestamp
     /// /// if timestamp less than 24h, use data from local storage and send to server
@@ -78,8 +80,8 @@ function App (): React.JSX.Element {
     /// / if > 24h : reset timestamp, gameid, playerid
     /// / elseif < 24h: use gameid, and playerid to communicate with server
 
-    if (gameQueryParam !== null && isValidUuid(gameQueryParam)) {
-      if (localStorage.gameId === gameQueryParam) {
+    if (gamePath !== null && isValidUuid(gamePath)) {
+      if (localStorage.gameId === gamePath) {
         console.log('gameId from localStrorage matches queryParam')
         if (localStorage.timeStamp + 24 * 60 * 60 * 1000 > Date.now()) {
           console.log('timestamp is less than one day')
@@ -95,9 +97,9 @@ function App (): React.JSX.Element {
       } else {
         console.log(
           'the valid uuid does not match gameId from local storage ',
-          gameQueryParam
+          gamePath
         )
-        gameId = gameQueryParam
+        gameId = gamePath
         playerId = uuidv4()
         timeStamp = Date.now()
       }
