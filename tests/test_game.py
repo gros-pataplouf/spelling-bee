@@ -37,7 +37,6 @@ def test_player_starts_empty_wordlist(player):
 def test_game_has_valid_uuid(game):
     assert is_valid_uuid(str(game.uuid))
 
-
 def test_invalid_game_uuid_raises_ValueError():
     with pytest.raises(ValueError):
         Game("invalid-uuid")
@@ -48,15 +47,13 @@ def test_game_has_random_letterset(game):
     with open(f"{Path.cwd()}/game/lettersets.json", "r", encoding="utf-8") as f:
         lettersets =  json.load(f)
         letterset = list(lettersets[random.randint(0,len(lettersets)-1)])
-
     assert game.letterset == letterset
 
-    # assert game.letterset
-#initializing the game
+def test_player_can_join_game(game, player):
+    game.add_players(player)
+    assert game.players == [player]
 
-#a game has a game id, which is a valid uuid
-# a game cannot have an invalid uuid
-# an initialized game has a random letterset
+
 # 
 # a game has up to two players; a 3rd player joining will be rejected
 # the player name must be unique

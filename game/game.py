@@ -34,6 +34,7 @@ class Game:
     def __init__(self, uuid=None) -> None:
          self.__uuid = uuid4() if not uuid else self.validate_uuid(uuid)
          self.__letterset = self.get_letterset()
+         self.__players = []
     
     @property
     def uuid(self):
@@ -41,6 +42,9 @@ class Game:
     @property
     def letterset(self):
         return self.__letterset
+    @property
+    def players(self):
+        return self.__players
     
     def get_letterset(self):
         letterset = []
@@ -54,11 +58,12 @@ class Game:
             letterset = list(lettersets[random.randint(0,len(lettersets)-1)])
         return letterset
         
-
     def validate_uuid(self, input):
         uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
         if not uuid_regex.match(str(input)):
             raise ValueError
         else:
             return input
+    def add_players(self, player):
+        self.__players.append(player)
 
