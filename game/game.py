@@ -2,6 +2,12 @@ import re, random, json, sys
 from uuid import uuid4
 from pathlib import Path
 
+class UniqueException(Exception):
+    def __init__(self, message: str) -> None:
+        super().__init__()
+        self.message = message
+        
+
 class Player:
     def __init__(self, name, uuid) -> None:
         self.__name = name
@@ -65,5 +71,8 @@ class Game:
         else:
             return input
     def add_players(self, player):
+        print(player.name, self.__players)
+        if list(filter(lambda x: x.name == player.name, self.__players)):
+            raise UniqueException("Player name must be unique.") 
         self.__players.append(player)
 

@@ -1,8 +1,7 @@
 import pytest, re, random, json
 from pathlib import Path
 from uuid import uuid4
-from game.game import Game, Player
-
+from game.game import Game, Player, UniqueException
 
 def is_valid_uuid(input):
     uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
@@ -53,6 +52,11 @@ def test_player_can_join_game(game, player):
     game.add_players(player)
     assert game.players == [player]
 
+def test_player_name_unique(game, player):
+    game.add_players(player)
+    next_player = Player(player.name, uuid4())
+    with pytest.raises(UniqueException):
+        game.add_players(next_player)
 
 # 
 # a game has up to two players; a 3rd player joining will be rejected
