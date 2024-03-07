@@ -1,4 +1,5 @@
-import pytest, re
+import pytest, re, random, json
+from pathlib import Path
 from uuid import uuid4
 from game.game import Game, Player
 
@@ -41,13 +42,21 @@ def test_invalid_game_uuid_raises_ValueError():
     with pytest.raises(ValueError):
         Game("invalid-uuid")
 
+def test_game_has_random_letterset(game):
+    random.seed(3)
+    letterset = []
+    with open(f"{Path.cwd()}/game/lettersets.json", "r", encoding="utf-8") as f:
+        lettersets =  json.load(f)
+        letterset = list(lettersets[random.randint(0,len(lettersets)-1)])
 
+    assert game.letterset == letterset
+
+    # assert game.letterset
 #initializing the game
 
 #a game has a game id, which is a valid uuid
 # a game cannot have an invalid uuid
 # an initialized game has a random letterset
-# a game starts with zero points for each player
 # 
 # a game has up to two players; a 3rd player joining will be rejected
 # the player name must be unique
