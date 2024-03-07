@@ -21,6 +21,8 @@ def test_player_has_valid_uuid(player):
 def test_player_starts_with_0_points(player):
     assert player.points == 0
 
+def test_player_starts_empty_wordlist(player):
+    assert player.guessed_words == []
 
 
 
