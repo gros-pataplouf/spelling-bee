@@ -12,22 +12,22 @@ def is_valid_uuid(input):
 def player():
     return Player("Plouf", uuid4())
 
-
-
 def test_player_has_name(player):
     assert player.name == "Plouf"
 
 def test_player_has_valid_uuid(player):
-    print(player.__dict__)
     assert is_valid_uuid(str(player.uuid))
 
+def test_player_starts_with_0_points(player):
+    assert player.points == 0
 
 
 
-# initializing the players 
-# a player has a name
-# a player has a uuid as an id
-# a points, which start with 0
+
+# initializing the players OK
+# a player has a name OK
+# a player has a uuid as an id OK
+# a points, which start with 0 
 # a list of guessed words, which starts empty
 # a current level ?
 
