@@ -57,6 +57,17 @@ def test_player_name_unique(game, player):
     next_player = Player(player.name, uuid4())
     with pytest.raises(UniqueException):
         game.add_players(next_player)
+    assert len(game.players) == 1
+
+def test_player_must_join_before_guessing(game):
+    #print(game.letterset) #['a', 'e', 'l', 'm', 's', 't', 'x'] with random.seed(3)
+    new_player = Player("Brian", uuid4())
+    with pytest.raises(Exception):
+        result = game.guess(new_player, "test")
+
+
+
+
 
 # 
 # a game has up to two players; a 3rd player joining will be rejected

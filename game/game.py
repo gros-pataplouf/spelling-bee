@@ -70,9 +70,16 @@ class Game:
             raise ValueError
         else:
             return input
+        
     def add_players(self, player):
         print(player.name, self.__players)
         if list(filter(lambda x: x.name == player.name, self.__players)):
             raise UniqueException("Player name must be unique.") 
         self.__players.append(player)
+    
+    def guess(self, player, solution):
+        if player not in self.__players:
+            raise Exception("Player must join game before guessing.")
+        
+
 
