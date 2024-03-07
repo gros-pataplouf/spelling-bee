@@ -77,8 +77,9 @@ class Game:
             raise UniqueException("Player name must be unique.") 
         self.__players.append(player)
     
-    def guess(self, player, solution):
-        if player not in self.__players:
+    def guess(self, player_uuid, solution):
+        player = list(filter(lambda p: p.uuid == player_uuid, self.__players))
+        if not player:
             raise Exception("Player must join game before guessing.")
         return False
         
