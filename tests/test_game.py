@@ -12,6 +12,10 @@ def is_valid_uuid(input):
 def player():
     return Player("Plouf", uuid4())
 
+@pytest.fixture
+def game():
+    return Game()
+
 def test_player_has_name(player):
     assert player.name == "Plouf"
 
@@ -21,8 +25,7 @@ def test_player_has_valid_uuid(player):
 
 def test_player_cannot_have_invalid_uuid():
     with pytest.raises(ValueError):
-        my_player = Player("Blabla", "invalid-uuid")
-
+        Player("Blabla", "invalid-uuid")
 
 def test_player_starts_with_0_points(player):
     assert player.points == 0
@@ -30,9 +33,9 @@ def test_player_starts_with_0_points(player):
 def test_player_starts_empty_wordlist(player):
     assert player.guessed_words == []
 
+def test_game_has_valid_uuid(game):
+    assert is_valid_uuid(str(game.uuid))
 
-def test_game_has_valid_uuid():
-    pass
 
 
 #initializing the game

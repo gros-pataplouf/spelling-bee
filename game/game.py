@@ -1,18 +1,10 @@
 import re
 from uuid import uuid4
 
-def validate_uuid(input):
-    uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
-    if not uuid_regex.match(str(input)):
-        raise ValueError
-    else:
-        return input
-
-
 class Player:
     def __init__(self, name, uuid) -> None:
         self.__name = name
-        self.__uuid = validate_uuid(uuid)
+        self.__uuid = self.validate_uuid(uuid)
         self.__points = 0
         self.__guessed_words = []
     @property
@@ -27,8 +19,19 @@ class Player:
     @property
     def guessed_words(self):
         return self.__guessed_words
-
+    
+    def validate_uuid(self, input):
+        uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+        if not uuid_regex.match(str(input)):
+            raise ValueError
+        else:
+            return input
 
 
 class Game:
-    pass
+    def __init__(self, uuid=None) -> None:
+         self.__uuid = uuid4() if not uuid else uuid
+    
+    @property
+    def uuid(self):
+        return self.__uuid
