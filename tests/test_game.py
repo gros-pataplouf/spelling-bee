@@ -63,9 +63,12 @@ def test_player_must_join_before_guessing(game):
     #print(game.letterset) #['a', 'e', 'l', 'm', 's', 't', 'x'] with random.seed(3)
     new_player = Player("Brian", uuid4())
     with pytest.raises(Exception):
-        result = game.guess(new_player, "test")
+        game.guess(new_player, "test")
 
-
+def test_player_receives_false_result_for_wrong_solution(game, player):
+    game.add_players(player)
+    result = game.guess(player, "aelms")
+    assert result == False
 
 
 

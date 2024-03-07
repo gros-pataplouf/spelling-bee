@@ -80,6 +80,7 @@ class Game:
     def guess(self, player, solution):
         if player not in self.__players:
             raise Exception("Player must join game before guessing.")
+        return False
         
 
 
