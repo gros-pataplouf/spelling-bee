@@ -1,10 +1,27 @@
-import pytest
+import pytest, re
+from uuid import uuid4
 from game.game import Game, Player
 
 
-def test_player_has_name():
-    player = Player("Plouf")
+def is_valid_uuid(input):
+    uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+    return uuid_regex.match(input)
+
+
+@pytest.fixture
+def player():
+    return Player("Plouf", uuid4())
+
+
+
+def test_player_has_name(player):
     assert player.name == "Plouf"
+
+def test_player_has_valid_uuid(player):
+    print(player.__dict__)
+    assert is_valid_uuid(str(player.uuid))
+
+
 
 
 # initializing the players 
