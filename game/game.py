@@ -30,8 +30,16 @@ class Player:
 
 class Game:
     def __init__(self, uuid=None) -> None:
-         self.__uuid = uuid4() if not uuid else uuid
+         self.__uuid = uuid4() if not uuid else self.validate_uuid(uuid)
     
     @property
     def uuid(self):
         return self.__uuid
+    
+    def validate_uuid(self, input):
+        uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+        if not uuid_regex.match(str(input)):
+            raise ValueError
+        else:
+            return input
+

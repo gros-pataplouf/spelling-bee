@@ -37,6 +37,10 @@ def test_game_has_valid_uuid(game):
     assert is_valid_uuid(str(game.uuid))
 
 
+def test_invalid_game_uuid_raises_ValueError():
+    with pytest.raises(ValueError):
+        Game("invalid-uuid")
+
 
 #initializing the game
 
