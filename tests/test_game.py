@@ -15,8 +15,14 @@ def player():
 def test_player_has_name(player):
     assert player.name == "Plouf"
 
+
 def test_player_has_valid_uuid(player):
     assert is_valid_uuid(str(player.uuid))
+
+def test_player_cannot_have_invalid_uuid():
+    with pytest.raises(ValueError):
+        my_player = Player("Blabla", "invalid-uuid")
+
 
 def test_player_starts_with_0_points(player):
     assert player.points == 0
@@ -25,13 +31,8 @@ def test_player_starts_empty_wordlist(player):
     assert player.guessed_words == []
 
 
-
-# initializing the players OK
-# a player has a name OK
-# a player has a uuid as an id OK
-# a points, which start with 0 
-# a list of guessed words, which starts empty
-# a current level ?
+def test_game_has_valid_uuid():
+    pass
 
 
 #initializing the game
