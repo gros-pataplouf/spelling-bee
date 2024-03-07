@@ -1,18 +1,10 @@
 import type React from 'react'
-
-import { useEffect, type BaseSyntheticEvent } from 'react'
+import { type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import { type GameProps } from '../types/types'
 
 function Game ({ props }: GameProps): React.JSX.Element {
   const { stateOfGame, setStateOfGame } = props
-
-  useEffect(() => {
-    setStateOfGame({
-      ...stateOfGame,
-      message: { category: null, content: null }
-    })
-  }, [stateOfGame.input, stateOfGame.points])
   function handleChange (e: BaseSyntheticEvent): void {
     const inputEvent = e.nativeEvent as InputEvent
     if (
@@ -86,7 +78,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
 
   return (
     <div className="flex flex-col items-center">
-      {stateOfGame.success.points !== null && (
+      {(stateOfGame.success?.points !== null && stateOfGame.success?.points > 0) ?? (
         <p>
           <span id="successMessage">{stateOfGame.success.success}</span>{' '}
           <span id="successPoints">+{stateOfGame.success.points}</span>
@@ -99,9 +91,9 @@ function Game ({ props }: GameProps): React.JSX.Element {
         placeholder="Type or click"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        value={stateOfGame?.input.join('')}
+        value={stateOfGame?.input?.join('')}
       />
-      <p id="message">{stateOfGame.message.content}</p>
+      <p id="message">{stateOfGame.message?.content}</p>
       <div id="hive" className="relative h-[33vh] w-full">
         {stateOfGame.letters.map((letter: string) => (
           <Cell
@@ -147,9 +139,9 @@ function Game ({ props }: GameProps): React.JSX.Element {
             <span id="points">{stateOfGame.points}</span> points
           </p>
           {stateOfGame.guessedWords?.length > 0 && (
-            <ul id="words">
+            <ul id="words" className="flex flex-wrap space-x-3 max-w-screen">
               {stateOfGame.guessedWords.map((word) => {
-                return <li key={word}>{word}</li>
+                return <li key={word}>{word} </li>
               })}
             </ul>
           )}

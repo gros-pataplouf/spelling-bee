@@ -32,5 +32,7 @@ module.exports = {
         
     ],
     "rules": {
-    }
+    },
+    "settings": { "react": { "version": '18.2' } }
+
 }

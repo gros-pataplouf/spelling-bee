@@ -16,10 +16,17 @@ function Cell (props: CellProps): React.JSX.Element {
     if (svg.lastChild?.textContent !== null) {
       const selectedLetter = svg.lastChild?.textContent
       if (selectedLetter !== undefined) {
-        setStateOfGame({
-          ...stateOfGame,
-          input: [...stateOfGame.input, selectedLetter]
-        })
+        if (stateOfGame.input?.length > 0) {
+          setStateOfGame({
+            ...stateOfGame,
+            input: [...stateOfGame.input, selectedLetter]
+          })
+        } else {
+          setStateOfGame({
+            ...stateOfGame,
+            input: [selectedLetter]
+          })
+        }
       }
     }
   }

@@ -29,13 +29,15 @@ function App (): React.JSX.Element {
   }
   const [stateOfGame, setStateOfGame] = useState(initialStateOfGame)
   const location = useLocation()
+
   useEffect(() => {
     if (stateOfGame?.gameId !== null) {
       let socket
       if (import.meta.env.REACT_ENV === 'test') {
         socket = new WebSocket('ws://localhost:8000')
       } else {
-        socket = new WebSocket(`ws://localhost:8000/${stateOfGame.gameId}`)
+        console.log(stateOfGame)
+        socket = new WebSocket(`ws://localhost:8000/${window.location.pathname.replace('/', '')}`)
       }
       socket.onopen = () => {
         if (connection.current !== null) {
@@ -43,9 +45,14 @@ function App (): React.JSX.Element {
         }
       }
       socket.onmessage = (message) => {
+        console.log(message.data)
         if (connection.current !== null) {
           const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
+          console.log('new state', newState)
           setStateOfGame(newState)
+          setTimeout(() => {
+            setStateOfGame({ ...newState, message: { category: null, content: null } })
+          }, 1200)
         }
       }
       connection.current = socket
@@ -136,7 +143,7 @@ function App (): React.JSX.Element {
     })
   }
   return (
-    <div className="bg-yellow-200 h-screen flex flex-col justify-center items-center">
+    <div className="bg-yellow-500 h-screen flex flex-col justify-center items-center">
       <h1 className="font-semibold text-center pb-6">Spelling Bee</h1>
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome
         ? (
