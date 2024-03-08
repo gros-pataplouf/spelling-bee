@@ -73,6 +73,10 @@ def test_player_receives_false_result_for_wrong_solution(game, player):
 def test_correct_guess_returns_true(game, player):
     game.add_players(player)
 
+def test_game_has_solutions(game):
+    for solution in game.solutions:
+        assert set(solution).issubset(set(game.letterset))
+        assert game.letterset[0] in solution
 
 
 

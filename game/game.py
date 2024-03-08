@@ -41,6 +41,7 @@ class Game:
          self.__uuid = uuid4() if not uuid else self.validate_uuid(uuid)
          self.__letterset = self.get_letterset()
          self.__players = []
+         self.__solutions = self.get_solutions(self.__letterset)
     
     @property
     def uuid(self):
@@ -51,10 +52,12 @@ class Game:
     @property
     def players(self):
         return self.__players
+    @property
+    def solutions(self):
+        return self.__solutions
     
     def get_letterset(self):
         letterset = []
-
         with open(f"{Path.cwd()}/game/lettersets.json", "r", encoding="utf-8") as f:
             lettersets =  json.load(f)
             print(sys.argv[0])
@@ -63,6 +66,14 @@ class Game:
                 random.seed(3)
             letterset = list(lettersets[random.randint(0,len(lettersets)-1)])
         return letterset
+
+    def get_solutions(self, letterset):
+        with open(f"{Path.cwd()}//game/solutions.json", "r", encoding="utf-8") as s:
+            all_solutions = json.load(s)
+            solutions = list(filter(lambda word: set(word).issubset(set(letterset)), all_solutions))
+            solutions_with_middleletter = list(filter(lambda word: letterset[0] in word, solutions))
+            return solutions_with_middleletter
+
         
     def validate_uuid(self, input):
         uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
