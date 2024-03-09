@@ -44,7 +44,7 @@ def test_game_has_random_letterset(game):
     letterset = []
     with open(f"{Path.cwd()}/game/lettersets.json", "r", encoding="utf-8") as f:
         lettersets =  json.load(f)
-        letterset = list(lettersets[random.randint(0,len(lettersets)-1)])
+        letterset = [letter.upper() for letter in list(lettersets[random.randint(0,len(lettersets)-1)])]
     assert game.letterset == letterset
 
 def test_player_can_join_game(game, player):
@@ -56,7 +56,6 @@ def test_max_2_players_in_game(game, player):
     game.add_player(Player("Second", uuid4()))
     with pytest.raises(Exception):
         game.add_player(Player("Third", uuid4()))
-
 
 def test_player_name_unique(game, player):
     game.add_player(player)

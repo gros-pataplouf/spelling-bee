@@ -64,12 +64,12 @@ class Game:
             lettersets =  json.load(f)
             if 'pytest' in sys.argv[0]:
                 random.seed(3)
-            letterset = list(lettersets[random.randint(0,len(lettersets)-1)])
+            letterset = list((lettersets[random.randint(0,len(lettersets)-1)]).upper())
         return letterset
 
     def get_solutions(self, letterset):
         with open(f"{Path.cwd()}//game/solutions.json", "r", encoding="utf-8") as s:
-            all_solutions = json.load(s)
+            all_solutions = [solution.upper() for solution in json.load(s)]
             solutions = list(filter(lambda word: set(word).issubset(set(letterset)), all_solutions))
             solutions_with_middleletter = list(filter(lambda word: letterset[0] in word, solutions))
             return solutions_with_middleletter
@@ -89,9 +89,11 @@ class Game:
         self.__players.append(player)
     
     def guess(self, player_uuid, guess):
+        guess = guess.upper()
         player_in_game = list(filter(lambda p: p.uuid == player_uuid, self.__players))
         if not player_in_game:
             raise Exception("Player must join game before guessing.")
+        print(self.__solutions, guess)
         is_correct_guess = guess in self.__solutions
         if is_correct_guess:
             player_in_game[0].points = (len(guess) - 3)

@@ -1,6 +1,7 @@
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from .game import Game, Player
 
 games = []
 
@@ -22,13 +23,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = text_data_json
         filtered_games = list(filter(lambda game: game.get("gameId") == message.get("gameId"), games))
         if not filtered_games:
-            games.append(message)
-            print(games)
             await self.channel_layer.group_send(self.game_group_name, {"type": "start_game", "message": message}
         )
 
     async def start_game(self, event):
         message = event["message"]
-
+        game = Game(message.get("gameId"))
+        player = Player(message.get("playerName"), message.get("playerId"))
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"letters": list("ABCDEFG")}))
+        await self.send(text_data=json.dumps({"letters": game.letterset}))
