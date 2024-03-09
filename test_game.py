@@ -19,7 +19,6 @@ def game():
 def test_player_has_name(player):
     assert player.name == "Plouf"
 
-
 def test_player_has_valid_uuid(player):
     assert is_valid_uuid(str(player.uuid))
 
@@ -49,14 +48,21 @@ def test_game_has_random_letterset(game):
     assert game.letterset == letterset
 
 def test_player_can_join_game(game, player):
-    game.add_players(player)
+    game.add_player(player)
     assert game.players == [player]
 
+def test_max_2_players_in_game(game, player):
+    game.add_player(player)
+    game.add_player(Player("Second", uuid4()))
+    with pytest.raises(Exception):
+        game.add_player(Player("Third", uuid4()))
+
+
 def test_player_name_unique(game, player):
-    game.add_players(player)
+    game.add_player(player)
     next_player = Player(player.name, uuid4())
     with pytest.raises(UniqueException):
-        game.add_players(next_player)
+        game.add_player(next_player)
     assert len(game.players) == 1
 
 def test_player_must_join_before_guessing(game):
@@ -66,7 +72,7 @@ def test_player_must_join_before_guessing(game):
         game.guess(new_player, "test")
 
 def test_player_receives_false_result_for_wrong_solution(game, player):
-    game.add_players(player)
+    game.add_player(player)
     result = game.guess(player.uuid, "aelms")
     assert result == False
 
@@ -76,18 +82,18 @@ def test_game_has_solutions(game):
         assert game.letterset[0] in solution
 
 def test_correct_guess_returns_true(game, player):
-    game.add_players(player)
+    game.add_player(player)
     result = game.guess(player.uuid, "teammate")
     assert result
 
 def test_player_gets_points_acc_to_wordlength(game, player):  #4 - 1, 5 - 2 etc.
-    game.add_players(player)
+    game.add_player(player)
     points_before = player.points
     game.guess(player.uuid, "team")
     assert player.points == points_before + 1
 
-def test_pangram_get_extra_7_points(game, player):
-    game.add_players(player)
+def test_pangram_earns_extra_7_points(game, player):
+    game.add_player(player)
     points_before = player.points
     my_guess = "malaxates"
     game.guess(player.uuid, my_guess)

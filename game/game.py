@@ -6,12 +6,11 @@ class UniqueException(Exception):
     def __init__(self, message: str) -> None:
         super().__init__()
         self.message = message
-        
 
 class Player:
     def __init__(self, name, uuid) -> None:
         self.__name = name
-        self.__uuid = self.validate_uuid(uuid)
+        self.__uuid = self.__validate_uuid(uuid)
         self.__points = 0
         self.__guessed_words = []
     @property
@@ -30,8 +29,7 @@ class Player:
     def points(self, new_points: int):
         self.__points += new_points
 
-    
-    def validate_uuid(self, input):
+    def __validate_uuid(self, input):
         uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
         if not uuid_regex.match(str(input)):
             raise ValueError
@@ -42,7 +40,7 @@ class Player:
 
 class Game:
     def __init__(self, uuid=None) -> None:
-         self.__uuid = uuid4() if not uuid else self.validate_uuid(uuid)
+         self.__uuid = uuid4() if not uuid else self.__validate_uuid(uuid)
          self.__letterset = self.get_letterset()
          self.__players = []
          self.__solutions = self.get_solutions(self.__letterset)
@@ -75,18 +73,19 @@ class Game:
             solutions = list(filter(lambda word: set(word).issubset(set(letterset)), all_solutions))
             solutions_with_middleletter = list(filter(lambda word: letterset[0] in word, solutions))
             return solutions_with_middleletter
-
         
-    def validate_uuid(self, input):
+    def __validate_uuid(self, input):
         uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
         if not uuid_regex.match(str(input)):
             raise ValueError
         else:
             return input
         
-    def add_players(self, player):
+    def add_player(self, player):
+        if len(self.players) >= 2:
+            raise Exception("There are already two players in this game.")
         if list(filter(lambda x: x.name == player.name, self.__players)):
-            raise UniqueException("Player name must be unique.") 
+            raise UniqueException("Player name must be unique.")
         self.__players.append(player)
     
     def guess(self, player_uuid, guess):
@@ -94,13 +93,10 @@ class Game:
         if not player_in_game:
             raise Exception("Player must join game before guessing.")
         is_correct_guess = guess in self.__solutions
-        
-
         if is_correct_guess:
             player_in_game[0].points = (len(guess) - 3)
         if self.__is_pangram(guess):
             player_in_game[0].points =  7
-
         return is_correct_guess
     
     def __is_pangram(self, guess):
