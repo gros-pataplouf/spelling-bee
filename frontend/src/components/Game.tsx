@@ -12,7 +12,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
       ...stateOfGame,
       message: { category: null, content: null }
     })
-  }, [stateOfGame.input, stateOfGame.points])
+  }, [stateOfGame.input, stateOfGame.player1Points])
   function handleChange (e: BaseSyntheticEvent): void {
     const inputEvent = e.nativeEvent as InputEvent
     if (
@@ -81,7 +81,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
   }
 
   function changePlayerName (event: React.BaseSyntheticEvent): void {
-    setStateOfGame({ ...stateOfGame, playerName: event.target.value })
+    setStateOfGame({ ...stateOfGame, player1Name: event.target.value })
   }
 
   return (
@@ -140,15 +140,15 @@ function Game ({ props }: GameProps): React.JSX.Element {
         <div>
           <input
             id="playerName"
-            value={stateOfGame.playerName}
+            value={stateOfGame.player1Name}
             onChange={changePlayerName}
           />
           <p>
-            <span id="points">{stateOfGame.points}</span> points
+            <span id="points">{stateOfGame.player1Points}</span> points
           </p>
-          {stateOfGame.guessedWords?.length > 0 && (
+          {stateOfGame.player1GuessedWords?.length > 0 && (
             <ul id="words">
-              {stateOfGame.guessedWords.map((word) => {
+              {stateOfGame.player1GuessedWords.map((word) => {
                 return <li key={word}>{word}</li>
               })}
             </ul>

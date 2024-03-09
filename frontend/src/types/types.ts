@@ -11,9 +11,9 @@ export interface GameState {
   phaseOfGame: PhaseOfGame
   letters: string[]
   player1Id: string | null
-  playerName: string
-  guessedWords: string[] | []
-  points: number
+  player1Name: string
+  player1GuessedWords: string[] | []
+  player1Points: number
   input: string[]
   message: ServerMessage
   success: SuccessMessage

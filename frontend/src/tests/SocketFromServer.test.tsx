@@ -76,7 +76,7 @@ describe('<Game/>', () => {
         bubbles: true
       })
     )
-    websocketServer.emit('message', JSON.stringify({ points: 3 }))
+    websocketServer.emit('message', JSON.stringify({ player1Points: 3 }))
     await waitFor(async () => {
       expect(game.container.querySelector('#points')).toHaveTextContent(
         '3'
@@ -99,7 +99,7 @@ describe('<Game/>', () => {
     )
     websocketServer.emit(
       'message',
-      JSON.stringify({ guessedWords: ['POCKET', 'POKE'] })
+      JSON.stringify({ player1GuessedWords: ['POCKET', 'POKE'] })
     )
     await waitFor(async () => {
       expect(game.container.querySelectorAll('#words>li').length).toBe(2)

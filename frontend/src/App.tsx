@@ -15,9 +15,9 @@ function App (): React.JSX.Element {
     phaseOfGame: PhaseOfGame.welcome,
     letters: Array.from('ILOQUST'),
     player1Id: null,
-    playerName: 'Player 1',
-    guessedWords: [],
-    points: 0,
+    player1Name: 'Player 1',
+    player1GuessedWords: [],
+    player1Points: 0,
     input: [],
     message: { category: null, content: null },
     success: { success: null, points: null },
@@ -56,7 +56,7 @@ function App (): React.JSX.Element {
         }
       }
     }
-  }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.playerName])
+  }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.player1Name])
   const [localStorage, setLocalStorage] = useLocalStorage('spellingBee', {
     gameId: '',
     player1Id: '',
