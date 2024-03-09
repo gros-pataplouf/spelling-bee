@@ -70,20 +70,20 @@ def test_player_must_join_before_guessing(game):
     with pytest.raises(Exception):
         game.guess(new_player, "test")
 
-def test_player_receives_false_result_for_wrong_solution(game, player):
+def test_player_receives_0pts_for_wrong_solution(game, player):
     game.add_player(player)
     result = game.guess(player.uuid, "aelms")
-    assert result == False
+    assert result == 0
 
 def test_game_has_solutions(game):
     for solution in game.solutions:
         assert set(solution).issubset(set(game.letterset))
         assert game.letterset[0] in solution
 
-def test_correct_guess_returns_true(game, player):
+def test_correct_guess_returns_added_points(game, player):
     game.add_player(player)
     result = game.guess(player.uuid, "teammate")
-    assert result
+    assert result == 5
 
 def test_player_gets_points_acc_to_wordlength(game, player):  #4 - 1, 5 - 2 etc.
     game.add_player(player)
@@ -95,7 +95,8 @@ def test_pangram_earns_extra_7_points(game, player):
     game.add_player(player)
     points_before = player.points
     my_guess = "malaxates"
-    game.guess(player.uuid, my_guess)
+    result = game.guess(player.uuid, my_guess)
+    assert result == 13
     assert player.points == points_before + len(my_guess) - 3 + 7
 
 

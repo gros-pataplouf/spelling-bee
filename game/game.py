@@ -89,17 +89,19 @@ class Game:
         self.__players.append(player)
     
     def guess(self, player_uuid, guess):
+        added_points = 0
         guess = guess.upper()
         player_in_game = list(filter(lambda p: p.uuid == player_uuid, self.__players))
         if not player_in_game:
             raise Exception("Player must join game before guessing.")
-        print(self.__solutions, guess)
         is_correct_guess = guess in self.__solutions
         if is_correct_guess:
-            player_in_game[0].points = (len(guess) - 3)
+            added_points += len(guess) - 3
+            player_in_game[0].points = added_points
         if self.__is_pangram(guess):
+            added_points += 7
             player_in_game[0].points =  7
-        return is_correct_guess
+        return added_points
     
     def __is_pangram(self, guess):
         if guess in self.__solutions:
