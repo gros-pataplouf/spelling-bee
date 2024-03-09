@@ -80,6 +80,12 @@ def test_correct_guess_returns_true(game, player):
     result = game.guess(player.uuid, "teammate")
     assert result
 
+def test_player_gets_points_acc_to_wordlength(game, player):  #4 - 1, 5 - 2 etc.
+    game.add_players(player)
+    points_before = player.points
+    result = game.guess(player.uuid, "team")
+    assert player.points == points_before + 1
+
 
 
 

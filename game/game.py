@@ -26,6 +26,10 @@ class Player:
     @property
     def guessed_words(self):
         return self.__guessed_words
+    @points.setter
+    def points(self, new_points: int):
+        self.__points = self.__points + new_points
+
     
     def validate_uuid(self, input):
         uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
@@ -89,12 +93,10 @@ class Game:
         self.__players.append(player)
     
     def guess(self, player_uuid, solution):
-        player = list(filter(lambda p: p.uuid == player_uuid, self.__players))
-        if not player:
+        player_in_game = list(filter(lambda p: p.uuid == player_uuid, self.__players))
+        if not player_in_game:
             raise Exception("Player must join game before guessing.")
-        if solution in self.__solutions:
-            return True
-        return False
-        
-
-
+        correct_guess = solution in self.__solutions
+        if correct_guess:
+            player_in_game[0].points = player_in_game[0].points + len(solution) - 3
+        return correct_guess
