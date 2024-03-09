@@ -83,9 +83,15 @@ def test_correct_guess_returns_true(game, player):
 def test_player_gets_points_acc_to_wordlength(game, player):  #4 - 1, 5 - 2 etc.
     game.add_players(player)
     points_before = player.points
-    result = game.guess(player.uuid, "team")
+    game.guess(player.uuid, "team")
     assert player.points == points_before + 1
 
+def test_pangram_get_extra_7_points(game, player):
+    game.add_players(player)
+    points_before = player.points
+    my_guess = "malaxates"
+    game.guess(player.uuid, my_guess)
+    assert player.points == points_before + len(my_guess) - 3 + 7
 
 
 

@@ -28,7 +28,7 @@ class Player:
         return self.__guessed_words
     @points.setter
     def points(self, new_points: int):
-        self.__points = self.__points + new_points
+        self.__points += new_points
 
     
     def validate_uuid(self, input):
@@ -64,9 +64,7 @@ class Game:
         letterset = []
         with open(f"{Path.cwd()}/game/lettersets.json", "r", encoding="utf-8") as f:
             lettersets =  json.load(f)
-            print(sys.argv[0])
             if 'pytest' in sys.argv[0]:
-                print('running pytest, setting random seed')
                 random.seed(3)
             letterset = list(lettersets[random.randint(0,len(lettersets)-1)])
         return letterset
@@ -87,16 +85,26 @@ class Game:
             return input
         
     def add_players(self, player):
-        print(player.name, self.__players)
         if list(filter(lambda x: x.name == player.name, self.__players)):
             raise UniqueException("Player name must be unique.") 
         self.__players.append(player)
     
-    def guess(self, player_uuid, solution):
+    def guess(self, player_uuid, guess):
         player_in_game = list(filter(lambda p: p.uuid == player_uuid, self.__players))
         if not player_in_game:
             raise Exception("Player must join game before guessing.")
-        correct_guess = solution in self.__solutions
-        if correct_guess:
-            player_in_game[0].points = player_in_game[0].points + len(solution) - 3
-        return correct_guess
+        is_correct_guess = guess in self.__solutions
+        
+
+        if is_correct_guess:
+            player_in_game[0].points = (len(guess) - 3)
+        if self.__is_pangram(guess):
+            player_in_game[0].points =  7
+
+        return is_correct_guess
+    
+    def __is_pangram(self, guess):
+        if guess in self.__solutions:
+            return set(guess).issubset(set(self.__letterset)) and set(self.__letterset).issubset(set(guess))
+        return False
+    
