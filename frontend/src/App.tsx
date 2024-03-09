@@ -14,7 +14,7 @@ function App (): React.JSX.Element {
     gameTimeStamp: null,
     phaseOfGame: PhaseOfGame.welcome,
     letters: Array.from('ILOQUST'),
-    playerId: null,
+    player1Id: null,
     playerName: 'Player 1',
     guessedWords: [],
     points: 0,
@@ -45,6 +45,7 @@ function App (): React.JSX.Element {
       socket.onmessage = (message) => {
         if (connection.current !== null) {
           const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
+          console.log(newState)
           setStateOfGame(newState)
         }
       }
@@ -58,14 +59,14 @@ function App (): React.JSX.Element {
   }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.playerName])
   const [localStorage, setLocalStorage] = useLocalStorage('spellingBee', {
     gameId: '',
-    playerId: '',
+    player1Id: '',
     timeStamp: 0
   })
   const navigate = useNavigate()
 
   function showGame (): void {
     let gameId: string
-    let playerId: string
+    let player1Id: string
     let timeStamp: number
 
     const gamePath = location.pathname.slice(1)
@@ -74,11 +75,11 @@ function App (): React.JSX.Element {
     // if there is a search string with game id, look into local storage
     /// / if it exists in local storage, check the timestamp
     /// /// if timestamp less than 24h, use data from local storage and send to server
-    /// /// else timestamp 24h or older, create fresh gameid and playerid
-    /// / elsif requested game uuid not in local storage, it means a new player has joined the game => set requested uuid as gameid, create playerid, send request to server to join game
+    /// /// else timestamp 24h or older, create fresh gameid and player1id
+    /// / elsif requested game uuid not in local storage, it means a new player has joined the game => set requested uuid as gameid, create player1id, send request to server to join game
     // elsif there is no searchstring for game id, retrieve it from local storage
-    /// / if > 24h : reset timestamp, gameid, playerid
-    /// / elseif < 24h: use gameid, and playerid to communicate with server
+    /// / if > 24h : reset timestamp, gameid, player1id
+    /// / elseif < 24h: use gameid, and player1id to communicate with server
 
     if (gamePath !== null && isValidUuid(gamePath)) {
       if (localStorage.gameId === gamePath) {
@@ -86,12 +87,12 @@ function App (): React.JSX.Element {
         if (localStorage.timeStamp + 24 * 60 * 60 * 1000 > Date.now()) {
           console.log('timestamp is less than one day')
           gameId = localStorage.gameId
-          playerId = localStorage.playerId
+          player1Id = localStorage.player1Id
           timeStamp = localStorage.timeStamp
         } else {
           console.log('timestamp is too old')
           gameId = uuidv4()
-          playerId = uuidv4()
+          player1Id = uuidv4()
           timeStamp = Date.now()
         }
       } else {
@@ -100,24 +101,24 @@ function App (): React.JSX.Element {
           gamePath
         )
         gameId = gamePath
-        playerId = uuidv4()
+        player1Id = uuidv4()
         timeStamp = Date.now()
       }
     } else {
       console.log('there is no query param or it is not a valid uuid')
       if (
         localStorage.gameId !== '' &&
-        localStorage.playerId !== '' &&
+        localStorage.player1Id !== '' &&
         localStorage.timeStamp + 24 * 60 * 60 * 1000 > Date.now()
       ) {
         gameId = localStorage.gameId
-        playerId = localStorage.playerId
+        player1Id = localStorage.player1Id
         timeStamp = localStorage.timeStamp
       } else {
         console.log('but there is still a valid entry in local storage')
 
         gameId = uuidv4()
-        playerId = uuidv4()
+        player1Id = uuidv4()
         timeStamp = Date.now()
       }
     }
@@ -126,12 +127,12 @@ function App (): React.JSX.Element {
       ...stateOfGame,
       phaseOfGame: PhaseOfGame.playing,
       gameId,
-      playerId,
+      player1Id,
       gameTimeStamp: timeStamp
     })
     setLocalStorage({
       gameId,
-      playerId,
+      player1Id,
       timeStamp
     })
   }

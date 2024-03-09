@@ -10,7 +10,7 @@ export interface GameState {
   gameTimeStamp: number | null
   phaseOfGame: PhaseOfGame
   letters: string[]
-  playerId: string | null
+  player1Id: string | null
   playerName: string
   guessedWords: string[] | []
   points: number
