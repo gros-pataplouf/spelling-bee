@@ -92,6 +92,8 @@ class Game:
         player = list(filter(lambda p: p.uuid == player_uuid, self.__players))
         if not player:
             raise Exception("Player must join game before guessing.")
+        if solution in self.__solutions:
+            return True
         return False
         
 
