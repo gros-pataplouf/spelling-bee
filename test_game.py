@@ -99,7 +99,8 @@ def test_pangram_earns_extra_7_points(game, player):
     assert result == 13
     assert player.points == points_before + len(my_guess) - 3 + 7
 
-
+def test_check_whether_guess_already_guessed(game, player):
+    pass
 
 # 
 # a game has up to two players; a 3rd player joining will be rejected
