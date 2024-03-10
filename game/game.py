@@ -28,6 +28,10 @@ class Player:
     @points.setter
     def points(self, new_points: int):
         self.__points += new_points
+    @guessed_words.setter
+    def guessed_words(self, new_word: int):
+        self.__guessed_words.append(new_word)
+
 
     def __validate_uuid(self, input):
         uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
@@ -98,6 +102,7 @@ class Game:
         if is_correct_guess:
             added_points += len(guess) - 3
             player_in_game[0].points = added_points
+            player_in_game[0].guessed_words = guess
         if self.__is_pangram(guess):
             added_points += 7
             player_in_game[0].points =  7

@@ -23,7 +23,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         print(channel_layer)
         text_data_json = json.loads(text_data)
         message = text_data_json
-        filtered_games = list(filter(lambda game: str(game.uuid) == message.get("gameId"), games))
+        filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
         if not filtered_games:
             await self.channel_layer.group_send(self.game_group_name, {"type": "start_game", "message": message})
         if filtered_games :
@@ -33,23 +33,40 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def check_guess(self, event):
         message = event["message"]
-        current_game = list(filter(lambda game: str(game.uuid) == message.get("gameId"), games))[0]
+        current_game = list(filter(lambda game: game.uuid == message.get("gameId"), games))[0]
         current_guess = "".join(message.get("input"))
         print(message.get("player1Id", current_guess))
-        current_player = list(filter(lambda player: str(player.uuid) == message.get("player1Id"), current_game.players))[0]
-        current_opponent = list(filter(lambda player: str(player.uuid) != message.get("player1Id"), current_game.players))[0]
+        current_player = list(filter(lambda player: player.uuid == message.get("player1Id"), current_game.players))[0]
+        current_opponent = None
+        print(current_game.players)
+        if len(current_game.players) > 1:
 
-        guess_result = current_game.guess(str(current_player.uuid), current_guess)
+            current_opponent = list(filter(lambda player: player.uuid != message.get("player1Id"), current_game.players))[0]
+            print("current opponent", current_opponent.guessed_words)
+
+        guess_result = current_game.guess(current_player.uuid, current_guess)
         if guess_result == 0:
             await self.send(text_data=json.dumps({
-                "for": [str(current_player.uuid)],
+                "for": [current_player.uuid],
                 "message": {"category": "warning", 
                 "content": "not a word"}}))
         else:
             await self.send(text_data=json.dumps({
+                "for": [current_player.uuid],
                 "success": {"success": "awesome", "points": guess_result},
                 "player1Points": current_player.points,
                 "player1GuessedWords": message.get("player1GuessedWords") + [current_guess]}))
+            if current_opponent:
+                print(current_opponent)
+                await self.send(text_data=json.dumps({
+                    "for": [current_opponent.uuid],
+                    "player1Points": current_opponent.points,
+                    "player1GuessedWords": current_opponent.guessed_words,
+                    "player2Points": current_player.points,
+                    "player2GuessedWords": message.get("player1GuessedWords") + [current_guess],
+                    "letters": current_game.letterset
+                    }))
+
 
     async def start_game(self, event):
         message = event["message"]
@@ -63,8 +80,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     
     async def continue_game(self, event):
         message = event["message"]
-        game = list(filter(lambda game: str(game.uuid) == message.get("gameId"), games))[0]
-        current_player = list(filter(lambda player: str(player.uuid) == message.get("player1Id"), game.players))
+        game = list(filter(lambda game: game.uuid == message.get("gameId"), games))[0]
+        current_player = list(filter(lambda player: player.uuid == message.get("player1Id"), game.players))
         if not current_player:
             game.add_player(Player(message.get('player1Name')+'2', message.get('player1Id')))
         await self.send(text_data=json.dumps({"letters": game.letterset}))

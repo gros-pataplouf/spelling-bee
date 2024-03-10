@@ -99,6 +99,14 @@ def test_pangram_earns_extra_7_points(game, player):
     assert result == 13
     assert player.points == points_before + len(my_guess) - 3 + 7
 
+def test_guessed_words_updated_for_player(game, player):  #4 - 1, 5 - 2 etc.
+    game.add_player(player)
+    points_before = player.points
+    game.guess(player.uuid, "team")
+    print(player.guessed_words)
+    assert "TEAM" in player.guessed_words
+
+
 def test_check_whether_guess_already_guessed(game, player):
     pass
 
