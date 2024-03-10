@@ -13,6 +13,7 @@ class Player:
         self.__uuid = self.__validate_uuid(uuid)
         self.__points = 0
         self.__guessed_words = []
+        self.group = None
     @property
     def name(self):
         return self.__name
@@ -30,7 +31,8 @@ class Player:
         self.__points += new_points
     @guessed_words.setter
     def guessed_words(self, new_word: int):
-        self.__guessed_words.append(new_word)
+        if new_word not in self.__guessed_words:
+            self.__guessed_words.append(new_word)
 
 
     def __validate_uuid(self, input):
@@ -91,11 +93,15 @@ class Game:
         if list(filter(lambda x: x.name == player.name, self.__players)):
             raise UniqueException("Player name must be unique.")
         self.__players.append(player)
+        return player
     
-    def guess(self, player_uuid, guess):
+    def guess(self, player_uuid, guess) -> int:
+        print("guessing", guess, player_uuid)
         added_points = 0
         guess = guess.upper()
         player_in_game = list(filter(lambda p: p.uuid == player_uuid, self.__players))
+        if list(filter(lambda p: guess in p.guessed_words, self.__players)):
+            raise UniqueException("already guessed")
         if not player_in_game:
             raise Exception("Player must join game before guessing.")
         is_correct_guess = guess in self.__solutions
@@ -106,6 +112,7 @@ class Game:
         if self.__is_pangram(guess):
             added_points += 7
             player_in_game[0].points =  7
+        print("hello from guess function", player_in_game[0].guessed_words)
         return added_points
     
     def __is_pangram(self, guess):
