@@ -2,6 +2,7 @@ import type React from 'react'
 
 import { useEffect, type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
+import PlayerStats from './PlayerStats'
 import { type GameProps } from '../types/types'
 
 function Game ({ props }: GameProps): React.JSX.Element {
@@ -80,10 +81,6 @@ function Game ({ props }: GameProps): React.JSX.Element {
     }
   }
 
-  function changePlayerName (event: React.BaseSyntheticEvent): void {
-    setStateOfGame({ ...stateOfGame, player1Name: event.target.value })
-  }
-
   return (
     <div className="flex flex-col items-center">
       {stateOfGame.success.points !== null && (
@@ -137,23 +134,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
         </button>
       </div>
       <div>
-        <div>
-          <input
-            id="playerName"
-            value={stateOfGame.player1Name}
-            onChange={changePlayerName}
-          />
-          <p>
-            <span id="points">{stateOfGame.player1Points}</span> points
-          </p>
-          {stateOfGame.player1GuessedWords?.length > 0 && (
-            <ul id="words">
-              {stateOfGame.player1GuessedWords.map((word) => {
-                return <li key={word}>{word}</li>
-              })}
-            </ul>
-          )}
-        </div>
+        <PlayerStats stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>
       </div>
     </div>
   )

@@ -43,10 +43,18 @@ function App (): React.JSX.Element {
         }
       }
       socket.onmessage = (message) => {
+        const recipients = JSON.parse(message.data as string).for as string[]
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (recipients && (recipients.length > 0) && !recipients.find(elt => elt === stateOfGame.player1Id)) {
+          console.log(stateOfGame.player1Id, recipients, recipients.find(elt => elt === stateOfGame.player1Id))
+          console.log('not for me')
+          return
+        }
         if (connection.current !== null) {
           const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
           console.log(newState)
           setStateOfGame(newState)
+          // abo@dvbag.de
         }
       }
       connection.current = socket

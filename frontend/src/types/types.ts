@@ -39,6 +39,11 @@ export interface CellProps {
   setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
 }
 
+export interface PlayerStatsProps {
+  stateOfGame: GameState
+  setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
+}
+
 export interface ServerMessage {
   category: string | null
   content: string | null
