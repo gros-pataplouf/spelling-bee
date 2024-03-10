@@ -18,7 +18,7 @@ class Player:
         return self.__name
     @property
     def uuid(self):
-        return self.__uuid
+        return str(self.__uuid)
     @property
     def points(self):
         return self.__points
@@ -47,7 +47,7 @@ class Game:
     
     @property
     def uuid(self):
-        return self.__uuid
+        return str(self.__uuid)
     @property
     def letterset(self):
         return self.__letterset
