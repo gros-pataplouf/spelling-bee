@@ -35,7 +35,7 @@ function App (): React.JSX.Element {
       if (import.meta.env.REACT_ENV === 'test') {
         socket = new WebSocket('ws://localhost:8000')
       } else {
-        socket = new WebSocket(`ws://localhost:8000/${stateOfGame.gameId}`)
+        socket = new WebSocket(`ws://localhost:8000/${stateOfGame.gameId}?${stateOfGame.player1Id}`)
       }
       socket.onopen = () => {
         if (connection.current !== null) {
@@ -48,9 +48,8 @@ function App (): React.JSX.Element {
         if (recipients && (recipients.length > 0) && !recipients.find(elt => elt === stateOfGame.player1Id)) {
           console.log(stateOfGame.player1Id, recipients, recipients.find(elt => elt === stateOfGame.player1Id))
           console.log('not for me')
-          return
-        }
-        if (connection.current !== null) {
+        } else if (connection.current !== null) {
+          console.log(JSON.parse(message.data as string))
           const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
           console.log(newState)
           setStateOfGame(newState)

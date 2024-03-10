@@ -23,7 +23,7 @@ export default function PlayerStats (props: PlayerStatsProps): React.JSX.Element
         </ul>
       )}
         {stateOfGame.player2GuessedWords?.length !== undefined && stateOfGame.player2GuessedWords?.length > 0 && (
-        <ul id="words2">
+        <ul id="words2">your opponent has {stateOfGame.player2Points} points
         {stateOfGame.player2GuessedWords?.map((word) => {
           return <li key={word}>{word}</li>
         })}
