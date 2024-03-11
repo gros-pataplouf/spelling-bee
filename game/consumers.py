@@ -17,7 +17,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.game_group_name, self.channel_name)
         await self.channel_layer.group_add(self.user_group_name, self.channel_name)
         user_groups[self.user_uuid] = self.user_group_name
-        print(user_groups)
         await self.accept()
 
     async def disconnect(self, close_code):

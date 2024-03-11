@@ -2,6 +2,18 @@ import re, random, json, sys
 from uuid import uuid4
 from pathlib import Path
 
+
+message_reference = {
+    1: "correct", 
+    2: "good",
+    3: "not to bad",
+    4: "respect",
+    5: "awesome",
+    6: "amazing",
+    7: "rockstar"
+}
+
+
 class UniqueException(Exception):
     def __init__(self, message: str) -> None:
         super().__init__()
@@ -31,8 +43,7 @@ class Player:
         self.__points += new_points
     @guessed_words.setter
     def guessed_words(self, new_word: int):
-        if new_word not in self.__guessed_words:
-            self.__guessed_words.append(new_word)
+        self.__guessed_words.append(new_word)
 
 
     def __validate_uuid(self, input):
@@ -98,10 +109,13 @@ class Game:
     def guess(self, player_uuid, guess) -> int:
         print("guessing", guess, player_uuid)
         added_points = 0
+        message = None
         guess = guess.upper()
         player_in_game = list(filter(lambda p: p.uuid == player_uuid, self.__players))
         if list(filter(lambda p: guess in p.guessed_words, self.__players)):
-            raise UniqueException("already guessed")
+            message = "already guessed"
+            return {"points": added_points, "message": message}
+
         if not player_in_game:
             raise Exception("Player must join game before guessing.")
         is_correct_guess = guess in self.__solutions
@@ -109,11 +123,13 @@ class Game:
             added_points += len(guess) - 3
             player_in_game[0].points = added_points
             player_in_game[0].guessed_words = guess
+            message = message_reference[added_points]
         if self.__is_pangram(guess):
             added_points += 7
             player_in_game[0].points =  7
+            message = "Pangram!"
         print("hello from guess function", player_in_game[0].guessed_words)
-        return added_points
+        return {"points": added_points, "message": message}
     
     def __is_pangram(self, guess):
         if guess in self.__solutions:
