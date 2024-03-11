@@ -128,6 +128,8 @@ class Game:
             added_points += 7
             player_in_game[0].points =  7
             message = "Pangram!"
+        if not is_correct_guess:
+            message = "not a word"
         print("hello from guess function", player_in_game[0].guessed_words)
         return {"points": added_points, "message": message}
     
