@@ -35,14 +35,14 @@ describe('<App />', () => {
     expect(h1?.textContent).toBe('Spelling Bee')
   })
 
-  test('Play button displayed', () => {
+  test('Play alone button displayed', () => {
     const wrapper = render(
       <BrowserRouter>
         <App />
       </BrowserRouter>
     )
     const button = wrapper.container.querySelector('button')
-    expect(button?.textContent).toBe('Play')
+    expect(button?.textContent).toBe('Play alone')
   })
   test('After clicking on play button, you get input field', () => {
     const wrapper = render(
@@ -52,7 +52,7 @@ describe('<App />', () => {
     )
     const button = wrapper.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -69,7 +69,7 @@ describe('<App />', () => {
     )
     const button = wrapper.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })

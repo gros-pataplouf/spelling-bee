@@ -34,7 +34,7 @@ describe('<Game/>', () => {
     )
     const button = app.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -50,7 +50,7 @@ describe('<Game/>', () => {
     )
     const button = game.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -68,7 +68,7 @@ describe('<Game/>', () => {
     )
     const button = game.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -87,7 +87,7 @@ describe('<Game/>', () => {
     )
     const button = game.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -119,7 +119,7 @@ describe('<Game/>', () => {
     )
     const button = game.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -143,7 +143,7 @@ describe('<Game/>', () => {
     )
     const button = game.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -176,7 +176,7 @@ describe('<Game/>', () => {
     )
     const button = game.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -211,7 +211,7 @@ describe('<Game/>', () => {
       throw new Error('play button not present')
     }
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -240,7 +240,7 @@ describe('<Game/>', () => {
     )
     const button = game.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })
@@ -271,7 +271,7 @@ describe('<Game/>', () => {
     )
     const button = game.container.querySelector('button') as HTMLElement
     fireEvent(
-      getByText(button, 'Play'),
+      getByText(button, 'Play alone'),
       new MouseEvent('click', {
         bubbles: true
       })

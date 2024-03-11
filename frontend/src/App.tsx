@@ -65,7 +65,7 @@ function App (): React.JSX.Element {
   })
   const navigate = useNavigate()
 
-  function showGame (): void {
+  function startGame (): void {
     let gameId: string
     let player1Id: string
     let timeStamp: number
@@ -143,9 +143,15 @@ function App (): React.JSX.Element {
           <p>How many words can you make with 7 letters?</p>
           <button
             className="btn btn-rounded text-white font-bold bg-black"
-            onClick={showGame}
+            onClick={startGame}
           >
-            Play
+            Play alone
+          </button>
+          <button
+            className="btn btn-rounded text-white font-bold bg-black"
+            onClick={startGame}
+          >
+            Invite a friend
           </button>
         </>
           )
