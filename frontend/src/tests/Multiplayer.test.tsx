@@ -1,7 +1,9 @@
 import { describe, test, expect, beforeEach } from 'vitest'
 import {
   render,
-  getByText
+  fireEvent,
+  screen,
+  waitFor
 } from '@testing-library/react'
 import { Server, WebSocket } from 'mock-socket'
 import { type GameState } from '../types/types'
@@ -23,13 +25,26 @@ describe('<Game/>', () => {
     clientMessages = []
   })
   test('User can initiate multiplayer game', () => {
-    const app = render(
+    render(
       <BrowserRouter>
         <App />
       </BrowserRouter>
     )
-    const button = app.container.querySelector('button') as HTMLElement
 
-    expect(getByText(button, 'Play alone')).toBeInTheDocument()
+    expect(screen.getByText('Invite a friend')).toBeInTheDocument()
+  })
+  test('User gets instructions to invite a friend', async () => {
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    )
+    fireEvent(
+      screen.getByText('Invite a friend'),
+      new MouseEvent('click', {
+        bubbles: true
+      })
+    )
+    await waitFor(() => { expect(screen.getByText('Send this link to your friend')).toBeInTheDocument() })
   })
 })

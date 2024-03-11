@@ -48,6 +48,12 @@ export interface PlayerStatsProps {
   setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
 }
 
+type StartGameFunction = (mode: string) => VoidFunction
+
+export interface WelcomeProps {
+  startGame: StartGameFunction
+}
+
 export interface ServerMessage {
   category: string | null
   content: string | null
