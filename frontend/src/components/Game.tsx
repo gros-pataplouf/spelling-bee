@@ -1,5 +1,5 @@
 import type React from 'react'
-
+import { v4 as uuidv4 } from 'uuid'
 import { useEffect, type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import PlayerStats from './PlayerStats'
@@ -100,7 +100,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
           <Cell
             letter={letter}
             middleLetter={letter === stateOfGame.letters[0]}
-            key={letter}
+            key={uuidv4()}
             stateOfGame={stateOfGame}
             setStateOfGame={setStateOfGame}
           />

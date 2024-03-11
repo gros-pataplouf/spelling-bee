@@ -13,7 +13,7 @@ function App (): React.JSX.Element {
     gameId: null,
     gameTimeStamp: null,
     phaseOfGame: PhaseOfGame.welcome,
-    letters: Array.from('ILOQUST'),
+    letters: import.meta.env.REACT_ENV === 'test' ? Array.from('ILOQUST') : Array.from('???????'),
     player1Id: null,
     player1Name: 'Player 1',
     player1GuessedWords: [],
