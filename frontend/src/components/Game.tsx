@@ -14,7 +14,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
       ...stateOfGame,
       message: { category: null, content: null, points: null }
     })
-  }, [stateOfGame.input, stateOfGame.player1Points])
+  }, [stateOfGame.input])
   function handleChange (e: BaseSyntheticEvent): void {
     const inputEvent = e.nativeEvent as InputEvent
     if (
@@ -88,7 +88,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
 
       <input
         id="input"
-        className="block"
+        className="block input-lg input"
         role="input"
         placeholder="Type or click"
         onChange={handleChange}
@@ -129,9 +129,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
           Enter
         </button>
       </div>
-      <div>
         <PlayerStats stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>
-      </div>
     </div>
   )
 }

@@ -37,7 +37,7 @@ function Cell (props: CellProps): React.JSX.Element {
         fill="white"
         stroke="gray"
       ></polygon>
-      <text x="51.96" y="60" fontFamily="Arial" fontSize="25">
+      <text x="51.96" y="60" fontFamily="Arial" fontSize="30" fontWeight="bold">
         {props.letter}
       </text>
     </svg>

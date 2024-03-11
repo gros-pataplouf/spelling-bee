@@ -42,17 +42,12 @@ function App (): React.JSX.Element {
         }
       }
       socket.onmessage = (message) => {
-        const recipients = JSON.parse(message.data as string).for as string[]
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (recipients && (recipients.length > 0) && !recipients.find(elt => elt === stateOfGame.player1Id)) {
-          console.log(stateOfGame.player1Id, recipients, recipients.find(elt => elt === stateOfGame.player1Id))
-          console.log('not for me')
-        } else if (connection.current !== null) {
+        if (connection.current !== null) {
           console.log(JSON.parse(message.data as string))
           const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
           console.log(newState)
           setStateOfGame(newState)
-          // abo@dvbag.de
         }
       }
       connection.current = socket
@@ -74,10 +69,7 @@ function App (): React.JSX.Element {
     let gameId: string
     let player1Id: string
     let timeStamp: number
-
     const gamePath = location.pathname.slice(1)
-    console.log(gamePath)
-
     // if there is a search string with game id, look into local storage
     /// / if it exists in local storage, check the timestamp
     /// /// if timestamp less than 24h, use data from local storage and send to server
@@ -143,8 +135,8 @@ function App (): React.JSX.Element {
     })
   }
   return (
-    <div className="bg-yellow-200 h-screen flex flex-col justify-center items-center">
-      <h1 className="font-semibold text-center pb-6">Spelling Bee</h1>
+    <div className="bg-yellow-400 h-screen flex flex-col justify-center items-center">
+      <h1 className="font-semibold text-center pb-6 text-3xl">Spelling Bee</h1>
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome
         ? (
         <>
