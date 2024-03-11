@@ -48,10 +48,10 @@ export interface PlayerStatsProps {
   setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
 }
 
-type StartGameFunction = (mode: string) => VoidFunction
-
 export interface WelcomeProps {
-  startGame: StartGameFunction
+  // TO DO construct proper function signature for startGame
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  startGame: Function
 }
 
 export interface ServerMessage {

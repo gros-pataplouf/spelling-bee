@@ -8,6 +8,7 @@ import { useLocalStorage } from 'usehooks-ts'
 import { isValidUuid } from './helpers/helpers'
 import Game from './components/Game'
 import Welcome from './components/Welcome'
+import WelcomeMultiplayer from './components/WelcomeMultiplayer'
 
 function App (): React.JSX.Element {
   const connection = useRef<WebSocket | null>(null)
@@ -145,7 +146,9 @@ function App (): React.JSX.Element {
       <h1 className="font-semibold text-center pb-6 text-3xl">Spelling Bee</h1>
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome
         ? (
-        <Welcome startGame={startGame}/>
+            stateOfGame.multiPlayer
+              ? <WelcomeMultiplayer startGame={startGame}/>
+              : < Welcome startGame={startGame}/>
           )
         : (
         <Game props={{ stateOfGame, setStateOfGame }} />
