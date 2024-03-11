@@ -232,7 +232,7 @@ describe('<Game/>', () => {
     expect(screen.getByText('too short')).toBeInTheDocument()
   })
 
-  test('if the input field changes and there is no submission, the message is deleted', async () => {
+  test('if the input field changes, the message is deleted', async () => {
     const game = render(
       <BrowserRouter>
         <App />
@@ -260,12 +260,10 @@ describe('<Game/>', () => {
     await userEvent.type(inputForm, 'SIT')
     await userEvent.click(enterButton)
     await userEvent.type(inputForm, 'IO')
-    expect(game.container.querySelector('input#input+p')).not.toHaveTextContent(
-      'too short'
-    )
+    expect(game.container.querySelector('#notificationMessage')).toHaveTextContent('')
   })
-
-  test("The frontend displays an input form with value 'Player 1'", async () => {
+  // use only in multiplayer version
+  test.skip("The frontend displays an input form with value 'Player 1'", async () => {
     const game = render(
       <BrowserRouter>
         <App />
@@ -281,36 +279,6 @@ describe('<Game/>', () => {
     await waitFor(async () => {
       expect(game.container.querySelector('#playerName')).toHaveValue(
         'Player 1'
-      )
-    })
-  })
-  test('Player 1 can change their user name', async () => {
-    const game = render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    )
-    const button = game.container.querySelector('button') as HTMLElement
-    fireEvent(
-      getByText(button, 'Play'),
-      new MouseEvent('click', {
-        bubbles: true
-      })
-    )
-    const playerField = game.container.querySelector('input#playerName')
-    if (playerField === null) {
-      throw new Error('playerField not present')
-    }
-    await userEvent.click(
-      playerField
-    )
-    await userEvent.type(
-      playerField,
-      '{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}Pataplouf'
-    )
-    await waitFor(async () => {
-      expect(game.container.querySelector('#playerName')).toHaveValue(
-        'Pataplouf'
       )
     })
   })

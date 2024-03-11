@@ -3,15 +3,10 @@ import type React from 'react'
 import { type PlayerStatsProps } from '../types/types'
 
 export default function PlayerStats (props: PlayerStatsProps): React.JSX.Element {
-  const { stateOfGame, setStateOfGame } = props
-  function changePlayerName (event: React.BaseSyntheticEvent): void {
-    setStateOfGame({ ...stateOfGame, player1Name: event.target.value })
-  }
+  const { stateOfGame } = props
+
   return <div>
-      <input
-        id="playerName"
-        value={stateOfGame.player1Name}
-        onChange={changePlayerName} />
+      {stateOfGame.multiPlayer && <p id="playerName">{stateOfGame.player1Name}</p>}
       <p>
         <span id="points">{stateOfGame.player1Points}</span> points
       </p>
