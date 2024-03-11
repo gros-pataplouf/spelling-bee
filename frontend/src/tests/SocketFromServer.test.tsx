@@ -55,9 +55,9 @@ describe('<Game/>', () => {
       })
     )
 
-    websocketServer.emit('message', JSON.stringify({ message: { category: 'warning', content: 'not a word' } }))
+    websocketServer.emit('message', JSON.stringify({ message: { category: 'warning', content: 'not a word', points: null } }))
     await waitFor(async () => {
-      expect(game.container.querySelector('#message')).toHaveTextContent(
+      expect(game.container.querySelector('#notificationMessage')).toHaveTextContent(
         'not a word'
       )
     })
@@ -120,13 +120,13 @@ describe('<Game/>', () => {
     )
     websocketServer.emit(
       'message',
-      JSON.stringify({ success: { points: 3, success: 'Excellent!' } })
+      JSON.stringify({ message: { points: 3, content: 'Excellent!', category: 'success' } })
     )
     await waitFor(async () => {
-      expect(game.container.querySelector('#successMessage')).toHaveTextContent(
+      expect(game.container.querySelector('#notificationMessage')).toHaveTextContent(
         'Excellent!'
       )
-      expect(game.container.querySelector('#successPoints')).toHaveTextContent(
+      expect(game.container.querySelector('#notificationPoints')).toHaveTextContent(
         '+3'
       )
     })

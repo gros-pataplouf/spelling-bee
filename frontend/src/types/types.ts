@@ -16,7 +16,6 @@ export interface GameState {
   player1Points: number
   input: string[]
   message: ServerMessage
-  success: SuccessMessage
   multiPlayer: boolean
   player2Id: string | null
   player2Name: string | null
@@ -39,6 +38,11 @@ export interface CellProps {
   setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
 }
 
+export interface NotificationProps {
+  stateOfGame: GameState
+  setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
+}
+
 export interface PlayerStatsProps {
   stateOfGame: GameState
   setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
@@ -47,6 +51,7 @@ export interface PlayerStatsProps {
 export interface ServerMessage {
   category: string | null
   content: string | null
+  points: number | null
 }
 
 export enum ClientMessageType {
@@ -57,9 +62,4 @@ export enum ClientMessageType {
 export interface ClientMessage {
   type: ClientMessageType
   content: string
-}
-
-export interface SuccessMessage {
-  success: string | null
-  points: number | null
 }

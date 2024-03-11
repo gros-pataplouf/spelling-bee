@@ -3,6 +3,7 @@ import type React from 'react'
 import { useEffect, type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import PlayerStats from './PlayerStats'
+import Notification from './Notification'
 import { type GameProps } from '../types/types'
 
 function Game ({ props }: GameProps): React.JSX.Element {
@@ -11,7 +12,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
   useEffect(() => {
     setStateOfGame({
       ...stateOfGame,
-      message: { category: null, content: null }
+      message: { category: null, content: null, points: null }
     })
   }, [stateOfGame.input, stateOfGame.player1Points])
   function handleChange (e: BaseSyntheticEvent): void {
@@ -63,12 +64,12 @@ function Game ({ props }: GameProps): React.JSX.Element {
     if (stateOfGame.input.join('').length < 4) {
       setStateOfGame({
         ...stateOfGame,
-        message: { category: 'warning', content: 'too short' }
+        message: { category: 'warning', content: 'too short', points: null }
       })
     } else if (!stateOfGame.input.join('').includes(stateOfGame.letters[0])) {
       setStateOfGame({
         ...stateOfGame,
-        message: { category: 'warning', content: 'middleletter missing' }
+        message: { category: 'warning', content: 'middleletter missing', points: null }
       })
     } else {
       setStateOfGame({ ...stateOfGame, guess: stateOfGame.input.join('') })
@@ -83,12 +84,8 @@ function Game ({ props }: GameProps): React.JSX.Element {
 
   return (
     <div className="flex flex-col items-center">
-      {stateOfGame.success.points !== null && (
-        <p>
-          <span id="successMessage">{stateOfGame.success.success}</span>{' '}
-          <span id="successPoints">+{stateOfGame.success.points}</span>
-        </p>
-      )}
+      <Notification stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />
+
       <input
         id="input"
         className="block"
@@ -98,7 +95,6 @@ function Game ({ props }: GameProps): React.JSX.Element {
         onKeyDown={handleKeyDown}
         value={stateOfGame?.input.join('')}
       />
-      <p id="message">{stateOfGame.message.content}</p>
       <div id="hive" className="relative h-[33vh] w-full">
         {stateOfGame.letters.map((letter: string) => (
           <Cell
