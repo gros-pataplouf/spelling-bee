@@ -8,7 +8,6 @@ import { useLocalStorage } from 'usehooks-ts'
 import { isValidUuid } from './helpers/helpers'
 import Game from './components/Game'
 import Welcome from './components/Welcome'
-import WelcomeMultiplayer from './components/WelcomeMultiplayer'
 
 function App (): React.JSX.Element {
   const connection = useRef<WebSocket | null>(null)
@@ -41,12 +40,12 @@ function App (): React.JSX.Element {
       }
       socket.onopen = () => {
         if (connection.current !== null) {
+          console.log('connecting')
           connection.current.send(JSON.stringify(stateOfGame))
         }
       }
       socket.onmessage = (message) => {
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (connection.current !== null) {
+        if (connection.current != null) {
           console.log(JSON.parse(message.data as string))
           const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
           console.log(newState)
@@ -126,7 +125,7 @@ function App (): React.JSX.Element {
       navigate(`/${gameId}`)
       setStateOfGame({
         ...stateOfGame,
-        phaseOfGame: mode === 'multiplayer' ? PhaseOfGame.welcome : PhaseOfGame.playing,
+        phaseOfGame: PhaseOfGame.playing,
         gameId,
         player1Id,
         gameTimeStamp: timeStamp,
@@ -145,11 +144,8 @@ function App (): React.JSX.Element {
     <div className="bg-yellow-400 h-screen flex flex-col justify-center items-center">
       <h1 className="font-semibold text-center pb-6 text-3xl">Spelling Bee</h1>
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome
-        ? (
-            stateOfGame.multiPlayer
-              ? <WelcomeMultiplayer startGame={startGame}/>
-              : < Welcome startGame={startGame}/>
-          )
+        ? < Welcome startGame={startGame}/>
+
         : (
         <Game props={{ stateOfGame, setStateOfGame }} />
           )}
