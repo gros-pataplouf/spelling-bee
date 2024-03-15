@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* npx tailwindcss -i ./src/index.css -o ./public/index.css --watch */
+
+.middleLetter {
+  top: calc(50% - 25px);
+  left: calc(50% - 28.865px);
+}
+
+.otherLetter:nth-child(2) {
+  top: calc(50% - 50px);
+  left: calc(50% + 14.4325px);
+}
+
+.otherLetter:nth-child(3) {
+  top: calc(50%);
+  left: calc(50% + 14.4325px);
+}
+
+.otherLetter:nth-child(4) {
+  top: calc(50% + 25px);
+  left: calc(50% - 28.865px);
+}
+
+.otherLetter:nth-child(5) {
+  top: calc(50%);
+  left: calc(50% - 57.73px - 14.4325px);
+}
+
+.otherLetter:nth-child(6) {
+  top: calc(50% - 50px);
+  left: calc(50% - 57.73px - 14.4325px);
+}
+
+.otherLetter:nth-child(7) {
+  top: calc(50% - 75px);
+  left: calc(50% - 28.865px);
+}
