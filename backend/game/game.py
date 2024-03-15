@@ -112,17 +112,24 @@ class Game:
         message = None
         guess = guess.upper()
         player_in_game = list(filter(lambda p: p.uuid == player_uuid, self.__players))
+        if not player_in_game:
+            raise Exception("Player must join game before guessing.")
+
+
         if len(guess) < 4:
             message = "too short"
+            return {"points": added_points, "message": message}
+
+        if self.letterset[0] not in guess:
+            message = "middleletter missing"
             return {"points": added_points, "message": message}
 
         if list(filter(lambda p: guess in p.guessed_words, self.__players)):
             message = "already guessed"
             return {"points": added_points, "message": message}
 
-        if not player_in_game:
-            raise Exception("Player must join game before guessing.")
         is_correct_guess = guess in self.__solutions
+
         if is_correct_guess:
             added_points += len(guess) - 3
             player_in_game[0].points = added_points

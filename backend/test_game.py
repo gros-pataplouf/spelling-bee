@@ -86,6 +86,13 @@ def test_guess_too_short(game, player):
     assert result["points"] == 0
     assert result["message"] == "too short"
 
+def test_middleletter_missing(game, player):
+    game.add_player(player)
+    result = game.guess(player.uuid, "text")
+    assert result["points"] == 0
+    assert result["message"] == "middleletter missing"
+
+
 def test_correct_guess_returns_added_points(game, player):
     game.add_player(player)
     result = game.guess(player.uuid, "teammate")
