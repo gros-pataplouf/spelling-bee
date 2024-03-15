@@ -10,7 +10,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.game_uuid = self.scope["url_route"]["kwargs"]["game_uuid"]
         self.user_uuid = self.scope["query_string"].decode("utf-8")
-        print("new user joined", self.user_uuid)
+        print("user joined", self.user_uuid)
         self.game_group_name = f"game_uuid_{self.game_uuid}"
         self.user_group_name = f"user_uuid_{self.user_uuid}"
         # Join game group
@@ -91,8 +91,20 @@ class GameConsumer(AsyncWebsocketConsumer):
                 "player1Points": new_player.points,
                 "player1GuessedWords": new_player.guessed_words,
                 "player2Points": playing_opponent.points if playing_opponent else None,
+                "player2Id": playing_opponent.uuid if playing_opponent else None,
                 "player2GuessedWords": playing_opponent.guessed_words if playing_opponent else None,
-                "letters": game.letterset
+                "letters": game.letterset,
+                "multiPlayer": True if playing_opponent else False
+                })})
+            await self.channel_layer.group_send(user_groups[playing_opponent.uuid], {'type': 'update_game', 'message': json.dumps({
+                "player1Points": playing_opponent.points,
+                "player1GuessedWords": playing_opponent.guessed_words,
+                "player2Points": new_player.points if playing_opponent else None,
+                "player2GuessedWords": new_player.guessed_words if playing_opponent else None,
+                "player2Id": new_player.uuid,
+                "letters": game.letterset,
+                "multiPlayer": True if playing_opponent else False
+
                 })})
 
         else:
