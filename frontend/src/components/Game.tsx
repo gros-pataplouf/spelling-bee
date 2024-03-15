@@ -62,19 +62,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
   }
 
   function submitWord (): void {
-    if (stateOfGame.input.join('').length < 4) {
-      setStateOfGame({
-        ...stateOfGame,
-        message: { category: 'warning', content: 'too short', points: null }
-      })
-    } else if (!stateOfGame.input.join('').includes(stateOfGame.letters[0])) {
-      setStateOfGame({
-        ...stateOfGame,
-        message: { category: 'warning', content: 'middleletter missing', points: null }
-      })
-    } else {
-      setStateOfGame({ ...stateOfGame, guess: stateOfGame.input.join('') })
-    }
+    setStateOfGame({ ...stateOfGame, guess: stateOfGame.input.join('') })
   }
 
   function handleKeyDown (event: React.KeyboardEvent<HTMLInputElement>): void {

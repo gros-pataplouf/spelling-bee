@@ -112,6 +112,10 @@ class Game:
         message = None
         guess = guess.upper()
         player_in_game = list(filter(lambda p: p.uuid == player_uuid, self.__players))
+        if len(guess) < 4:
+            message = "too short"
+            return {"points": added_points, "message": message}
+
         if list(filter(lambda p: guess in p.guessed_words, self.__players)):
             message = "already guessed"
             return {"points": added_points, "message": message}

@@ -80,6 +80,12 @@ def test_game_has_solutions(game):
         assert set(solution).issubset(set(game.letterset))
         assert game.letterset[0] in solution
 
+def test_guess_too_short(game, player):
+    game.add_player(player)
+    result = game.guess(player.uuid, "tax")
+    assert result["points"] == 0
+    assert result["message"] == "too short"
+
 def test_correct_guess_returns_added_points(game, player):
     game.add_player(player)
     result = game.guess(player.uuid, "teammate")
