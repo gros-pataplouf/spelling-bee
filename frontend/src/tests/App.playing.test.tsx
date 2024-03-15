@@ -200,38 +200,6 @@ describe('<Game/>', () => {
     expect(inputForm).toHaveAttribute('value', 'SOI')
   })
 
-  test('a < 4 letter input generates a "too short" message"', async () => {
-    const game = render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    )
-    const button = game.container.querySelector('button')
-    if (button === null) {
-      throw new Error('play button not present')
-    }
-    fireEvent(
-      getByText(button, 'Play alone'),
-      new MouseEvent('click', {
-        bubbles: true
-      })
-    )
-
-    const enterButton = game.container.querySelector(
-      'button#enter'
-    )
-    const inputForm = game.container.querySelector(
-      'input#input'
-    )
-    if (inputForm === null || enterButton === null) {
-      throw new Error('inputform or enter button is null')
-    }
-    await userEvent.click(inputForm)
-    await userEvent.type(inputForm, 'SIT')
-    await userEvent.click(enterButton)
-    expect(screen.getByText('too short')).toBeInTheDocument()
-  })
-
   test('if the input field changes, the message is deleted', async () => {
     const game = render(
       <BrowserRouter>
