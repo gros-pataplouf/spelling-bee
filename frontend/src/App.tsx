@@ -122,13 +122,15 @@ function App (): React.JSX.Element {
         }
       }
       navigate(`/${gameId}`)
-      setStateOfGame({
-        ...stateOfGame,
-        phaseOfGame: PhaseOfGame.playing,
-        gameId,
-        player1Id,
-        gameTimeStamp: timeStamp,
-        multiPlayer: mode === 'multiplayer'
+      setStateOfGame((draft) => {
+        return {
+          ...draft,
+          phaseOfGame: PhaseOfGame.playing,
+          gameId,
+          player1Id,
+          gameTimeStamp: timeStamp,
+          multiPlayer: mode === 'multiplayer'
+        }
       })
       setLocalStorage({
         gameId,
