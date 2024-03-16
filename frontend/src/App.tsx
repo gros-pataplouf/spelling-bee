@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
-import { useEffect, useState, useRef, type MouseEventHandler } from 'react'
+import { useEffect, useRef, type MouseEventHandler } from 'react'
+import { useImmer } from 'use-immer'
 import type React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { PhaseOfGame, type GameState } from './types/types'
@@ -28,7 +29,7 @@ function App (): React.JSX.Element {
     player2GuessedWords: null,
     player2Points: null
   }
-  const [stateOfGame, setStateOfGame] = useState(initialStateOfGame)
+  const [stateOfGame, setStateOfGame] = useImmer(initialStateOfGame)
   const location = useLocation()
   useEffect(() => {
     if (stateOfGame?.gameId !== null) {
@@ -46,10 +47,8 @@ function App (): React.JSX.Element {
       }
       socket.onmessage = (message) => {
         if (connection.current != null) {
-          console.log(JSON.parse(message.data as string))
-          const newState: GameState = { ...stateOfGame, ...JSON.parse(message.data as string) }
-          console.log(newState)
-          setStateOfGame(newState)
+          const incoming = JSON.parse(message.data as string)
+          setStateOfGame((draft) => { return { ...draft, ...incoming } })
         }
       }
       connection.current = socket
