@@ -28,9 +28,13 @@ function Game ({ props }: GameProps): React.JSX.Element {
         .toLowerCase()
         .includes(inputEvent.data.toLowerCase())
     ) {
-      setStateOfGame({
-        ...stateOfGame,
-        input: [...stateOfGame.input, inputEvent.data.toUpperCase()]
+      setStateOfGame((draft) => {
+        // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+        const input = inputEvent.data as string
+        return {
+          ...draft,
+          input: [...stateOfGame.input, input.toUpperCase()]
+        }
       })
     } else if (inputEvent.inputType === 'deleteContentBackward') {
       setStateOfGame({
