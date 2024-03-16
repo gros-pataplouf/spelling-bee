@@ -37,9 +37,11 @@ function Game ({ props }: GameProps): React.JSX.Element {
         }
       })
     } else if (inputEvent.inputType === 'deleteContentBackward') {
-      setStateOfGame({
-        ...stateOfGame,
-        input: stateOfGame.input.slice(0, stateOfGame.input.length - 1)
+      setStateOfGame((draft) => {
+        return {
+          ...draft,
+          input: draft.input.slice(0, draft.input.length - 1)
+        }
       })
     }
   }
