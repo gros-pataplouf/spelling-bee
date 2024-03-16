@@ -33,7 +33,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
         const input = inputEvent.data as string
         return {
           ...draft,
-          input: [...stateOfGame.input, input.toUpperCase()]
+          input: [...draft.input, input.toUpperCase()]
         }
       })
     } else if (inputEvent.inputType === 'deleteContentBackward') {
@@ -47,9 +47,11 @@ function Game ({ props }: GameProps): React.JSX.Element {
   }
   function deleteLetter (): void {
     if (stateOfGame.input.length > 0) {
-      setStateOfGame({
-        ...stateOfGame,
-        input: stateOfGame.input.slice(0, stateOfGame.input.length - 1)
+      setStateOfGame((draft) => {
+        return {
+          ...draft,
+          input: draft.input.slice(0, draft.input.length - 1)
+        }
       })
     }
   }
@@ -63,14 +65,16 @@ function Game ({ props }: GameProps): React.JSX.Element {
       )
       otherLettersNew.push(removedLetter)
     }
-    setStateOfGame({
-      ...stateOfGame,
-      letters: [stateOfGame.letters[0], ...otherLettersNew]
+    setStateOfGame((draft) => {
+      return {
+        ...draft,
+        letters: [draft.letters[0], ...otherLettersNew]
+      }
     })
   }
 
   function submitWord (): void {
-    setStateOfGame({ ...stateOfGame, guess: stateOfGame.input.join('') })
+    setStateOfGame((draft) => { return { ...draft, guess: draft.input.join('') } })
   }
 
   function handleKeyDown (event: React.KeyboardEvent<HTMLInputElement>): void {

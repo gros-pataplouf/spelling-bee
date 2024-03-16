@@ -9,16 +9,18 @@ function Cell (props: CellProps): React.JSX.Element {
   } else {
     sortOfLetter = 'otherLetter'
   }
-  const { stateOfGame, setStateOfGame } = props
+  const { setStateOfGame } = props
 
   function selectLetter (event: BaseSyntheticEvent): void {
     const svg = event.currentTarget as SVGElement
     if (svg.lastChild?.textContent !== null) {
       const selectedLetter = svg.lastChild?.textContent
       if (selectedLetter !== undefined) {
-        setStateOfGame({
-          ...stateOfGame,
-          input: [...stateOfGame.input, selectedLetter]
+        setStateOfGame((draft) => {
+          return {
+            ...draft,
+            input: [...draft.input, selectedLetter]
+          }
         })
       }
     }
