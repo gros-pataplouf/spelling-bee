@@ -64,6 +64,28 @@ describe('<Game/>', () => {
     })
   })
 
+  test('Messages from the backend disappear after a short lapse of time', async () => {
+    const game = render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    )
+    const button = game.container.querySelector('button') as HTMLElement
+    fireEvent(
+      getByText(button, 'Play alone'),
+      new MouseEvent('click', {
+        bubbles: true
+      })
+    )
+
+    websocketServer.emit('message', JSON.stringify({ message: { category: 'warning', content: 'not a word', points: null } }))
+
+    await waitFor(async () => {
+      expect(game.container.querySelector('#notificationMessage')).toBeEmptyDOMElement()
+    })
+    screen.debug()
+  })
+
   test('Frontend displays points sent from the backend', async () => {
     const game = render(
       <BrowserRouter>
