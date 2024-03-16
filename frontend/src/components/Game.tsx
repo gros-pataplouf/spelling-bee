@@ -11,9 +11,11 @@ function Game ({ props }: GameProps): React.JSX.Element {
   const { stateOfGame, setStateOfGame } = props
 
   useEffect(() => {
-    setStateOfGame({
-      ...stateOfGame,
-      message: { category: null, content: null, points: null }
+    setStateOfGame((draft) => {
+      return {
+        ...draft,
+        message: { category: null, content: null, points: null }
+      }
     })
   }, [stateOfGame.input])
   function handleChange (e: BaseSyntheticEvent): void {
