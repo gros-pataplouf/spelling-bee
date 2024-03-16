@@ -33,6 +33,21 @@ describe('<Game/>', () => {
 
     expect(screen.getByText('Invite a friend')).toBeInTheDocument()
   })
+  test('User is prompted to enter their name', async () => {
+    render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    )
+    fireEvent(
+      screen.getByText('Invite a friend'),
+      new MouseEvent('click', {
+        bubbles: true
+      })
+    )
+    await waitFor(() => { expect(screen.getByText('Please enter your name')).toBeInTheDocument() })
+  })
+
   test('User gets instructions to invite a friend', async () => {
     render(
       <BrowserRouter>
@@ -41,6 +56,12 @@ describe('<Game/>', () => {
     )
     fireEvent(
       screen.getByText('Invite a friend'),
+      new MouseEvent('click', {
+        bubbles: true
+      })
+    )
+    fireEvent(
+      screen.getByText('Confirm'),
       new MouseEvent('click', {
         bubbles: true
       })

@@ -28,6 +28,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         print(channel_layer)
         text_data_json = json.loads(text_data)
         message = text_data_json
+        print(message)
         filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
         if not filtered_games:
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
@@ -72,6 +73,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = event["message"]
         game = Game(message.get("gameId"))
         player = Player(message.get("player1Name"), message.get("player1Id"))
+        print(message.get("player1Name"))
+
         game.add_player(player)
         games.append(game)
         # Send message to WebSocket
@@ -86,13 +89,15 @@ class GameConsumer(AsyncWebsocketConsumer):
         game = list(filter(lambda game: game.uuid == message.get("gameId"), games))[0]
         current_player_list = list(filter(lambda player: player.uuid == message.get("player1Id"), game.players))
         if not current_player_list: #if the joining user is not yet playing
-            new_player = game.add_player(Player(message.get('player1Name')+'2', message.get('player1Id'))) #add them to game
+            new_player = game.add_player(Player(message.get('player1Name'), message.get('player1Id'))) #add them to game
             playing_opponent = list(filter(lambda player: player.uuid != message.get("player1Id"), game.players))[0]
             await self.channel_layer.group_send(user_groups[new_player.uuid], {'type': 'update_game', 'message': json.dumps({
                 "player1Points": new_player.points,
                 "player1GuessedWords": new_player.guessed_words,
+                "player1Name": new_player.name,
                 "player2Points": playing_opponent.points if playing_opponent else None,
                 "player2Id": playing_opponent.uuid if playing_opponent else None,
+                "player2Name": playing_opponent.name if playing_opponent else None,
                 "player2GuessedWords": playing_opponent.guessed_words if playing_opponent else None,
                 "letters": game.letterset,
                 "multiPlayer": True if playing_opponent else False
@@ -100,9 +105,11 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(user_groups[playing_opponent.uuid], {'type': 'update_game', 'message': json.dumps({
                 "player1Points": playing_opponent.points,
                 "player1GuessedWords": playing_opponent.guessed_words,
+                "player1Name": playing_opponent.name,
                 "player2Points": new_player.points if playing_opponent else None,
                 "player2GuessedWords": new_player.guessed_words if playing_opponent else None,
                 "player2Id": new_player.uuid,
+                "player2Name": new_player.name,
                 "letters": game.letterset,
                 "multiPlayer": True if playing_opponent else False
 

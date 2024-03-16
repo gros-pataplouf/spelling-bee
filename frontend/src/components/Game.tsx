@@ -77,7 +77,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
 
   return (
     stateOfGame.multiPlayer && stateOfGame.player2Id === null
-      ? <WelcomeMultiplayer/>
+      ? <WelcomeMultiplayer props={{ stateOfGame, setStateOfGame }}/>
       : <div className="flex flex-col items-center">
       <Notification stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />
 
