@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest'
-import { render, fireEvent, waitFor, getByText } from '@testing-library/react'
+import { render, fireEvent, waitFor, getByText, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Server, WebSocket } from 'mock-socket'
 import { type GameState } from '../types/types'
 import { BrowserRouter } from 'react-router-dom'
@@ -128,6 +129,45 @@ describe('<Game/>', () => {
       )
       expect(game.container.querySelector('#notificationPoints')).toHaveTextContent(
         '+3'
+      )
+    })
+  })
+  test('Backend server can reset input field', async () => {
+    const game = render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    )
+    const button = game.container.querySelector('button') as HTMLElement
+    fireEvent(
+      getByText(button, 'Play alone'),
+      new MouseEvent('click', {
+        bubbles: true
+      })
+    )
+    const enterButton = game.container.querySelector(
+      'button#enter'
+    )
+    const inputForm = game.container.querySelector(
+      'input#input'
+    )
+    if (enterButton === null || inputForm === null) {
+      throw new Error('enter button or input form null')
+    }
+    await userEvent.click(inputForm)
+    await userEvent.type(inputForm, 'SOLILOQUIST')
+    websocketServer.emit(
+      'message',
+      JSON.stringify({ input: [] })
+    )
+    await waitFor(async () => {
+      expect(screen.getByRole('input')).toHaveAttribute(
+        'value',
+        'SOLILOQUIST'
+      )
+      expect(screen.getByRole('input')).toHaveAttribute(
+        'value',
+        'SOLILOQUIST'
       )
     })
   })

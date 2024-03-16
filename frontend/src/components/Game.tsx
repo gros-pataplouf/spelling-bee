@@ -1,6 +1,6 @@
 import type React from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { useEffect, type BaseSyntheticEvent } from 'react'
+import { type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import PlayerStats from './PlayerStats'
 import Notification from './Notification'
@@ -10,14 +10,6 @@ import { type GameProps } from '../types/types'
 function Game ({ props }: GameProps): React.JSX.Element {
   const { stateOfGame, setStateOfGame } = props
 
-  useEffect(() => {
-    setStateOfGame((draft) => {
-      return {
-        ...draft,
-        message: { category: null, content: null, points: null }
-      }
-    })
-  }, [stateOfGame.input])
   function handleChange (e: BaseSyntheticEvent): void {
     const inputEvent = e.nativeEvent as InputEvent
     if (

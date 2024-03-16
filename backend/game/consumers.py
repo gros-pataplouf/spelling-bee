@@ -53,7 +53,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                 "message": {"category": "result", "content": guess_result["message"], "points": guess_result["points"] if guess_result["points"] > 0 else None},
                 "player2Points": current_opponent.points if current_opponent else None,
                 "player2GuessedWords": current_opponent.guessed_words if current_opponent else None,
-                "letters": current_game.letterset
+                "letters": current_game.letterset,
+                "input": [] if guess_result["points"] > 0 else message.get("input")
                 })})
 
         if current_opponent:
