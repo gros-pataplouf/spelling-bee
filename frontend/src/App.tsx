@@ -32,8 +32,8 @@ function App (): React.JSX.Element {
   const [stateOfGame, setStateOfGame] = useImmer(initialStateOfGame)
   const location = useLocation()
   useEffect(() => {
+    let socket
     if (stateOfGame?.gameId !== null) {
-      let socket
       if (import.meta.env.REACT_ENV === 'test') {
         socket = new WebSocket('ws://localhost:8000')
       } else {
@@ -49,6 +49,31 @@ function App (): React.JSX.Element {
         if (connection.current != null) {
           const incoming = JSON.parse(message.data as string)
           setStateOfGame((draft) => { return { ...draft, ...incoming } })
+        }
+      }
+      connection.current = socket
+      return () => {
+        if (connection.current !== null) {
+          connection.current.close()
+        }
+      }
+    } else if (isValidUuid(location.pathname.slice(1))) {
+      const gameId = location.pathname.slice(1)
+      socket = new WebSocket('ws://localhost:8000/query')
+
+      socket.onopen = () => {
+        if (connection.current !== null) {
+          console.log('connecting')
+          connection.current.send(JSON.stringify({ gameId }))
+        }
+      }
+      socket.onmessage = (message) => {
+        if (connection.current != null) {
+          const incoming = JSON.parse(message.data as string)
+          setStateOfGame((draft) => {
+            console.log(stateOfGame, incoming)
+            return { ...draft, ...incoming }
+          })
         }
       }
       connection.current = socket

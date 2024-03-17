@@ -3,6 +3,7 @@ import type React from 'react'
 export enum PhaseOfGame {
   playing = 'playing',
   welcome = 'welcome',
+  joining = 'joining'
 }
 
 export interface GameState {
