@@ -6,6 +6,7 @@ export default function WelcomeMultiplayer ({ props }: GameProps): React.JSX.Ele
   const [notification, setNotification] = useState('')
   const [userInput, setUserInput] = useState('your name')
   const { stateOfGame, setStateOfGame } = props
+  console.log(stateOfGame)
   function handleChange (e: BaseSyntheticEvent): void {
     const newName = e.target.value as string
     setUserInput(newName)

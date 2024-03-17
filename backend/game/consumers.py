@@ -17,9 +17,9 @@ class QueryConsumer(AsyncWebsocketConsumer):
             queried_game = filtered_games[0]
             if len(queried_game.players) == 1:
                 self.temp_user_group = "group_" + str(uuid4()) 
-                print("sending information")
+                print(queried_game.players[0].name)
                 await self.channel_layer.group_add(self.temp_user_group, self.channel_name)
-                await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": "joining"}})
+                await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": "joining", "player2Name": queried_game.players[0].name}})
         else:
             await self.close()
     async def game_info(self, event):
@@ -29,12 +29,8 @@ class QueryConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.temp_user_group, self.channel_name)
 
-
-
-
-
-
 class GameConsumer(AsyncWebsocketConsumer):
+
     async def connect(self):
         self.game_uuid = self.scope["url_route"]["kwargs"]["game_uuid"]
         self.user_uuid = self.scope["query_string"].decode("utf-8")
@@ -50,9 +46,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
 
-    # Receive message from WebSocket
     async def receive(self, text_data):
-
         text_data_json = json.loads(text_data)
         message = text_data_json
         print(message)
@@ -100,8 +94,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = event["message"]
         game = Game(message.get("gameId"))
         player = Player(message.get("player1Name"), message.get("player1Id"))
-        print(message.get("player1Name"))
-
         game.add_player(player)
         games.append(game)
         # Send message to WebSocket
@@ -114,7 +106,10 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def continue_game(self, event):
         message = event["message"]
         game = list(filter(lambda game: game.uuid == message.get("gameId"), games))[0]
-        print(game.players)
+        already_playing = game.players
+        for player in already_playing:
+            if player.uuid == message.get("player1Id"):
+                player.name = message.get("player1Name")
         current_player_list = list(filter(lambda player: player.uuid == message.get("player1Id"), game.players))
         if not current_player_list: #if the joining user is not yet playing
             new_player = game.add_player(Player(message.get('player1Name') or "dummy", message.get('player1Id'))) #add them to game
@@ -130,6 +125,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 "letters": game.letterset,
                 "multiPlayer": True if playing_opponent else False
                 })})
+            print("opponent", playing_opponent.name)
             await self.channel_layer.group_send(user_groups[playing_opponent.uuid], {'type': 'update_game', 'message': json.dumps({
                 "player1Points": playing_opponent.points,
                 "player1GuessedWords": playing_opponent.guessed_words,

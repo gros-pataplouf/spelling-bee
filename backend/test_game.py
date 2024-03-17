@@ -121,8 +121,6 @@ def test_guessed_words_updated_for_player(game, player):  #4 - 1, 5 - 2 etc.
     assert player.guessed_words == ["TEAM"]
     assert player.points == 1
 
-
-
 def test_word_can_only_be_guessed_once(game, player):
     game.add_player(player)
     player2 = Player("Plouf2", uuid4())
@@ -133,7 +131,9 @@ def test_word_can_only_be_guessed_once(game, player):
     assert result["message"] == "already guessed"
     assert player2.guessed_words == []
         
-    
+def test_player_name_can_be_set(player):
+    player.name = "Mary"
+    assert player.name == "Mary"    
 
 # 
 # a game has up to two players; a 3rd player joining will be rejected

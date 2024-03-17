@@ -44,6 +44,9 @@ class Player:
     @guessed_words.setter
     def guessed_words(self, new_word: int):
         self.__guessed_words.append(new_word)
+    @name.setter
+    def name(self, new_name):
+        self.__name = new_name
 
 
     def __validate_uuid(self, input):
