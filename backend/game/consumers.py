@@ -9,7 +9,6 @@ user_groups = {}
 
 class QueryConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("hello from scope", self.scope["url_route"])
         await self.accept()
     async def receive(self, text_data):
         message = json.loads(text_data)
@@ -27,6 +26,9 @@ class QueryConsumer(AsyncWebsocketConsumer):
         print("handling game info")
         message =  json.dumps(event["message"])
         await self.send(text_data=message)
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.temp_user_group, self.channel_name)
+
 
 
 

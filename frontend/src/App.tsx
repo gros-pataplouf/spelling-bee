@@ -9,6 +9,7 @@ import { useLocalStorage } from 'usehooks-ts'
 import { isValidUuid } from './helpers/helpers'
 import Game from './components/Game'
 import Welcome from './components/Welcome'
+import Join from './components/Join'
 
 function App (): React.JSX.Element {
   const connection = useRef<WebSocket | null>(null)
@@ -169,12 +170,10 @@ function App (): React.JSX.Element {
   return (
     <div className="bg-yellow-400 h-screen flex flex-col justify-center items-center">
       <h1 className="font-semibold text-center pb-6 text-3xl">Spelling Bee</h1>
-      {stateOfGame.phaseOfGame === PhaseOfGame.welcome
-        ? < Welcome startGame={startGame}/>
+      {stateOfGame.phaseOfGame === PhaseOfGame.welcome && < Welcome startGame={startGame}/>}
+      {stateOfGame.phaseOfGame === PhaseOfGame.joining && <Join startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
+      {stateOfGame.phaseOfGame === PhaseOfGame.playing && <Game props={{ stateOfGame, setStateOfGame }}/>}
 
-        : (
-        <Game props={{ stateOfGame, setStateOfGame }} />
-          )}
     </div>
   )
 }
