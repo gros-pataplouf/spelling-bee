@@ -6,7 +6,7 @@ from pathlib import Path
 message_reference = {
     1: "correct", 
     2: "good",
-    3: "not to bad",
+    3: "not too bad",
     4: "respect",
     5: "awesome",
     6: "amazing",
