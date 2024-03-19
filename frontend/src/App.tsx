@@ -10,6 +10,9 @@ import { isValidUuid } from './helpers/helpers'
 import Game from './components/Game'
 import Welcome from './components/Welcome'
 import Join from './components/Join'
+const BASE_URL = import.meta.env.REACT_ENV !== 'dev' || import.meta.env.REACT_ENV !== 'test' ? 'wss://spellingb.up.railway.app' : 'ws://localhost:8000'
+
+console.log(import.meta.env.REACT_ENV, BASE_URL)
 
 function App (): React.JSX.Element {
   const connection = useRef<WebSocket | null>(null)
@@ -36,9 +39,9 @@ function App (): React.JSX.Element {
     let socket
     if (stateOfGame?.gameId !== null) {
       if (import.meta.env.REACT_ENV === 'test') {
-        socket = new WebSocket('ws://localhost:8000')
+        socket = new WebSocket(BASE_URL)
       } else {
-        socket = new WebSocket(`ws://localhost:8000/${stateOfGame.gameId}?${stateOfGame.player1Id}`)
+        socket = new WebSocket(`${BASE_URL}/${stateOfGame.gameId}?${stateOfGame.player1Id}`)
       }
       socket.onopen = () => {
         if (connection.current !== null) {
@@ -58,9 +61,9 @@ function App (): React.JSX.Element {
           connection.current.close()
         }
       }
-    } else if (isValidUuid(location.pathname.slice(1))) {
+    } else if (isValidUuid(location.pathname.slice(1)) && location.pathname.slice(1) !== localStorage.gameId) {
       const gameId = location.pathname.slice(1)
-      socket = new WebSocket('ws://localhost:8000/query')
+      socket = new WebSocket(`${BASE_URL}/query`)
 
       socket.onopen = () => {
         if (connection.current !== null) {
