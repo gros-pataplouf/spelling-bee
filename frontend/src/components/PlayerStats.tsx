@@ -5,7 +5,7 @@ import { type PlayerStatsProps } from '../types/types'
 export default function PlayerStats (props: PlayerStatsProps): React.JSX.Element {
   const { stateOfGame } = props
 
-  return <div className="card bg-gray-200 m-4">
+  return <div className="card m-4">
       <p className="text-center">
         <span id="points">You have {stateOfGame.player1Points}</span> points
       </p>

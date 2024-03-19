@@ -22,7 +22,7 @@ export default function Notification (props: NotificationProps): React.JSX.Eleme
     }, 3000)
   }, [stateOfGame.message])
 
-  return <p className="animate-bounce">
+  return <p className="animate-bounce text-lg dark:text-red-900">
       &nbsp;
       <span id="notificationMessage">{stateOfGame.message?.content}</span>{' '}
       <span id="notificationPoints">{(stateOfGame.message?.points) != null && stateOfGame.message.points > 0 && '+'.concat(stateOfGame.message.points.toString())}</span>
