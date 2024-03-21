@@ -10,9 +10,11 @@ import { isValidUuid } from './helpers/helpers'
 import Game from './components/Game'
 import Welcome from './components/Welcome'
 import Join from './components/Join'
-const BASE_URL = import.meta.env.REACT_ENV !== 'dev' || import.meta.env.REACT_ENV !== 'test' ? 'wss://spellingb.up.railway.app' : 'ws://localhost:8000'
 
-console.log(import.meta.env.REACT_ENV, BASE_URL)
+const BASE_URL =
+import.meta.env.VITE_REACT_ENV === 'production'
+  ? 'wss://spellingb.up.railway.app'
+  : 'ws://localhost:8000'
 
 function App (): React.JSX.Element {
   const connection = useRef<WebSocket | null>(null)
@@ -20,7 +22,7 @@ function App (): React.JSX.Element {
     gameId: null,
     gameTimeStamp: null,
     phaseOfGame: PhaseOfGame.welcome,
-    letters: import.meta.env.REACT_ENV === 'test' ? Array.from('ILOQUST') : Array.from('???????'),
+    letters: import.meta.env.VITE_REACT_ENV === 'test' ? Array.from('ILOQUST') : Array.from('???????'),
     player1Id: null,
     player1Name: null,
     player1GuessedWords: [],
@@ -37,8 +39,9 @@ function App (): React.JSX.Element {
   const location = useLocation()
   useEffect(() => {
     let socket
+    console.log(import.meta.env.VITE_REACT_ENV)
     if (stateOfGame?.gameId !== null) {
-      if (import.meta.env.REACT_ENV === 'test') {
+      if (import.meta.env.VITE_REACT_ENV === 'test') {
         socket = new WebSocket(BASE_URL)
       } else {
         socket = new WebSocket(`${BASE_URL}/${stateOfGame.gameId}?${stateOfGame.player1Id}`)
@@ -74,6 +77,7 @@ function App (): React.JSX.Element {
       socket.onmessage = (message) => {
         if (connection.current != null) {
           const incoming = JSON.parse(message.data as string)
+          console.log('during game', incoming)
           setStateOfGame((draft) => {
             console.log(stateOfGame, incoming)
             return { ...draft, ...incoming }

@@ -36,10 +36,10 @@ describe('<Game/>', () => {
     websocketServer.emit('message', JSON.stringify({ letters: Array.from('ABCDEFG') }))
     await waitFor(() => { expect(game.container.querySelector('text')?.textContent).toBe('A') }
     )
-    const letterArrayBefore = Array.from(
+    const letterArray = Array.from(
       game.container.querySelectorAll('#hive>svg>text')
     ).map((node) => node.textContent)
-    expect(letterArrayBefore.join('')).toBe('ABCDEFG')
+    expect(letterArray.join('')).toBe('ABCDEFG')
   })
 
   test('Frontend displays warning messages from the backend', async () => {
