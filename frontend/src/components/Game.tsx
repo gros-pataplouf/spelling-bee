@@ -4,7 +4,6 @@ import { type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import PlayerStats from './PlayerStats'
 import Notification from './Notification'
-import WelcomeMultiplayer from './WelcomeMultiplayer'
 import { type GameProps } from '../types/types'
 
 function Game ({ props }: GameProps): React.JSX.Element {
@@ -76,9 +75,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
   }
 
   return (
-    stateOfGame.multiPlayer && stateOfGame.player2Id === null
-      ? <WelcomeMultiplayer props={{ stateOfGame, setStateOfGame }}/>
-      : <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center">
       <Notification stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />
 
       <input

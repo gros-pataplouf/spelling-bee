@@ -13,9 +13,10 @@ class QueryConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         message = json.loads(text_data)
         filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
+        self.temp_user_group = None
         if filtered_games:
             queried_game = filtered_games[0]
-            if len(queried_game.players) == 1:
+            if len(queried_game.players) == 1 and queried_game.players[0].uuid != message.get("player1Id"):
                 self.temp_user_group = "group_" + str(uuid4()) 
                 print(queried_game.players[0].name)
                 await self.channel_layer.group_add(self.temp_user_group, self.channel_name)
@@ -27,7 +28,8 @@ class QueryConsumer(AsyncWebsocketConsumer):
         message =  json.dumps(event["message"])
         await self.send(text_data=message)
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.temp_user_group, self.channel_name)
+        if self.temp_user_group:
+            await self.channel_layer.group_discard(self.temp_user_group, self.channel_name)
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -52,7 +54,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
         if not filtered_games:
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
-        if filtered_games :
+        if filtered_games and message.get("phaseOfGame") == "waiting":
             print(filtered_games)
             await self.channel_layer.group_send(self.user_group_name, {"type": "continue_game", "message": message})
         if message["input"]:
@@ -94,59 +96,37 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = event["message"]
         game = Game(message.get("gameId"))
         player = Player(message.get("player1Name"), message.get("player1Id"))
-        game.add_player(player)
-        games.append(game)
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({"letters": game.letterset}))
+        if player not in game.players:
+            game.add_player(player)
+            games.append(game)
+            await self.send(text_data=json.dumps({"letters": game.letterset}))
     
     async def update_game(self, event):
         message = event["message"]
         await self.send(text_data=message)
     
     async def continue_game(self, event):
+        print("continue game")
         message = event["message"]
         game = list(filter(lambda game: game.uuid == message.get("gameId"), games))[0]
         already_playing = game.players
+        sending_player = None
         for player in already_playing:
             if player.uuid == message.get("player1Id"):
-                player.name = message.get("player1Name")
-        current_player_list = list(filter(lambda player: player.uuid == message.get("player1Id"), game.players))
-        if not current_player_list: #if the joining user is not yet playing
-            new_player = game.add_player(Player(message.get('player1Name') or "dummy", message.get('player1Id'))) #add them to game
-            playing_opponent = list(filter(lambda player: player.uuid != message.get("player1Id"), game.players))[0]
-            await self.channel_layer.group_send(user_groups[new_player.uuid], {'type': 'update_game', 'message': json.dumps({
-                "player1Points": new_player.points,
-                "player1GuessedWords": new_player.guessed_words,
-                "player1Name": new_player.name,
-                "player2Points": playing_opponent.points if playing_opponent else None,
-                "player2Id": playing_opponent.uuid if playing_opponent else None,
-                "player2Name": playing_opponent.name if playing_opponent else None,
-                "player2GuessedWords": playing_opponent.guessed_words if playing_opponent else None,
+                sending_player = player
+        if not sending_player:
+            sending_player = game.add_player(Player(message.get('player1Name') or "dummy", message.get('player1Id'))) #add them to game
+        for player in game.players:
+            other_players = list(filter(lambda x: x.uuid != player.uuid, game.players))
+            opponent = other_players[0] if other_players else None
+            await self.channel_layer.group_send(user_groups[player.uuid], {'type': 'update_game', 'message': json.dumps({
+                "player1Points": player.points,
+                "player1GuessedWords": player.guessed_words,
+                "player1Name": player.name,
+                "player2Points": opponent.points if opponent else None,
+                "player2Id": opponent.uuid if opponent else None,
+                "player2Name": opponent.name if opponent else None,
+                "player2GuessedWords": opponent.guessed_words if opponent else None,
                 "letters": game.letterset,
-                "multiPlayer": True if playing_opponent else False
-                })})
-            print("opponent", playing_opponent.name)
-            await self.channel_layer.group_send(user_groups[playing_opponent.uuid], {'type': 'update_game', 'message': json.dumps({
-                "player1Points": playing_opponent.points,
-                "player1GuessedWords": playing_opponent.guessed_words,
-                "player1Name": playing_opponent.name,
-                "player2Points": new_player.points if playing_opponent else None,
-                "player2GuessedWords": new_player.guessed_words if playing_opponent else None,
-                "player2Id": new_player.uuid,
-                "player2Name": new_player.name,
-                "letters": game.letterset,
-                "multiPlayer": True if playing_opponent else False
-
-                })})
-
-        else:
-            current_player = current_player_list[0]
-            playing_opponent_list = list(filter(lambda player: player.uuid != message.get("player1Id"), game.players))
-            playing_opponent = playing_opponent_list[0] if playing_opponent_list else None
-            await self.channel_layer.group_send(user_groups[current_player.uuid], {'type': 'update_game', 'message': json.dumps({
-                "player1Points": current_player.points,
-                "player1GuessedWords": current_player.guessed_words,
-                "player2Points": playing_opponent.points if playing_opponent else None,
-                "player2GuessedWords": playing_opponent.guessed_words if playing_opponent else None,
-                "letters": game.letterset
+                "multiPlayer": True if opponent else False
                 })})

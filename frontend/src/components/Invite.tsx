@@ -1,8 +1,8 @@
 import type React from 'react'
 import { type BaseSyntheticEvent, useState } from 'react'
-import { type GameProps } from '../types/types'
+import { PhaseOfGame, type JoinProps } from '../types/types'
 
-export default function WelcomeMultiplayer ({ props }: GameProps): React.JSX.Element {
+export default function Invite (props: JoinProps): React.JSX.Element {
   const [notification, setNotification] = useState('')
   const [userInput, setUserInput] = useState('your name')
   const { stateOfGame, setStateOfGame } = props
@@ -18,16 +18,16 @@ export default function WelcomeMultiplayer ({ props }: GameProps): React.JSX.Ele
     setStateOfGame((draft) => {
       return {
         ...draft,
-        player1Name: userInput
+        player1Name: userInput,
+        phaseOfGame: PhaseOfGame.waiting
       }
     })
   }
-
   function copyToClipBoard (): void {
     void navigator.clipboard.writeText(window.location.href)
     setNotification('Success! Waiting for your friend to join the game')
   }
-  if (stateOfGame.player1Name === null) {
+  if (stateOfGame.phaseOfGame === PhaseOfGame.inviting) {
     return <div className="flex flex-col space-y-12 text-center dark:text-black">
     <p className="text-xl text-bold">Please enter your name</p>
     <input className="mx-auto input" value={userInput} onChange={handleChange} onClick={() => { userInput === 'your name' && setUserInput('') }}/>
@@ -38,11 +38,12 @@ export default function WelcomeMultiplayer ({ props }: GameProps): React.JSX.Ele
         Confirm
       </button>
   </div>
+  } else {
+    return <div className="flex flex-col space-y-12 text-center dark:text-black">
+    <p className="text-xl text-bold">Send this link to your friend</p>
+    <p className="text-xl text-bold cursor-copy" onClick={copyToClipBoard}>{window.location.href}</p>
+    <button className="btn btn-solid-secondary btn-lg block mx-auto dark:bg-gray-700 dark:text-gray-100" onClick={copyToClipBoard}>Copy</button>
+    <p className="text-2xl dark:text-red-800 animate-pulse">{notification}</p>
+  </div>
   }
-  return <div className="flex flex-col space-y-12 text-center dark:text-black">
-      <p className="text-xl text-bold">Send this link to your friend</p>
-      <p className="text-xl text-bold cursor-copy" onClick={copyToClipBoard}>{window.location.href}</p>
-      <button className="btn btn-solid-secondary btn-lg block mx-auto dark:bg-gray-700 dark:text-gray-100" onClick={copyToClipBoard}>Copy</button>
-      <p className="text-2xl dark:text-red-800 animate-pulse">{notification}</p>
-    </div>
 }

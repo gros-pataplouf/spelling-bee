@@ -10,7 +10,7 @@ import { isValidUuid } from './helpers/helpers'
 import Game from './components/Game'
 import Welcome from './components/Welcome'
 import Join from './components/Join'
-
+import Invite from './components/Invite'
 const BASE_URL: string =
 import.meta.env.VITE_REACT_ENV === 'production'
   ? import.meta.env.VITE_PRODUCTION_URL
@@ -43,6 +43,7 @@ function App (): React.JSX.Element {
     console.log(localStorage.gameId)
     let socket: WebSocket | null = null
     let gameId: string
+    let player1Id: string | null
     if (stateOfGame?.gameId !== null) {
       if (import.meta.env.VITE_REACT_ENV === 'test') {
         socket = new WebSocket(BASE_URL)
@@ -51,6 +52,7 @@ function App (): React.JSX.Element {
       }
     } else if (isValidUuid(location.pathname.slice(1))) {
       gameId = location.pathname.slice(1)
+      player1Id = localStorage.player1Id
       socket = new WebSocket(`${BASE_URL}/query`)
     }
 
@@ -63,7 +65,7 @@ function App (): React.JSX.Element {
             connection.current.send(JSON.stringify(stateOfGame))
           } else {
             console.log('connecting')
-            connection.current.send(JSON.stringify({ gameId }))
+            connection.current.send(JSON.stringify({ gameId, player1Id }))
           }
         }
       }
@@ -105,7 +107,7 @@ function App (): React.JSX.Element {
       setStateOfGame((draft) => {
         return {
           ...draft,
-          phaseOfGame: PhaseOfGame.playing,
+          phaseOfGame: mode === 'multiplayer' ? PhaseOfGame.inviting : PhaseOfGame.playing,
           gameId,
           player1Id,
           multiPlayer: mode === 'multiplayer'
@@ -123,6 +125,7 @@ function App (): React.JSX.Element {
     <div className="bg-yellow-400 h-screen flex flex-col justify-center items-cente">
       <h1 className="font-semibold text-center pb-6 dark:text-black text-4xl">Spelling Bee</h1>
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome && < Welcome startGame={startGame}/>}
+      {(stateOfGame.phaseOfGame === PhaseOfGame.inviting || stateOfGame.phaseOfGame === PhaseOfGame.waiting) && < Invite startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
       {stateOfGame.phaseOfGame === PhaseOfGame.joining && <Join startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
       {stateOfGame.phaseOfGame === PhaseOfGame.playing && <Game props={{ stateOfGame, setStateOfGame }}/>}
 
