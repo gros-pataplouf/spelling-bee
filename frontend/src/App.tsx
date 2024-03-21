@@ -42,23 +42,29 @@ function App (): React.JSX.Element {
     console.log(location.pathname.slice(1))
     console.log(localStorage.gameId)
     let socket: WebSocket | null = null
-    let gameId
+    let gameId: string
     if (stateOfGame?.gameId !== null) {
       if (import.meta.env.VITE_REACT_ENV === 'test') {
         socket = new WebSocket(BASE_URL)
       } else {
         socket = new WebSocket(`${BASE_URL}/${stateOfGame.gameId}?${stateOfGame.player1Id}`)
       }
-    } else if (isValidUuid(location.pathname.slice(1)) && location.pathname.slice(1) !== localStorage.gameId) {
+    } else if (isValidUuid(location.pathname.slice(1))) {
       gameId = location.pathname.slice(1)
-      socket = new WebSocket(`${BASE_URL}/query/${gameId}`)
+      socket = new WebSocket(`${BASE_URL}/query`)
     }
 
     if (socket != null) {
+      console.log(socket.url)
       socket.onopen = () => {
         if (connection.current !== null) {
-          console.log('connecting')
-          connection.current.send(JSON.stringify(stateOfGame))
+          if (stateOfGame.gameId !== null) {
+            console.log('sending message', stateOfGame)
+            connection.current.send(JSON.stringify(stateOfGame))
+          } else {
+            console.log('connecting')
+            connection.current.send(JSON.stringify({ gameId }))
+          }
         }
       }
       socket.onmessage = (message) => {

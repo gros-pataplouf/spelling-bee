@@ -30,7 +30,6 @@ class QueryConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.temp_user_group, self.channel_name)
 
 class GameConsumer(AsyncWebsocketConsumer):
-
     async def connect(self):
         self.game_uuid = self.scope["url_route"]["kwargs"]["game_uuid"]
         self.user_uuid = self.scope["query_string"].decode("utf-8")
@@ -60,6 +59,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(self.user_group_name, {"type": "check_guess", "message": message})
 
     async def check_guess(self, event):
+        print("check guess function", event["message"])
         message = event["message"]
         current_game = list(filter(lambda game: game.uuid == message.get("gameId"), games))[0]
         current_guess = "".join(message.get("input"))
