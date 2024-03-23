@@ -147,6 +147,9 @@ def test_multiplayer_one_player_cannot_get_letterset(game, player):
     game.add_player(player, multiplayer = True)
     assert game.letterset == None
 
+def test_game_status_waiting_if_one_player_multiplayer(game, player):
+    game.add_player(player, multiplayer = True)
+    assert game.status == "waiting"
 
 # a game has up to two players; a 3rd player joining will be rejected
 # the player name must be unique

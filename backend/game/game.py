@@ -68,11 +68,14 @@ class Game:
          self.__players = []
          self.__solutions = self.get_solutions(self.__letterset)
          self.__multiplayer = False
-
-    
+         self.__status = 'playing'
+   
     @property
     def uuid(self):
         return str(self.__uuid)
+    @property
+    def status(self):
+        return str(self.__status)
     @property
     def letterset(self):
         if self.__multiplayer and len(self.__players) < 2:
@@ -120,6 +123,7 @@ class Game:
         self.__players.append(player)
         if multiplayer and len(self.__players) == 1:
             self.__multiplayer = multiplayer
+            self.__status = 'waiting'
         return player
     
     def guess(self, player_uuid, guess) -> int:
