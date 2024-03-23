@@ -151,5 +151,13 @@ def test_game_status_waiting_if_one_player_multiplayer(game, player):
     game.add_player(player, multiplayer = True)
     assert game.status == "waiting"
 
+def test_when_second_player_joins_status_becomes_playing(game, player):
+    game.add_player(player, multiplayer = True)
+    second_player = Player("Putzi", uuid4())
+    game.add_player(second_player)
+    assert game.status == "playing"
+
+
+
 # a game has up to two players; a 3rd player joining will be rejected
 # the player name must be unique

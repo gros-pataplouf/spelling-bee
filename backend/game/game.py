@@ -124,6 +124,9 @@ class Game:
         if multiplayer and len(self.__players) == 1:
             self.__multiplayer = multiplayer
             self.__status = 'waiting'
+        elif self.__multiplayer and len(self.__players) == 2:
+            print('joining multiplayer')
+            self.__status = 'playing'
         return player
     
     def guess(self, player_uuid, guess) -> int:
