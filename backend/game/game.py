@@ -25,6 +25,7 @@ class Player:
         self.__uuid = self.__validate_uuid(uuid)
         self.__points = 0
         self.__guessed_words = []
+        self.__multiplayer = False
         self.group = None
     @property
     def name(self):
@@ -38,6 +39,7 @@ class Player:
     @property
     def guessed_words(self):
         return self.__guessed_words
+    
     @points.setter
     def points(self, new_points: int):
         self.__points += new_points
@@ -47,6 +49,7 @@ class Player:
     @name.setter
     def name(self, new_name):
         self.__name = new_name
+    
 
 
     def __validate_uuid(self, input):
@@ -64,6 +67,8 @@ class Game:
          self.__letterset = self.get_letterset()
          self.__players = []
          self.__solutions = self.get_solutions(self.__letterset)
+         self.__multiplayer = False
+
     
     @property
     def uuid(self):
@@ -77,6 +82,9 @@ class Game:
     @property
     def solutions(self):
         return self.__solutions
+    @property
+    def multiplayer(self):
+        return self.__multiplayer
     
     def get_letterset(self):
         letterset = []
