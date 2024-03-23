@@ -139,8 +139,11 @@ def test_game_is_not_multiplayer_by_default(game, player):
     game.add_player(player)
     assert game.multiplayer == False
 
+def test_first_player_can_set_multiplayer(game, player):
+   game.add_player(player, multiplayer = True)
+   assert game.multiplayer == True 
+
 
 # 
 # a game has up to two players; a 3rd player joining will be rejected
 # the player name must be unique
-
