@@ -75,7 +75,10 @@ class Game:
         return str(self.__uuid)
     @property
     def letterset(self):
-        return self.__letterset
+        if self.__multiplayer and len(self.__players) < 2:
+            return None
+        else:
+            return self.__letterset
     @property
     def players(self):
         return self.__players

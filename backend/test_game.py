@@ -143,7 +143,10 @@ def test_first_player_can_set_multiplayer(game, player):
    game.add_player(player, multiplayer = True)
    assert game.multiplayer == True 
 
+def test_multiplayer_one_player_cannot_get_letterset(game, player):
+    game.add_player(player, multiplayer = True)
+    assert game.letterset == None
 
-# 
+
 # a game has up to two players; a 3rd player joining will be rejected
 # the player name must be unique
