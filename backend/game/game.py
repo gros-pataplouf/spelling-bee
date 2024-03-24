@@ -24,7 +24,7 @@ def threaded(fn):
     return wrapper
 
 
-class UniqueException(Exception):
+class GameException(Exception):
     def __init__(self, message: str) -> None:
         super().__init__()
         self.message = message
@@ -70,7 +70,6 @@ class Game:
          self.__uuid = uuid4() if not uuid else self.__validate_uuid(uuid)
          self.__letterset = self.get_letterset()
          self.__players = []
-         self.__guessed_solutions = []
          self.__solutions = self.get_solutions(self.__letterset)
          self.__multiplayer = False
          self.__status = 'playing'
@@ -122,16 +121,15 @@ class Game:
         
     def add_player(self, player, multiplayer = False):
         if len(self.players) >= 2:
-            raise Exception("There are already two players in this game.")
+            raise GameException("There are already two players in this game.")
         if list(filter(lambda x: x.name == player.name, self.__players)):
-            raise UniqueException("Player name must be unique.")
+            raise GameException("Player name must be unique.")
         self.__players.append(player)
         if multiplayer and len(self.__players) == 1:
             self.__multiplayer = multiplayer
             self.__status = 'waiting'
         elif self.__multiplayer and len(self.__players) == 2:
             print('joining multiplayer')
-            self.__start_time = now()
             self.__status = 'playing'
             self.countdown()
         else:

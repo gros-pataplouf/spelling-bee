@@ -1,7 +1,7 @@
 import pytest, re, random, json, asyncio
 from pathlib import Path
 from uuid import uuid4
-from game.game import Game, Player, UniqueException
+from game.game import Game, Player, GameException
 from time import sleep
 
 def is_valid_uuid(input):
@@ -61,7 +61,7 @@ def test_max_2_players_in_game(game, player):
 def test_player_name_unique(game, player):
     game.add_player(player)
     next_player = Player(player.name, uuid4())
-    with pytest.raises(UniqueException):
+    with pytest.raises(GameException):
         game.add_player(next_player)
     assert len(game.players) == 1
 
@@ -92,7 +92,6 @@ def test_middleletter_missing(game, player):
     result = game.guess(player.uuid, "text")
     assert result["points"] == 0
     assert result["message"] == "middleletter missing"
-
 
 def test_correct_guess_returns_added_points(game, player):
     game.add_player(player)
@@ -168,5 +167,6 @@ def test_game_end_if_all_solutions_guessed(game, player):
     game.add_player(player)
     for solution in game.solutions:
         game.guess(player.uuid, solution)
-    sleep(2) #to allow the countdown function call the check function
+    sleep(2) #to allow the countdown function to call the check function
     assert game.status == "ended"
+
