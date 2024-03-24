@@ -120,7 +120,7 @@ class Game:
             return input
         
     def add_player(self, player, multiplayer=False):
-        if not multiplayer or len(self.players) > 0:
+        if len(self.players) > 0:
             multiplayer = self.multiplayer
         max_players = 2 if multiplayer else 1
         print(self.players, max_players, multiplayer)
