@@ -20,7 +20,6 @@ def threaded(fn):
     def wrapper(*args, **kwargs):
         thread = threading.Thread(target=fn, args=args, kwargs=kwargs)
         thread.start()
-        print("started new thread")
         return thread
     return wrapper
 
@@ -36,7 +35,6 @@ class Player:
         self.__uuid = self.__validate_uuid(uuid)
         self.__points = 0
         self.__guessed_words = []
-        self.__multiplayer = False
         self.group = None
     @property
     def name(self):
@@ -60,9 +58,6 @@ class Player:
     @name.setter
     def name(self, new_name):
         self.__name = new_name
-    
-
-
     def __validate_uuid(self, input):
         uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
         if not uuid_regex.match(str(input)):
@@ -70,19 +65,16 @@ class Player:
         else:
             return input
 
-
-
 class Game:
     def __init__(self, uuid=None, timeout=timeout) -> None:
          self.__uuid = uuid4() if not uuid else self.__validate_uuid(uuid)
          self.__letterset = self.get_letterset()
          self.__players = []
+         self.__guessed_solutions = []
          self.__solutions = self.get_solutions(self.__letterset)
          self.__multiplayer = False
          self.__status = 'playing'
          self.__timeout = timeout
-         self.__start_time = now()
-   
     @property
     def uuid(self):
         return str(self.__uuid)
@@ -173,14 +165,13 @@ class Game:
             added_points += len(guess) - 3
             player_in_game[0].points = added_points
             player_in_game[0].guessed_words = guess
-            message = message_reference[added_points]
+            message = message_reference.get(added_points) or message_reference.get(max(message_reference.keys()))
         if self.__is_pangram(guess):
             added_points += 7
             player_in_game[0].points =  7
             message = "Pangram!"
         if not is_correct_guess:
             message = "not a word"
-        print("hello from guess function", player_in_game[0].guessed_words)
         return {"points": added_points, "message": message}
     
     def __is_pangram(self, guess):
@@ -190,7 +181,13 @@ class Game:
     
     @threaded
     def countdown(self):
-        for i in range(1, self.__timeout):
+        if self.check_guesses_left() == 0:
+            self.__status = "ended"
+        for i in range(0, self.__timeout):
             sleep(1)
-            print("ticking", i)
         self.__status = "ended"
+    
+    def check_guesses_left(self):
+        all_guesses = list(map(lambda player: (lambda word: word, player.guessed_words), self.__players))
+        solutions = self.__solutions
+        return len(all_guesses) - len(solutions)

@@ -163,3 +163,10 @@ def test_game_ends_after_timeout(player):
     new_game.add_player(player)
     sleep(6)
     assert new_game.status == "ended"
+
+def test_game_end_if_all_solutions_guessed(game, player):
+    game.add_player(player)
+    for solution in game.solutions:
+        game.guess(player.uuid, solution)
+    sleep(2) #to allow the countdown function call the check function
+    assert game.status == "ended"
