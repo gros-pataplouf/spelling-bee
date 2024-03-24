@@ -55,7 +55,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         if not filtered_games:
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
         if filtered_games and message.get("phaseOfGame") == "waiting":
-            print(filtered_games)
             await self.channel_layer.group_send(self.user_group_name, {"type": "continue_game", "message": message})
         if message["input"]:
             await self.channel_layer.group_send(self.user_group_name, {"type": "check_guess", "message": message})

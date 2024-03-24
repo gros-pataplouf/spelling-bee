@@ -123,7 +123,6 @@ class Game:
         if len(self.players) > 0:
             multiplayer = self.multiplayer
         max_players = 2 if multiplayer else 1
-        print(self.players, max_players, multiplayer)
         if len(self.players) == max_players:
             raise GameException(f"Only {max_players} player(s) can join game.")
         if list(filter(lambda x: x.name == player.name, self.__players)):
