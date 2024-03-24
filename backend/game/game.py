@@ -1,7 +1,8 @@
-import re, random, json, sys
+import re, random, json, sys, asyncio, threading
 from uuid import uuid4
 from pathlib import Path
-
+from time import gmtime as now
+from time import sleep
 
 message_reference = {
     1: "correct", 
@@ -12,6 +13,16 @@ message_reference = {
     6: "amazing",
     7: "rockstar"
 }
+
+timeout = 180
+
+def threaded(fn):
+    def wrapper(*args, **kwargs):
+        thread = threading.Thread(target=fn, args=args, kwargs=kwargs)
+        thread.start()
+        print("started new thread")
+        return thread
+    return wrapper
 
 
 class UniqueException(Exception):
@@ -62,13 +73,15 @@ class Player:
 
 
 class Game:
-    def __init__(self, uuid=None) -> None:
+    def __init__(self, uuid=None, timeout=timeout) -> None:
          self.__uuid = uuid4() if not uuid else self.__validate_uuid(uuid)
          self.__letterset = self.get_letterset()
          self.__players = []
          self.__solutions = self.get_solutions(self.__letterset)
          self.__multiplayer = False
          self.__status = 'playing'
+         self.__timeout = timeout
+         self.__start_time = now()
    
     @property
     def uuid(self):
@@ -126,7 +139,11 @@ class Game:
             self.__status = 'waiting'
         elif self.__multiplayer and len(self.__players) == 2:
             print('joining multiplayer')
+            self.__start_time = now()
             self.__status = 'playing'
+            self.countdown()
+        else:
+            self.countdown()
         return player
     
     def guess(self, player_uuid, guess) -> int:
@@ -171,3 +188,9 @@ class Game:
             return set(guess).issubset(set(self.__letterset)) and set(self.__letterset).issubset(set(guess))
         return False
     
+    @threaded
+    def countdown(self):
+        for i in range(1, self.__timeout):
+            sleep(1)
+            print("ticking", i)
+        self.__status = "ended"

@@ -1,7 +1,8 @@
-import pytest, re, random, json
+import pytest, re, random, json, asyncio
 from pathlib import Path
 from uuid import uuid4
 from game.game import Game, Player, UniqueException
+from time import sleep
 
 def is_valid_uuid(input):
     uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
@@ -14,7 +15,7 @@ def player():
 
 @pytest.fixture
 def game():
-    return Game()
+    return Game(timeout=2)
 
 def test_player_has_name(player):
     assert player.name == "Plouf"
@@ -153,11 +154,12 @@ def test_game_status_waiting_if_one_player_multiplayer(game, player):
 
 def test_when_second_player_joins_status_becomes_playing(game, player):
     game.add_player(player, multiplayer = True)
-    second_player = Player("Putzi", uuid4())
+    second_player = Player("Test", uuid4())
     game.add_player(second_player)
     assert game.status == "playing"
 
-
-
-# a game has up to two players; a 3rd player joining will be rejected
-# the player name must be unique
+def test_game_ends_after_timeout(player):
+    new_game = Game(timeout = 5)
+    new_game.add_player(player)
+    sleep(6)
+    assert new_game.status == "ended"
