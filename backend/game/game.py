@@ -119,9 +119,13 @@ class Game:
         else:
             return input
         
-    def add_player(self, player, multiplayer = False):
-        if len(self.players) >= 2:
-            raise GameException("There are already two players in this game.")
+    def add_player(self, player, multiplayer=False):
+        if not multiplayer or len(self.players) > 0:
+            multiplayer = self.multiplayer
+        max_players = 2 if multiplayer else 1
+        print(self.players, max_players, multiplayer)
+        if len(self.players) == max_players:
+            raise GameException(f"Only {max_players} player(s) can join game.")
         if list(filter(lambda x: x.name == player.name, self.__players)):
             raise GameException("Player name must be unique.")
         self.__players.append(player)
@@ -137,7 +141,7 @@ class Game:
         return player
     
     def guess(self, player_uuid, guess) -> int:
-        print("guessing", guess, player_uuid)
+        #print("guessing", guess, player_uuid)
         added_points = 0
         message = None
         guess = guess.upper()

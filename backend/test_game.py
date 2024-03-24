@@ -52,14 +52,22 @@ def test_player_can_join_game(game, player):
     game.add_player(player)
     assert game.players == [player]
 
-def test_max_2_players_in_game(game, player):
+def test_if_not_multiplayer_only_one_can_join(game, player):
     game.add_player(player)
+    second_player = Player("Cleo", uuid4())
+    with pytest.raises(GameException):
+        game.add_player(second_player, multiplayer=True)
+    assert game.multiplayer == False
+
+
+def test_max_2_players_in_game(game, player):
+    game.add_player(player, multiplayer=True)
     game.add_player(Player("Second", uuid4()))
     with pytest.raises(Exception):
         game.add_player(Player("Third", uuid4()))
 
 def test_player_name_unique(game, player):
-    game.add_player(player)
+    game.add_player(player, multiplayer=True)
     next_player = Player(player.name, uuid4())
     with pytest.raises(GameException):
         game.add_player(next_player)
@@ -122,7 +130,7 @@ def test_guessed_words_updated_for_player(game, player):  #4 - 1, 5 - 2 etc.
     assert player.points == 1
 
 def test_word_can_only_be_guessed_once(game, player):
-    game.add_player(player)
+    game.add_player(player, multiplayer=True)
     player2 = Player("Plouf2", uuid4())
     game.add_player(player2)
     game.guess(player.uuid, "mate")
