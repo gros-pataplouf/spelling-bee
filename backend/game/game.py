@@ -53,7 +53,7 @@ class Player:
     def points(self, new_points: int):
         self.__points += new_points
     @guessed_words.setter
-    def guessed_words(self, new_word: int):
+    def guessed_words(self, new_word: str):
         self.__guessed_words.append(new_word)
     @name.setter
     def name(self, new_name):
