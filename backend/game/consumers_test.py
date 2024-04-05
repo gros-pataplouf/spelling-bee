@@ -12,14 +12,13 @@ class QueryConsumer(AsyncWebsocketConsumer):
         await self.accept()
     async def receive(self, text_data):
         message = json.loads(text_data)
-        requested_game_id = message.get("gameId")
-        filtered_games = list(filter(lambda game: game.uuid == requested_game_id, games))
+        filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
         self.temp_user_group = "group_" + str(uuid4())
         await self.channel_layer.group_add(self.temp_user_group, self.channel_name)
         if not filtered_games:
             await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": "error", "message": {"category": "result", "content": "game does not exist", "points": None}}})
-        elif filtered_games:
-            await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": filtered_games[0].status}})
+        else:
+            await self.close()
     async def disconnect(self, close_code):
         pass
     async def game_info(self, event):
