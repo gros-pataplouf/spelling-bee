@@ -17,6 +17,8 @@ class QueryConsumer(AsyncWebsocketConsumer):
         filtered_games = list(filter(lambda game: game.uuid == requested_game_id, games))
         self.temp_user_group = "group_" + str(uuid4())
         await self.channel_layer.group_add(self.temp_user_group, self.channel_name)
+        if filtered_games:
+            print("we have", message.get("player1Id"), [p.uuid for p in filtered_games[0].players])
         if not filtered_games:
             await self.channel_layer.group_send(
                 self.temp_user_group, {
@@ -31,6 +33,15 @@ class QueryConsumer(AsyncWebsocketConsumer):
                     "message": {
                         "phaseOfGame": "error",
                         "message": {"category": "result", "content": "game already full", "points": None}}})
+        elif filtered_games and len(filtered_games[0].players) > 1 and message.get("player1Id") not in [p.uuid for p in filtered_games[0].players]:
+            await self.channel_layer.group_send(
+                self.temp_user_group, {
+                    "type": "game_info",
+                    "message": {
+                        "phaseOfGame": "error",
+                        "message": {"category": "result", "content": "game already full", "points": None}}})
+        elif filtered_games and filtered_games[0].multiplayer and message.get("player1Id") not in [p.uuid for p in filtered_games[0].players]:
+            await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": "joining", "multiPlayer": filtered_games[0].multiplayer}})
         elif filtered_games:
             await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": filtered_games[0].status, "multiPlayer": filtered_games[0].multiplayer}})
 

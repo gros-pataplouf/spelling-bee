@@ -110,3 +110,41 @@ async def test_multiplayer_keep_waiting(multiplayer_game):
     response = await communicator.receive_from()
     assert json.loads(response) == {"phaseOfGame": "waiting", "multiPlayer": True}
     await communicator.disconnect()
+
+@pytest.mark.asyncio
+async def test_multiplayer_keep_waiting(multiplayer_game):
+    communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), "ws://localhost/query")
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    gameId = multiplayer_game.uuid
+    await communicator.send_to(text_data=json.dumps({"gameId": gameId, "player1Id": str(uuid4())}))
+    response = await communicator.receive_from()
+    assert json.loads(response) == {"phaseOfGame": "joining", "multiPlayer": True}
+    await communicator.disconnect()
+
+@pytest.mark.asyncio
+async def test_multiplayer_game_full(multiplayer_game):
+    communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), "ws://localhost/query")
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    gameId = multiplayer_game.uuid
+    second_player = Player("Puffy", uuid4())
+    multiplayer_game.add_player(second_player)
+    await communicator.send_to(text_data=json.dumps({"gameId": gameId, "player1Id": str(uuid4())}))
+    response = await communicator.receive_from()
+    assert json.loads(response) == {"phaseOfGame": "error", "message": {"category": "result", "content": "game already full", "points": None}}
+    await communicator.disconnect()
+
+@pytest.mark.asyncio
+async def test_multiplayer_continue(multiplayer_game):
+    print("test multiplayer continue")
+    communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), "ws://localhost/query")
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    gameId = multiplayer_game.uuid
+    second_player = Player("Puffy", uuid4())
+    multiplayer_game.add_player(second_player)
+    await communicator.send_to(text_data=json.dumps({"gameId": gameId, "player1Id": second_player.uuid}))
+    response = await communicator.receive_from()
+    assert json.loads(response) == {"phaseOfGame": "playing", "multiPlayer": True}
+    await communicator.disconnect()
