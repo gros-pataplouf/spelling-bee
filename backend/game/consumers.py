@@ -9,6 +9,7 @@ user_groups = {}
 
 class QueryConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.temp_user_group = None
         await self.accept()
     async def receive(self, text_data):
         message = json.loads(text_data)
@@ -17,13 +18,28 @@ class QueryConsumer(AsyncWebsocketConsumer):
         self.temp_user_group = "group_" + str(uuid4())
         await self.channel_layer.group_add(self.temp_user_group, self.channel_name)
         if not filtered_games:
-            await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": "error", "message": {"category": "result", "content": "game does not exist", "points": None}}})
+            await self.channel_layer.group_send(
+                self.temp_user_group, {
+                    "type": "game_info",
+                    "message": {
+                        "phaseOfGame": "error",
+                        "message": {"category": "result", "content": "game does not exist", "points": None}}})
+        elif filtered_games and not filtered_games[0].multiplayer and message.get("player1Id") != filtered_games[0].players[0].uuid:
+            await self.channel_layer.group_send(
+                self.temp_user_group, {
+                    "type": "game_info",
+                    "message": {
+                        "phaseOfGame": "error",
+                        "message": {"category": "result", "content": "game already full", "points": None}}})
         elif filtered_games:
-            await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": filtered_games[0].status}})
+            await self.channel_layer.group_send(self.temp_user_group, {"type": "game_info", "message": {"phaseOfGame": filtered_games[0].status, "multiPlayer": filtered_games[0].multiplayer}})
+
+        
     async def disconnect(self, close_code):
-        pass
+        if self.temp_user_group:
+            await self.channel_layer.group_discard(self.temp_user_group, self.channel_name)
+
     async def game_info(self, event):
-        print("handling game info")
         message =  json.dumps(event["message"])
         await self.send(text_data=message)
 

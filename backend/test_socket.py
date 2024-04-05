@@ -21,6 +21,15 @@ def monoplayer_game():
     games.append(monoplayer_game)
     return monoplayer_game
 
+@pytest.fixture
+def multiplayer_game():
+    new_player = Player("Plouf", uuid4())
+    multiplayer_game = Game(timeout=10)
+    multiplayer_game.add_player(new_player, multiplayer=True)
+    games.append(multiplayer_game)
+    return multiplayer_game
+
+
 def is_valid_uuid(self, input):
     uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
     return uuid_regex.match(str(input))
@@ -63,7 +72,7 @@ async def test_query_ws_returns_error_if_not_exists():
     await communicator.disconnect()
 
 @pytest.mark.asyncio
-async def test_query_returns_status(monoplayer_game):
+async def test_query_returns_status_and_multiplayer(monoplayer_game):
     communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), "ws://localhost/query")
     connected, subprotocol = await communicator.connect()
     assert connected
@@ -71,5 +80,33 @@ async def test_query_returns_status(monoplayer_game):
     playerId = monoplayer_game.players[0].uuid
     await communicator.send_to(text_data=json.dumps({"gameId": gameId, "player1Id": playerId}))
     response = await communicator.receive_from()
-    assert json.loads(response) == {"phaseOfGame": "playing"}
+    assert json.loads(response) == {"phaseOfGame": "playing", "multiPlayer": False}
+    await communicator.disconnect()
+
+@pytest.mark.asyncio
+async def test_monoplayer_game_cannot_be_joined(monoplayer_game):
+    communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), "ws://localhost/query")
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    gameId = monoplayer_game.uuid
+    playerId = monoplayer_game.players[0].uuid
+    await communicator.send_to(text_data=json.dumps({"gameId": gameId, "player1Id": str(uuid4())}))
+    response = await communicator.receive_from()
+    assert json.loads(response) == {"phaseOfGame": "error", "message": {"category": "result", "content": "game already full", "points": None}}
+    await communicator.disconnect()
+
+"""
+if game, multi, one player => compare playerId with player in game. if matches, keep 'waiting'. else, send 'joining' message to joining player
+"""
+
+@pytest.mark.asyncio
+async def test_multiplayer_keep_waiting(multiplayer_game):
+    communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), "ws://localhost/query")
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    gameId = multiplayer_game.uuid
+    playerId = multiplayer_game.players[0].uuid
+    await communicator.send_to(text_data=json.dumps({"gameId": gameId, "player1Id": playerId}))
+    response = await communicator.receive_from()
+    assert json.loads(response) == {"phaseOfGame": "waiting", "multiPlayer": True}
     await communicator.disconnect()
