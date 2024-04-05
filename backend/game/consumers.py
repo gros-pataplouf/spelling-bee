@@ -37,22 +37,24 @@ class QueryConsumer(AsyncWebsocketConsumer):
             requested_game = filtered_games[0]
             all_player_uuids = [p.uuid for p in requested_game.players]
             requesting_player_uuid = message.get("player1Id")
+            plays_game = requesting_player_uuid in all_player_uuids
 
         self.temp_user_group = "group_" + str(uuid4())
         await self.channel_layer.group_add(self.temp_user_group, self.channel_name)
-        if not filtered_games:
+        if filtered_games:
+            if not requested_game.multiplayer and not plays_game:
+                await self.channel_layer.group_send(
+                    self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["full"]))
+            elif len(requested_game.players) > 1 and not plays_game:
+                await self.channel_layer.group_send(
+                    self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["full"]))
+            elif requested_game.multiplayer and not plays_game:
+                await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game, status="joining"))
+            else:
+                await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game))
+        else:
             await self.channel_layer.group_send(
                 self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["not_ex"]))
-        elif filtered_games and not requested_game.multiplayer and requesting_player_uuid != requested_game.players[0].uuid:
-            await self.channel_layer.group_send(
-                self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["full"]))
-        elif filtered_games and len(requested_game.players) > 1 and requesting_player_uuid not in all_player_uuids:
-            await self.channel_layer.group_send(
-                 self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["full"]))
-        elif filtered_games and requested_game.multiplayer and requesting_player_uuid not in all_player_uuids:
-            await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game, status="joining"))
-        elif filtered_games:
-            await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game))
 
         
     async def disconnect(self, close_code):
