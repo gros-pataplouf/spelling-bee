@@ -42,19 +42,23 @@ class GameConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json
         filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
-        if not filtered_games and message.get("multiPlayer") == False:
-            await self.channel_layer.group_send(self.user_group_name, {"type": "start_game_mono", "message": message})
-        
+        if not filtered_games:
+            await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
 
-    async def start_game_mono(self, event):
+
+    async def start_game(self, event):
         message = event["message"]
         game = Game(message.get("gameId"))
         player = Player(message.get("player1Name"), message.get("player1Id"))
-        game.add_player(player)
+        game.add_player(player, multiplayer=message.get("multiPlayer"))
         games.append(game)
         feedback = json.dumps(self.translate_game_object(game, player_id=player.uuid))
         print(feedback)
         await self.send(text_data=feedback)
+    
+
+    
+
     
     def translate_game_object(self, game: Game, player_id):
         def get_player(id, opponent=False) -> Player:
