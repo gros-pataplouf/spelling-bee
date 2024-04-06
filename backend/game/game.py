@@ -13,7 +13,7 @@ message_reference = {
     7: "rockstar"
 }
 
-timeout = 180
+timeout = 2
 
 def threaded(fn):
     def wrapper(*args, **kwargs):
@@ -74,6 +74,9 @@ class Game:
          self.__multiplayer = False
          self.__status = 'playing'
          self.__timeout = timeout
+    @property
+    def timeout(self):
+        return str(self.__timeout)
     @property
     def uuid(self):
         return str(self.__uuid)

@@ -12,26 +12,77 @@ ERROR_MESSAGES = {
 }
 
 class GameConsumer(AsyncWebsocketConsumer):
+
+
     async def connect(self):
-        print(dir(self))
         self.game_uuid = self.scope["path"].strip("/")
         self.user_uuid = self.scope["query_string"].decode("utf-8")
         try:
             Player.validate_uuid(self.user_uuid)
+            self.game_group_name = f"game_uuid_{self.game_uuid}"
+            self.user_group_name = f"user_uuid_{self.user_uuid}"
+        # Join game group
+            await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+            await self.channel_layer.group_add(self.user_group_name, self.channel_name)
             await self.accept()
         except ValueError:
             await self.close()
 
     async def disconnect(self, close_code):
-        pass
+        print("running disconnect", close_code)
+        await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
+        print("user group discarded")
+        await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
+        print("game group discarded")
+        del self
+
 
     
     async def receive(self, text_data):
-        pass
+        text_data_json = json.loads(text_data)
+        message = text_data_json
+        filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
+        if not filtered_games and message.get("multiPlayer") == False:
+            await self.channel_layer.group_send(self.user_group_name, {"type": "start_game_mono", "message": message})
+        
 
-            
-    async def game_info(self, event):
-        pass
+    async def start_game_mono(self, event):
+        message = event["message"]
+        game = Game(message.get("gameId"))
+        player = Player(message.get("player1Name"), message.get("player1Id"))
+        game.add_player(player)
+        games.append(game)
+        feedback = json.dumps(self.translate_game_object(game, player_id=player.uuid))
+        print(feedback)
+        await self.send(text_data=feedback)
+    
+    def translate_game_object(self, game: Game, player_id):
+        def get_player(id, opponent=False) -> Player:
+            if not opponent:
+                filtered_players = list(filter(lambda p: p.uuid == id, game.players))
+                return filtered_players[0] if filtered_players else None
+            else:
+                filtered_players = list(filter(lambda p: p.uuid != id, game.players))
+                return filtered_players[0] if filtered_players else None
+        player1 = get_player(player_id)
+        player2 = get_player(player_id, opponent=True)
+
+        return {
+                "gameId": game.uuid,
+                "gameTimeStamp": game.timeout,
+                "letters": game.letterset,
+                "phaseOfGame": game.status,
+                "player1Id": player1.uuid,
+                "player1Name": player1.name,
+                "player1GuessedWords": player1.guessed_words,
+                "player1Points": player1.points,
+                "multiPlayer": game.multiplayer,
+                "player2Id": player2.uuid if player2 else None,
+                "player2Name": player2.name if player2 else None,
+                "player2GuessedWords": player2.guessed_words if player2 else None,
+                "player2Points": player2.points if player2 else None
+            }
+
 
 
 
