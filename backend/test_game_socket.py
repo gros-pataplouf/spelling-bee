@@ -43,10 +43,16 @@ elif game with game id => send current state
 """
 
 @pytest.mark.asyncio
-async def test_enforces_valid_playerId():
+async def test_enforces_valid_playerId_negative():
     communicator = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{uuid4()}?fake")
     connected, subprotocol = await communicator.connect()
     assert not connected
+
+@pytest.mark.asyncio
+async def test_enforces_valid_playerId_positive():
+    communicator = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{uuid4()}?{uuid4()}")
+    connected, subprotocol = await communicator.connect()
+    assert connected
 
 
 
