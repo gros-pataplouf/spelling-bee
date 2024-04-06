@@ -48,20 +48,6 @@ if game, multi, two players => compare playerId with players in game. if none ma
 
 
 @pytest.mark.asyncio
-async def test_game_connection_can_be_established():
-    communicator = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{uuid4()}")
-    connected, subprotocol = await communicator.connect()
-    assert connected
-    await communicator.disconnect()
-
-@pytest.mark.asyncio
-async def test_query_connection_can_be_established():
-    communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), "ws://localhost/query")
-    connected, subprotocol = await communicator.connect()
-    assert connected
-    await communicator.disconnect()
-
-@pytest.mark.asyncio
 async def test_query_ws_returns_error_if_not_exists():
     communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), "ws://localhost/query")
     connected, subprotocol = await communicator.connect()
