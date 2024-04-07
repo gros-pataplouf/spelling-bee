@@ -38,12 +38,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = text_data_json
         filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
         if not filtered_games and message.get("phaseOfGame") != "inviting":
+            print("starting game")
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
         elif filtered_games and message.get("phaseOfGame") == "joining":
             await self.channel_layer.group_send(self.user_group_name, {"type": "join_game", "message": message})
         elif filtered_games and message.get("phaseOfGame") == "playing":
-            print("continue game")
-            await self.channel_layer.group_send(self.user_group_name, {"type": "update_game", "message": message})
+            requested_game = filtered_games[0]
+            requesting_player_uuid = message.get("player1Id")
+            await self.channel_layer.group_send(self.user_group_name, {"type": "update_game", "game": requested_game, "id": requesting_player_uuid })
 
     async def join_game(self, event):
         message = event["message"]
@@ -62,8 +64,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         id = event["id"]
         feedback = json.dumps(self.translate_game_object(game, player_id=id))
         await self.send(text_data=feedback)
-
-
 
     async def start_game(self, event):
         message = event["message"]
@@ -150,11 +150,13 @@ class QueryConsumer(AsyncWebsocketConsumer):
             elif requested_game.multiplayer and not plays_game:
                 await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game, status="joining"))
             else:
+                print(requested_game, requesting_player_uuid)
                 await self.channel_layer.group_send(self.temp_user_group, {"type": "update_game", "game": requested_game, "id": requesting_player_uuid})
         else:
             await self.channel_layer.group_send(
                 self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["not_ex"]))
     async def update_game(self, event):
+        print(event)
         game = event["game"]
         id = event["id"]
         feedback = json.dumps(GameConsumer.translate_game_object(game, player_id=id))
