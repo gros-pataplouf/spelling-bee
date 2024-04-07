@@ -19,10 +19,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.user_uuid = self.scope["query_string"].decode("utf-8")
         try:
             Player.validate_uuid(self.user_uuid)
-            self.game_group_name = f"game_uuid_{self.game_uuid}"
             self.user_group_name = f"user_uuid_{self.user_uuid}"
-        # Join game group
-            await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+            user_groups[self.user_uuid] = self.user_group_name
             await self.channel_layer.group_add(self.user_group_name, self.channel_name)
             await self.accept()
         except ValueError:
@@ -32,9 +30,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         print("running disconnect", close_code)
         await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
         print("user group discarded")
-        await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-        print("game group discarded")
-        del self
 
 
     
@@ -44,6 +39,17 @@ class GameConsumer(AsyncWebsocketConsumer):
         filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
         if not filtered_games:
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
+        elif filtered_games and message.get("phaseOfGame") == "joining":
+            await self.channel_layer.group_send(self.user_group_name, {"type": "join_game", "message": message})
+
+    async def join_game(self, event):
+        message = event["message"]
+        game = list(filter(lambda g: g.uuid == message.get("gameId"), games))[0]
+        player = Player(message.get("player1Name") or "Testplayer", message.get("player1Id"))
+        game.add_player(player)
+        feedback = json.dumps(self.translate_game_object(game, player_id=player.uuid))
+        print(feedback)
+        await self.send(text_data=feedback)
 
 
     async def start_game(self, event):
@@ -55,11 +61,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         feedback = json.dumps(self.translate_game_object(game, player_id=player.uuid))
         print(feedback)
         await self.send(text_data=feedback)
-    
 
-    
-
-    
     def translate_game_object(self, game: Game, player_id):
         def get_player(id, opponent=False) -> Player:
             if not opponent:

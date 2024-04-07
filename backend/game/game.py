@@ -132,10 +132,11 @@ class Game:
             raise GameException("Player name must be unique.")
         self.__players.append(player)
         if multiplayer and len(self.__players) == 1:
+            print("1 player joined, status set to")
             self.__multiplayer = multiplayer
             self.__status = 'waiting'
         elif self.__multiplayer and len(self.__players) == 2:
-            print('joining multiplayer')
+            print('joining multiplayer, set status to playing')
             self.__status = 'playing'
             self.countdown()
         else:
