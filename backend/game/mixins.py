@@ -21,7 +21,7 @@ class GameMixin:
     def generate_status_message(self, game, status=None):
         template = {"type": "game_info", "message": {"phaseOfGame": status or game.status, "multiPlayer": game.multiplayer}}
         return template
-
+ 
     
     def get_game(self, game_id, games):
         filtered_games = list(filter(lambda game: game.uuid == game_id, games))

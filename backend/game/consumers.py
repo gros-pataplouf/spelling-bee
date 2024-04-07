@@ -33,7 +33,9 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         text_data_json = json.loads(text_data)
         message = text_data_json
         game = self.get_game(message.get("gameId"), games)
-        if not game and message.get("phaseOfGame") != "inviting":
+        if game and message.get("input"):
+                await self.channel_layer.group_send(self.user_group_name, {"type": "check_guess", "message": message})
+        elif not game and message.get("phaseOfGame") != "inviting":
             print("starting game")
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
         elif game and message.get("phaseOfGame") == "joining":
@@ -63,6 +65,27 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         feedback = json.dumps(self.translate_game_object(game, player_id=player.uuid))
         print(feedback)
         await self.send(text_data=feedback)
+    
+    async def check_guess(self, event):
+        print("check guess function", event["message"])
+        message = event["message"]
+        game = self.get_game(message.get("gameId"), games)
+        guess = "".join(message.get("input"))
+        player = list(filter(lambda player: player.uuid == message.get("player1Id"), game.players))[0]
+        opponent = None
+        if len(game.players) > 1:
+            opponent = list(filter(lambda player: player.uuid != message.get("player1Id"), game.players))[0]
+        guess_result = game.guess(player.uuid, guess)
+        await self.channel_layer.group_send(self.user_group_name, {'type': 'send_message', "message": {"category": "result", "content": guess_result["message"], "points": guess_result["points"] if guess_result["points"] > 0 else None}})
+        await self.channel_layer.group_send(self.user_group_name, {'type': 'update_game', 'game': game, 'id': player.uuid})
+        if opponent:
+             await self.channel_layer.group_send(user_groups[opponent.uuid], {'type': 'update_game', 'game': game, 'id': opponent.uuid})
+    
+    async def send_message(self, event):
+        message = {"message": event["message"]}
+        await self.send(text_data=json.dumps(message))
+
+
 
 
 
@@ -74,6 +97,7 @@ class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
     
     async def receive(self, text_data):
         message = json.loads(text_data)
+        print(message)
         game = self.get_game(message.get("gameId"), games)
 
         [all_player_uuids, requesting_player_uuid, plays_game] = [None for i in range(3)]
