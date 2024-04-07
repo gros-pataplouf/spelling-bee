@@ -28,7 +28,7 @@ export default function Join (props: JoinProps): React.JSX.Element {
       <input className="mx-auto input text-xl text-bold mb-4" value={userInput} onClick={ () => { userInput === 'player 2' && setUserInput('') } } onChange={handleChange} onMouseLeave={submitName}/>
       <button
         className="btn btn-rounded text-white font-bold bg-black mx-auto block"
-        onClick={startGame('solo')}
+        onClick={startGame('joining')}
       >
         Join game
       </button>

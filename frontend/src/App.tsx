@@ -104,13 +104,15 @@ function App (): React.JSX.Element {
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       player1Id = (isValidUuid(localStorage.player1Id) && localStorage.player1Id) || uuidv4()
       navigate(`/${gameId}`)
+      console.log(mode, stateOfGame.multiPlayer)
+      const multiPlayerMode: boolean = stateOfGame.multiPlayer || mode === 'inviting'
       setStateOfGame((draft) => {
         return {
           ...draft,
-          phaseOfGame: mode === 'multiplayer' ? PhaseOfGame.inviting : PhaseOfGame.playing,
+          phaseOfGame: mode,
           gameId,
           player1Id,
-          multiPlayer: mode === 'multiplayer'
+          multiPlayer: multiPlayerMode
         }
       })
       setLocalStorage({

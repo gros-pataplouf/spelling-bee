@@ -7,13 +7,13 @@ export default function Welcome (props: WelcomeProps): React.JSX.Element {
       <p className="text-2xl text-center dark:text-black">How many words <br/> can you make with 7 letters?</p>
       <button
         className="btn btn-rounded text-white font-bold text-xl bg-black block mx-auto"
-        onClick={startGame('solo')}
+        onClick={startGame('playing')}
       >
         Play alone
       </button>
       <button
         className="btn btn-rounded text-white font-bold text-xl bg-black block mx-auto"
-        onClick={startGame('multiplayer')}
+        onClick={startGame('inviting')}
       >
         Invite a friend
       </button>

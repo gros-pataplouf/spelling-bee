@@ -37,7 +37,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json
         filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
-        if not filtered_games:
+        if not filtered_games and message.get("phaseOfGame") != "inviting":
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
         elif filtered_games and message.get("phaseOfGame") == "joining":
             await self.channel_layer.group_send(self.user_group_name, {"type": "join_game", "message": message})
