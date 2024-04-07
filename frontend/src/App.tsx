@@ -60,6 +60,7 @@ function App (): React.JSX.Element {
     if (socket != null) {
       console.log(socket.url)
       socket.onopen = () => {
+        setStateOfGame((draft) => { return { ...draft, loading: true } })
         if (connection.current !== null) {
           if (stateOfGame.gameId !== null) {
             console.log('sending message', stateOfGame)
@@ -72,6 +73,7 @@ function App (): React.JSX.Element {
       }
       socket.onmessage = (message) => {
         if (connection.current != null) {
+          setStateOfGame((draft) => { return { ...draft, loading: false } })
           const incoming = JSON.parse(message.data as string)
           console.log(incoming)
           setStateOfGame((draft) => { return { ...draft, ...incoming } })
@@ -126,13 +128,13 @@ function App (): React.JSX.Element {
   }
 
   return (
+
     <div className="bg-yellow-400 h-screen flex flex-col justify-center items-cente">
       <h1 className="font-semibold text-center pb-6 dark:text-black text-4xl">Spelling Bee</h1>
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome && < Welcome startGame={startGame}/>}
       {(stateOfGame.phaseOfGame === PhaseOfGame.inviting || stateOfGame.phaseOfGame === PhaseOfGame.waiting) && < Invite startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
       {stateOfGame.phaseOfGame === PhaseOfGame.joining && <Join startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
       {stateOfGame.phaseOfGame === PhaseOfGame.playing && <Game props={{ stateOfGame, setStateOfGame }}/>}
-
     </div>
   )
 }

@@ -10,6 +10,25 @@ class GameMixin:
             "full": "game already full"
             }
 
+    def generate_error_message(self, text):
+        template = {
+                    "type": "game_info",
+                    "message": {
+                        "phaseOfGame": "error",
+                        "message": {"category": "result", "content": text, "points": None}}}
+        return template
+    
+    def generate_status_message(self, game, status=None):
+        template = {"type": "game_info", "message": {"phaseOfGame": status or game.status, "multiPlayer": game.multiplayer}}
+        return template
+
+    
+    def get_game(self, game_id, games):
+        filtered_games = list(filter(lambda game: game.uuid == game_id, games))
+        if filtered_games:
+            return filtered_games[0]
+        return None
+
     def translate_game_object(self, game: Game, player_id):
         def get_player(id, opponent=False) -> Player:
             if not opponent:

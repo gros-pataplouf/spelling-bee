@@ -8,8 +8,6 @@ games = []
 user_groups = {}
 
 
-
-
 class GameConsumer(AsyncWebsocketConsumer, GameMixin):
 
     async def connect(self):
@@ -34,20 +32,19 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json
-        filtered_games = list(filter(lambda game: game.uuid == message.get("gameId"), games))
-        if not filtered_games and message.get("phaseOfGame") != "inviting":
+        game = self.get_game(message.get("gameId"), games)
+        if not game and message.get("phaseOfGame") != "inviting":
             print("starting game")
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
-        elif filtered_games and message.get("phaseOfGame") == "joining":
+        elif game and message.get("phaseOfGame") == "joining":
             await self.channel_layer.group_send(self.user_group_name, {"type": "join_game", "message": message})
-        elif filtered_games and message.get("phaseOfGame") == "playing":
-            requested_game = filtered_games[0]
+        elif game and message.get("phaseOfGame") == "playing":
             requesting_player_uuid = message.get("player1Id")
-            await self.channel_layer.group_send(self.user_group_name, {"type": "update_game", "game": requested_game, "id": requesting_player_uuid })
+            await self.channel_layer.group_send(self.user_group_name, {"type": "update_game", "game": game, "id": requesting_player_uuid })
 
     async def join_game(self, event):
         message = event["message"]
-        game = list(filter(lambda g: g.uuid == message.get("gameId"), games))[0]
+        game = self.get_game(message.get("gameId"), games)
         player = Player(message.get("player1Name") or "Testplayer", message.get("player1Id"))
         opponent: Player = game.players[0]
         game.add_player(player)
@@ -69,23 +66,7 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
 
 
 
-
-
-
 class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
-
-    def generate_error_message(self, text):
-        template = {
-                    "type": "game_info",
-                    "message": {
-                        "phaseOfGame": "error",
-                        "message": {"category": "result", "content": text, "points": None}}}
-        return template
-    
-    def generate_status_message(self, game, status=None):
-        template = {"type": "game_info", "message": {"phaseOfGame": status or game.status, "multiPlayer": game.multiplayer}}
-        return template
-
 
     async def connect(self):
         self.temp_user_group = None
@@ -93,30 +74,29 @@ class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
     
     async def receive(self, text_data):
         message = json.loads(text_data)
-        requested_game_id = message.get("gameId")
-        filtered_games = list(filter(lambda game: game.uuid == requested_game_id, games))
-        [requested_game, all_player_uuids, requesting_player_uuid, plays_game] = [None for i in range(4)]
+        game = self.get_game(message.get("gameId"), games)
+
+        [all_player_uuids, requesting_player_uuid, plays_game] = [None for i in range(3)]
         self.temp_user_group = "group_" + str(uuid4())
         
         await self.channel_layer.group_add(self.temp_user_group, self.channel_name)
         
-        if filtered_games:
-            requested_game = filtered_games[0]
-            all_player_uuids = [p.uuid for p in requested_game.players]
+        if game:
+            all_player_uuids = [p.uuid for p in game.players]
             requesting_player_uuid = message.get("player1Id")
             plays_game = requesting_player_uuid in all_player_uuids
             
-            if not requested_game.multiplayer and not plays_game:
+            if not game.multiplayer and not plays_game:
                 await self.channel_layer.group_send(
                     self.temp_user_group, self.generate_error_message(self.error_messages["full"]))
-            elif len(requested_game.players) > 1 and not plays_game:
+            elif len(game.players) > 1 and not plays_game:
                 await self.channel_layer.group_send(
                     self.temp_user_group, self.generate_error_message(self.error_messages["full"]))
-            elif requested_game.multiplayer and not plays_game:
-                await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game, status="joining"))
+            elif game.multiplayer and not plays_game:
+                await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(game, status="joining"))
             else:
-                print(requested_game, requesting_player_uuid)
-                await self.channel_layer.group_send(self.temp_user_group, {"type": "update_game", "game": requested_game, "id": requesting_player_uuid})
+                print(game, requesting_player_uuid)
+                await self.channel_layer.group_send(self.temp_user_group, {"type": "update_game", "game": game, "id": requesting_player_uuid})
         else:
             await self.channel_layer.group_send(
                 self.temp_user_group, self.generate_error_message(self.error_messages["not_ex"]))

@@ -25,6 +25,7 @@ export interface GameState {
   player2GuessedWords: string[] | [] | null
   player2Points: number | null
   guess?: string
+  loading?: boolean
 }
 
 export interface GameProps {
