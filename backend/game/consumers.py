@@ -2,45 +2,11 @@ import json
 from uuid import uuid4
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .game import Game, Player
+from .mixins import GameMixin
 
 games = []
 user_groups = {}
 
-ERROR_MESSAGES = {
-    "not_ex": "game does not exist", 
-    'full': "game already full"
-}
-
-class GameMixin:
-    """
-    methods shared by Gameconsumer and QueryConsumer
-    """
-    def translate_game_object(self, game: Game, player_id):
-        def get_player(id, opponent=False) -> Player:
-            if not opponent:
-                filtered_players = list(filter(lambda p: p.uuid == id, game.players))
-                return filtered_players[0] if filtered_players else None
-            else:
-                filtered_players = list(filter(lambda p: p.uuid != id, game.players))
-                return filtered_players[0] if filtered_players else None
-        player1 = get_player(player_id)
-        player2 = get_player(player_id, opponent=True)
-
-        return {
-                "gameId": game.uuid,
-                "gameTimeStamp": game.timeout,
-                "letters": game.letterset,
-                "phaseOfGame": game.status,
-                "player1Id": player1.uuid,
-                "player1Name": player1.name,
-                "player1GuessedWords": player1.guessed_words,
-                "player1Points": player1.points,
-                "multiPlayer": game.multiplayer,
-                "player2Id": player2.uuid if player2 else None,
-                "player2Name": player2.name if player2 else None,
-                "player2GuessedWords": player2.guessed_words if player2 else None,
-                "player2Points": player2.points if player2 else None
-            }
 
 
 
@@ -91,12 +57,6 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         await self.channel_layer.group_send(opponent_group, {"type": "update_game", "game": game, "id": opponent.uuid})
         await self.channel_layer.group_send(player_group, {"type": "update_game", "game": game, "id": player.uuid})
     
-    async def update_game(self, event):
-        game = event["game"]
-        id = event["id"]
-        feedback = json.dumps(self.translate_game_object(game, player_id=id))
-        await self.send(text_data=feedback)
-
     async def start_game(self, event):
         message = event["message"]
         game = Game(message.get("gameId"))
@@ -148,10 +108,10 @@ class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
             
             if not requested_game.multiplayer and not plays_game:
                 await self.channel_layer.group_send(
-                    self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["full"]))
+                    self.temp_user_group, self.generate_error_message(self.error_messages["full"]))
             elif len(requested_game.players) > 1 and not plays_game:
                 await self.channel_layer.group_send(
-                    self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["full"]))
+                    self.temp_user_group, self.generate_error_message(self.error_messages["full"]))
             elif requested_game.multiplayer and not plays_game:
                 await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game, status="joining"))
             else:
@@ -159,13 +119,7 @@ class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
                 await self.channel_layer.group_send(self.temp_user_group, {"type": "update_game", "game": requested_game, "id": requesting_player_uuid})
         else:
             await self.channel_layer.group_send(
-                self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["not_ex"]))
-    async def update_game(self, event):
-        print(event)
-        game = event["game"]
-        id = event["id"]
-        feedback = json.dumps(self.translate_game_object(game, player_id=id))
-        await self.send(text_data=feedback)
+                self.temp_user_group, self.generate_error_message(self.error_messages["not_ex"]))
 
         
     async def disconnect(self, close_code):
