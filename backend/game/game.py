@@ -13,7 +13,7 @@ message_reference = {
     7: "rockstar"
 }
 
-timeout = 180
+timeout = 1
 
 def threaded(fn):
     def wrapper(*args, **kwargs):
