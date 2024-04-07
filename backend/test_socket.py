@@ -47,7 +47,7 @@ def create_game_state( #a game state message as the client would send it
 
 @pytest.fixture
 def player():
-    return Player("Plouf", uuid4())
+    yield Player("Plouf", uuid4())
 
 @pytest.fixture
 def monoplayer_game():
@@ -55,7 +55,7 @@ def monoplayer_game():
     monoplayer_game = Game(timeout=10)
     monoplayer_game.add_player(new_player)
     games.append(monoplayer_game)
-    return monoplayer_game
+    yield monoplayer_game
 
 @pytest.fixture
 def multiplayer_game():
@@ -63,7 +63,7 @@ def multiplayer_game():
     multiplayer_game = Game(timeout=10)
     multiplayer_game.add_player(new_player, multiplayer=True)
     games.append(multiplayer_game)
-    return multiplayer_game
+    yield multiplayer_game
 
 
 def is_valid_uuid(self, input):
@@ -213,18 +213,26 @@ async def test_creates_new_game_if_not_exists_multi():
     num_of_games = len(games)
     new_game_id = str(uuid4())
     new_player_id = str(uuid4())
+    new_player_id2 = str(uuid4())
+    print(new_player_id, new_player_id2)
     communicator = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{new_game_id}?{new_player_id}")
+    communicator2 = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{new_game_id}?{new_player_id2}")
     connected, subprotocol = await communicator.connect()
     assert connected
+    connected2, subprotocol2 = await communicator2.connect()
+    assert connected2
     await communicator.send_to(text_data=json.dumps(create_game_state(new_game_id, new_player_id, multiPlayer=True)))
     response = await communicator.receive_from()
     assert len(games) == num_of_games + 1
     assert json.loads(response)["phaseOfGame"] == "waiting"
     assert json.loads(response)["letters"] == None
-    await communicator.send_to(text_data=json.dumps(create_game_state(new_game_id,str(uuid4()), multiPlayer=True, phaseOfGame="joining", player1Name="Plouffyvampire")))
-    response = await communicator.receive_from()
+    await communicator2.send_to(text_data=json.dumps(create_game_state(new_game_id, new_player_id2, multiPlayer=True, phaseOfGame="joining", player1Name="Plouffyvampire")))
+    response = await communicator2.receive_from()
+    # game starts for player 2
     assert json.loads(response)["phaseOfGame"] == "playing"
     assert json.loads(response)["letters"] == ['A', 'E', 'L', 'M', 'S', 'T', 'X']
-
-
     await communicator.disconnect()
+    await communicator2.disconnect()
+
+ 
+    

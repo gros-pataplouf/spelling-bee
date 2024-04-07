@@ -18,8 +18,10 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.game_uuid = self.scope["path"].strip("/")
         self.user_uuid = self.scope["query_string"].decode("utf-8")
         try:
+            print("try validating player")
             Player.validate_uuid(self.user_uuid)
             self.user_group_name = f"user_uuid_{self.user_uuid}"
+            print(self.user_group_name)
             user_groups[self.user_uuid] = self.user_group_name
             await self.channel_layer.group_add(self.user_group_name, self.channel_name)
             await self.accept()
@@ -30,8 +32,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         print("running disconnect", close_code)
         await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
         print("user group discarded")
-
-
     
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -48,7 +48,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         player = Player(message.get("player1Name") or "Testplayer", message.get("player1Id"))
         game.add_player(player)
         feedback = json.dumps(self.translate_game_object(game, player_id=player.uuid))
-        print(feedback)
         await self.send(text_data=feedback)
 
 
