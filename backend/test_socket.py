@@ -208,6 +208,8 @@ async def test_creates_new_game_if_not_exists_mono():
     assert json.loads(response)["letters"] == ['A', 'E', 'L', 'M', 'S', 'T', 'X']
     await communicator.disconnect()
 
+
+# problem with setup / teardown: test only runs alone
 @pytest.mark.asyncio
 async def test_creates_new_game_if_not_exists_multi():
     num_of_games = len(games)
@@ -229,6 +231,10 @@ async def test_creates_new_game_if_not_exists_multi():
     await communicator2.send_to(text_data=json.dumps(create_game_state(new_game_id, new_player_id2, multiPlayer=True, phaseOfGame="joining", player1Name="Plouffyvampire")))
     response = await communicator2.receive_from()
     # game starts for player 2
+    assert json.loads(response)["phaseOfGame"] == "playing"
+    assert json.loads(response)["letters"] == ['A', 'E', 'L', 'M', 'S', 'T', 'X']
+    # game also starts for 1st player
+    response = await communicator.receive_from()
     assert json.loads(response)["phaseOfGame"] == "playing"
     assert json.loads(response)["letters"] == ['A', 'E', 'L', 'M', 'S', 'T', 'X']
     await communicator.disconnect()

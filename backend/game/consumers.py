@@ -46,9 +46,20 @@ class GameConsumer(AsyncWebsocketConsumer):
         message = event["message"]
         game = list(filter(lambda g: g.uuid == message.get("gameId"), games))[0]
         player = Player(message.get("player1Name") or "Testplayer", message.get("player1Id"))
+        opponent: Player = game.players[0]
         game.add_player(player)
-        feedback = json.dumps(self.translate_game_object(game, player_id=player.uuid))
+        # update all players that game starts
+        player_group = user_groups[player.uuid]
+        opponent_group = user_groups[opponent.uuid]
+        await self.channel_layer.group_send(opponent_group, {"type": "update_game", "game": game, "id": opponent.uuid})
+        await self.channel_layer.group_send(player_group, {"type": "update_game", "game": game, "id": player.uuid})
+    
+    async def update_game(self, event):
+        game = event["game"]
+        id = event["id"]
+        feedback = json.dumps(self.translate_game_object(game, player_id=id))
         await self.send(text_data=feedback)
+
 
 
     async def start_game(self, event):
