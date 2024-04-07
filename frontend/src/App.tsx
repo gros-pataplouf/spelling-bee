@@ -45,6 +45,7 @@ function App (): React.JSX.Element {
     let gameId: string
     let player1Id: string | null
     if (stateOfGame?.gameId !== null) {
+      console.log('we have a game id')
       if (import.meta.env.VITE_REACT_ENV === 'test') {
         socket = new WebSocket(BASE_URL)
       } else {
@@ -72,6 +73,7 @@ function App (): React.JSX.Element {
       socket.onmessage = (message) => {
         if (connection.current != null) {
           const incoming = JSON.parse(message.data as string)
+          console.log(incoming)
           setStateOfGame((draft) => { return { ...draft, ...incoming } })
         }
       }
@@ -82,7 +84,7 @@ function App (): React.JSX.Element {
         }
       }
     }
-  }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.player1Name])
+  }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.player1Name, stateOfGame.phaseOfGame])
   const [localStorage, setLocalStorage] = useLocalStorage('spellingBee', {
     gameId: '',
     player1Id: ''

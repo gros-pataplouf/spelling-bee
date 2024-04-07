@@ -41,6 +41,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
         elif filtered_games and message.get("phaseOfGame") == "joining":
             await self.channel_layer.group_send(self.user_group_name, {"type": "join_game", "message": message})
+        elif filtered_games and message.get("phaseOfGame") == "playing":
+            print("continue game")
+            await self.channel_layer.group_send(self.user_group_name, {"type": "update_game", "message": message})
 
     async def join_game(self, event):
         message = event["message"]
@@ -72,6 +75,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         print(feedback)
         await self.send(text_data=feedback)
 
+    @classmethod
     def translate_game_object(self, game: Game, player_id):
         def get_player(id, opponent=False) -> Player:
             if not opponent:
@@ -146,10 +150,15 @@ class QueryConsumer(AsyncWebsocketConsumer):
             elif requested_game.multiplayer and not plays_game:
                 await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game, status="joining"))
             else:
-                await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(requested_game))
+                await self.channel_layer.group_send(self.temp_user_group, {"type": "update_game", "game": requested_game, "id": requesting_player_uuid})
         else:
             await self.channel_layer.group_send(
                 self.temp_user_group, self.generate_error_message(ERROR_MESSAGES["not_ex"]))
+    async def update_game(self, event):
+        game = event["game"]
+        id = event["id"]
+        feedback = json.dumps(GameConsumer.translate_game_object(game, player_id=id))
+        await self.send(text_data=feedback)
 
         
     async def disconnect(self, close_code):
