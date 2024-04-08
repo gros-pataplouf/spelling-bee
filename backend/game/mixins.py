@@ -42,30 +42,23 @@ class GameMixin:
         return None
 
     def translate_game_object(self, game: Game, player_id):
-        def get_player(id, opponent=False) -> Player:
-            if not opponent:
-                filtered_players = list(filter(lambda p: p.uuid == id, game.players))
-                return filtered_players[0] if filtered_players else None
-            else:
-                filtered_players = list(filter(lambda p: p.uuid != id, game.players))
-                return filtered_players[0] if filtered_players else None
-        player1 = get_player(player_id)
-        player2 = get_player(player_id, opponent=True)
+        player = self.get_player(player_id, game)
+        opponent = self.get_opponent(player_id, game)
 
         return {
                 "gameId": game.uuid,
                 "gameTimeStamp": game.timeout,
                 "letters": game.letterset,
                 "phaseOfGame": game.status,
-                "player1Id": player1.uuid,
-                "player1Name": player1.name,
-                "player1GuessedWords": player1.guessed_words,
-                "player1Points": player1.points,
+                "player1Id": player.uuid,
+                "player1Name": player.name,
+                "player1GuessedWords": player.guessed_words,
+                "player1Points": player.points,
                 "multiPlayer": game.multiplayer,
-                "player2Id": player2.uuid if player2 else None,
-                "player2Name": player2.name if player2 else None,
-                "player2GuessedWords": player2.guessed_words if player2 else None,
-                "player2Points": player2.points if player2 else None
+                "player2Id": opponent.uuid if opponent else None,
+                "player2Name": opponent.name if opponent else None,
+                "player2GuessedWords": opponent.guessed_words if opponent else None,
+                "player2Points": opponent.points if opponent else None
             }
     async def update_game(self, event):
         game = event["game"]
