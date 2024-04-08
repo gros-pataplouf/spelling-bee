@@ -5,36 +5,36 @@
 /* npx tailwindcss -i ./src/index.css -o ./public/index.css --watch */
 
 .middleLetter {
-  top: calc(50% - 25px);
-  left: calc(50% - 28.865px);
+  top: calc(50% - 30px);
+  left: calc(50% - 34.6164px);
 }
 
 .otherLetter:nth-child(2) {
-  top: calc(50% - 50px);
-  left: calc(50% + 14.4325px);
+  top: calc(50% - 60px);
+  left: calc(50% + 17.3082px); /*=14.4235*6/5*/
 }
 
 .otherLetter:nth-child(3) {
   top: calc(50%);
-  left: calc(50% + 14.4325px);
+  left: calc(50% + 17.3082px);
 }
 
 .otherLetter:nth-child(4) {
-  top: calc(50% + 25px);
-  left: calc(50% - 28.865px);
+  top: calc(50% + 30px);
+  left: calc(50% - 34.6164px);
 }
 
 .otherLetter:nth-child(5) {
   top: calc(50%);
-  left: calc(50% - 57.73px - 14.4325px);
+  left: calc(50% - 69.2328px - 17.3082px);
 }
 
 .otherLetter:nth-child(6) {
-  top: calc(50% - 50px);
-  left: calc(50% - 57.73px - 14.4325px);
+  top: calc(50% - 60px);
+  left: calc(50% - 69.2328px - 17.3082px);
 }
 
 .otherLetter:nth-child(7) {
-  top: calc(50% - 75px);
-  left: calc(50% - 28.865px);
+  top: calc(50% - 90px);
+  left: calc(50% - 34.6164px);
 }
