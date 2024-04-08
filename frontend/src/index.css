@@ -3,38 +3,43 @@
 @tailwind utilities;
 
 /* npx tailwindcss -i ./src/index.css -o ./public/index.css --watch */
+:root {
+  --cellHeight: 60px;
+  --tangens: 1.7320508075688767; /*tangens 60° to get x offsets*/
+}
+
 
 .middleLetter {
-  top: calc(50% - 30px);
-  left: calc(50% - 34.6164px);
+  top: calc(50% - var(--cellHeight)/2);
+  left: calc(50% - var(--cellHeight)/var(--tangens));
 }
 
 .otherLetter:nth-child(2) {
-  top: calc(50% - 60px);
-  left: calc(50% + 17.3082px); /*=14.4235*6/5*/
+  top: calc(50% - var(--cellHeight));
+  left: calc(50% + var(--cellHeight)/(2*var(--tangens))); /*=14.4235*6/5*/
 }
 
 .otherLetter:nth-child(3) {
   top: calc(50%);
-  left: calc(50% + 17.3082px);
+  left: calc(50% + var(--cellHeight)/(2*var(--tangens)));
 }
 
 .otherLetter:nth-child(4) {
-  top: calc(50% + 30px);
-  left: calc(50% - 34.6164px);
+  top: calc(50% + var(--cellHeight)/2);
+  left: calc(50% - var(--cellHeight)/var(--tangens));
 }
 
 .otherLetter:nth-child(5) {
   top: calc(50%);
-  left: calc(50% - 69.2328px - 17.3082px);
+  left: calc(50% - 5*var(--cellHeight)/(2*var(--tangens)));
 }
 
 .otherLetter:nth-child(6) {
-  top: calc(50% - 60px);
-  left: calc(50% - 69.2328px - 17.3082px);
+  top: calc(50% - var(--cellHeight));
+  left: calc(50% - 5*var(--cellHeight)/(2*var(--tangens)));
 }
 
 .otherLetter:nth-child(7) {
-  top: calc(50% - 90px);
-  left: calc(50% - 34.6164px);
+  top: calc(50% - 1.5*var(--cellHeight));
+  left: calc(50% - var(--cellHeight)/var(--tangens));
 }
