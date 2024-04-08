@@ -27,7 +27,6 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
     async def disconnect(self, close_code):
         print("running disconnect", close_code)
         await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
-        print("user group discarded")
     
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -67,14 +66,11 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         await self.send(text_data=feedback)
     
     async def check_guess(self, event):
-        print("check guess function", event["message"])
         message = event["message"]
         game = self.get_game(message.get("gameId"), games)
         guess = "".join(message.get("input"))
-        player = list(filter(lambda player: player.uuid == message.get("player1Id"), game.players))[0]
-        opponent = None
-        if len(game.players) > 1:
-            opponent = list(filter(lambda player: player.uuid != message.get("player1Id"), game.players))[0]
+        player = self.get_player(message.get("player1Id"), game)
+        opponent = self.get_opponent(message.get("player1Id"), game)
         guess_result = game.guess(player.uuid, guess)
         message_for_player = {
             "category": "result",

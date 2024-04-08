@@ -28,6 +28,18 @@ class GameMixin:
         if filtered_games:
             return filtered_games[0]
         return None
+    
+    def get_player(self, player_id, game):
+        filtered_players = list(filter(lambda player: player.uuid == player_id, game.players))
+        if filtered_players:
+            return filtered_players[0]
+        return None
+    
+    def get_opponent(self, player_id, game):
+        filtered_players = list(filter(lambda player: player.uuid != player_id, game.players))
+        if filtered_players:
+            return filtered_players[0]
+        return None
 
     def translate_game_object(self, game: Game, player_id):
         def get_player(id, opponent=False) -> Player:
