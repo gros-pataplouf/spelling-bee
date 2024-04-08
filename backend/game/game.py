@@ -71,6 +71,7 @@ class Game:
          self.__letterset = self.get_letterset()
          self.__players = []
          self.__solutions = self.get_solutions(self.__letterset)
+         self.__guesses_left = len(self.__solutions)
          self.__multiplayer = False
          self.__status = 'playing'
          self.__timeout = timeout
@@ -98,6 +99,9 @@ class Game:
     @property
     def multiplayer(self):
         return self.__multiplayer
+    @property
+    def guesses_left(self):
+        return self.__guesses_left
     
     def get_letterset(self):
         letterset = []
@@ -170,6 +174,7 @@ class Game:
             added_points += len(guess) - 3
             player_in_game[0].points = added_points
             player_in_game[0].guessed_words = guess
+            self.__guesses_left -= 1
             message = message_reference.get(added_points) or message_reference.get(max(message_reference.keys()))
         if self.__is_pangram(guess):
             added_points += 7
@@ -192,7 +197,3 @@ class Game:
             sleep(1)
         self.__status = "ended"
     
-    def check_guesses_left(self):
-        all_guesses = list(map(lambda player: (lambda word: word, player.guessed_words), self.__players))
-        solutions = self.__solutions
-        return len(all_guesses) - len(solutions)

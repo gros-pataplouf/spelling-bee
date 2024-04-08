@@ -50,6 +50,7 @@ class GameMixin:
                 "gameTimeStamp": game.timeout,
                 "letters": game.letterset,
                 "phaseOfGame": game.status,
+                "guessesLeft": game.guesses_left,
                 "player1Id": player.uuid,
                 "player1Name": player.name,
                 "player1GuessedWords": player.guessed_words,

@@ -28,6 +28,7 @@ export interface GameState {
   player2Points: number | null
   guess?: string
   loading?: boolean
+  guessesLeft?: number | null
 }
 
 export interface GameProps {
