@@ -11,30 +11,32 @@ import Game from './components/Game'
 import Welcome from './components/Welcome'
 import Join from './components/Join'
 import Invite from './components/Invite'
+import Error from './components/Error'
 const BASE_URL: string =
 import.meta.env.VITE_REACT_ENV === 'production'
   ? import.meta.env.VITE_PRODUCTION_URL
   : 'ws://localhost:8000'
 
+export const initialStateOfGame: GameState = {
+  gameId: null,
+  gameTimeStamp: null,
+  phaseOfGame: PhaseOfGame.welcome,
+  letters: import.meta.env.VITE_REACT_ENV === 'test' ? Array.from('ILOQUST') : Array.from('???????'),
+  player1Id: null,
+  player1Name: null,
+  player1GuessedWords: [],
+  player1Points: 0,
+  input: [],
+  message: { category: null, content: null, points: null },
+  multiPlayer: false,
+  player2Id: null,
+  player2Name: null,
+  player2GuessedWords: null,
+  player2Points: null
+}
+
 function App (): React.JSX.Element {
   const connection = useRef<WebSocket | null>(null)
-  const initialStateOfGame: GameState = {
-    gameId: null,
-    gameTimeStamp: null,
-    phaseOfGame: PhaseOfGame.welcome,
-    letters: import.meta.env.VITE_REACT_ENV === 'test' ? Array.from('ILOQUST') : Array.from('???????'),
-    player1Id: null,
-    player1Name: null,
-    player1GuessedWords: [],
-    player1Points: 0,
-    input: [],
-    message: { category: null, content: null, points: null },
-    multiPlayer: false,
-    player2Id: null,
-    player2Name: null,
-    player2GuessedWords: null,
-    player2Points: null
-  }
   const [stateOfGame, setStateOfGame] = useImmer(initialStateOfGame)
   const location = useLocation()
   useEffect(() => {
@@ -51,7 +53,7 @@ function App (): React.JSX.Element {
       } else {
         socket = new WebSocket(`${BASE_URL}/${stateOfGame.gameId}?${stateOfGame.player1Id}`)
       }
-    } else if (isValidUuid(location.pathname.slice(1))) {
+    } else if (location.pathname.slice(1) !== '') {
       gameId = location.pathname.slice(1)
       player1Id = localStorage.player1Id
       socket = new WebSocket(`${BASE_URL}/query`)
@@ -131,6 +133,7 @@ function App (): React.JSX.Element {
 
     <div className="bg-yellow-400 h-screen flex flex-col justify-center items-cente">
       <h1 className="font-semibold text-center pb-6 dark:text-black text-4xl">Spelling Bee</h1>
+      {stateOfGame.phaseOfGame === PhaseOfGame.error && < Error stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>}
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome && < Welcome startGame={startGame}/>}
       {(stateOfGame.phaseOfGame === PhaseOfGame.inviting || stateOfGame.phaseOfGame === PhaseOfGame.waiting) && < Invite startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
       {stateOfGame.phaseOfGame === PhaseOfGame.joining && <Join startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}

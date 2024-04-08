@@ -6,8 +6,8 @@ class GameMixin:
     things shared by Gameconsumer and QueryConsumer
     """
     error_messages = {
-            "not_ex": "game does not exist", 
-            "full": "game already full"
+            "not_ex": "this game does not exist.", 
+            "full": "you cannot join this game."
             }
 
     def generate_error_message(self, text):

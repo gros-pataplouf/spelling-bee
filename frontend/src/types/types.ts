@@ -5,7 +5,9 @@ export enum PhaseOfGame {
   welcome = 'welcome',
   joining = 'joining',
   waiting = 'waiting',
-  inviting = 'inviting'
+  inviting = 'inviting',
+  error = 'error',
+  ended = 'ended'
 }
 
 export interface GameState {
