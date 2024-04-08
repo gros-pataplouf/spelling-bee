@@ -76,13 +76,22 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         if len(game.players) > 1:
             opponent = list(filter(lambda player: player.uuid != message.get("player1Id"), game.players))[0]
         guess_result = game.guess(player.uuid, guess)
-        await self.channel_layer.group_send(self.user_group_name, {'type': 'send_message', "message": {"category": "result", "content": guess_result["message"], "points": guess_result["points"] if guess_result["points"] > 0 else None}})
+        message_for_player = {
+            "category": "result",
+            "content": guess_result["message"],
+            "points": guess_result["points"] if guess_result["points"] > 0 else None
+        }
+
+        await self.channel_layer.group_send(self.user_group_name, {'type': 'send_message', "message": message_for_player, "reset_input": guess_result["points"] > 0})
         await self.channel_layer.group_send(self.user_group_name, {'type': 'update_game', 'game': game, 'id': player.uuid})
         if opponent:
              await self.channel_layer.group_send(user_groups[opponent.uuid], {'type': 'update_game', 'game': game, 'id': opponent.uuid})
     
     async def send_message(self, event):
         message = {"message": event["message"]}
+        if event.get("reset_input"):
+            message["input"] = []
+
         await self.send(text_data=json.dumps(message))
 
 
