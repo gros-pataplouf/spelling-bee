@@ -191,7 +191,7 @@ class Game:
     
     @threaded
     def countdown(self):
-        if self.check_guesses_left() == 0:
+        if self.guesses_left == 0:
             self.__status = "ended"
         for i in range(0, self.__timeout):
             sleep(1)

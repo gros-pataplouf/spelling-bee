@@ -4,6 +4,8 @@ from game.consumers import GameConsumer, QueryConsumer, games
 from game.game import Player, Game, message_reference
 from uuid import uuid4
 from channels.testing import WebsocketCommunicator
+from game.mixins import GameMixin
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.dev')
 
@@ -90,7 +92,7 @@ async def test_query_ws_returns_error_if_not_exists():
     assert connected
     await communicator.send_to(text_data=json.dumps({"gameId": "fake"}))
     response = await communicator.receive_from()
-    assert json.loads(response) == {"phaseOfGame": "error", "message": {"category": "result", "content": "game does not exist", "points": None}}
+    assert json.loads(response) == {"phaseOfGame": "error", "message": {"category": "result", "content": GameMixin.error_messages["not_ex"], "points": None}}
     await communicator.disconnect()
 
 @pytest.mark.asyncio
@@ -154,7 +156,7 @@ async def test_multiplayer_game_full(multiplayer_game):
     multiplayer_game.add_player(second_player)
     await communicator.send_to(text_data=json.dumps({"gameId": gameId, "player1Id": str(uuid4())}))
     response = await communicator.receive_from()
-    assert json.loads(response) == {"phaseOfGame": "error", "message": {"category": "result", "content": "game already full", "points": None}}
+    assert json.loads(response) == {"phaseOfGame": "error", "message": {"category": "result", "content": GameMixin.error_messages["full"], "points": None}}
     await communicator.disconnect()
 
 @pytest.mark.asyncio
