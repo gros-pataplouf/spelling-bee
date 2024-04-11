@@ -13,7 +13,9 @@ message_reference = {
     7: "rockstar"
 }
 
-timeout = 180
+timeout = 180 if "pytest" not in sys.argv[0] else 5
+
+
 
 def threaded(fn):
     def wrapper(*args, **kwargs):

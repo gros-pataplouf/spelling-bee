@@ -1,5 +1,6 @@
 
 import pytest, os, django, re, json
+from time import sleep
 from game.consumers import GameConsumer, QueryConsumer, games
 from game.game import Player, Game, message_reference
 from uuid import uuid4
@@ -54,7 +55,7 @@ def player():
 @pytest.fixture
 def monoplayer_game():
     new_player = Player("Plouf", uuid4())
-    monoplayer_game = Game(timeout=10)
+    monoplayer_game = Game()
     monoplayer_game.add_player(new_player)
     games.append(monoplayer_game)
     yield monoplayer_game
@@ -62,7 +63,7 @@ def monoplayer_game():
 @pytest.fixture
 def multiplayer_game():
     new_player = Player("Plouf", uuid4())
-    multiplayer_game = Game(timeout=10)
+    multiplayer_game = Game()
     multiplayer_game.add_player(new_player, multiplayer=True)
     games.append(multiplayer_game)
     yield multiplayer_game
@@ -220,7 +221,20 @@ async def test_user_can_guess_mono(monoplayer_game):
     assert json.loads(response)["message"] == {"category": "result", "content": message_reference[1], "points": 1}
     await communicator.disconnect()
 
-
+@pytest.mark.asyncio
+async def test_game_notifies_consumer_when_ended():
+    new_game_id = str(uuid4())
+    new_player_id = str(uuid4()) 
+    communicator = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{new_game_id}?{new_player_id}")
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    await communicator.send_to(text_data=json.dumps(create_game_state(new_game_id, new_player_id)))
+    print("now we go to sleep")
+    sleep(6)
+    response = await communicator.receive_from()
+    assert True
+    assert json.loads(response)["phaseOfGame"] == "ended"
+    await communicator.disconnect()
 
 # BUG: the following test only passes when running alone
 """ => RuntimeError: <Queue at 0x7f25fd3b4e90 maxsize=0 _getters[1]> is bound to a different event loop
