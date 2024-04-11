@@ -21,7 +21,6 @@ class GameMixin:
     def generate_status_message(self, game, status=None):
         template = {"type": "game_info", "message": {"phaseOfGame": status or game.status, "multiPlayer": game.multiplayer}}
         return template
- 
     
     def get_game(self, game_id, games):
         filtered_games = list(filter(lambda game: game.uuid == game_id, games))
@@ -44,7 +43,6 @@ class GameMixin:
     def translate_game_object(self, game: Game, player_id):
         player = self.get_player(player_id, game)
         opponent = self.get_opponent(player_id, game)
-
         return {
                 "gameId": game.uuid,
                 "gameTimeStamp": game.timeout,

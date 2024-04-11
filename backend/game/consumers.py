@@ -1,7 +1,7 @@
 import json
 from uuid import uuid4
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .game import Game, Player
+from .game import Game, Player, GameAdapter
 from .mixins import GameMixin
 
 games = []
@@ -41,7 +41,7 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
             await self.channel_layer.group_send(self.user_group_name, {"type": "join_game", "message": message})
         elif game and message.get("phaseOfGame") == "playing":
             requesting_player_uuid = message.get("player1Id")
-            await self.channel_layer.group_send(self.user_group_name, {"type": "update_game", "game": game, "id": requesting_player_uuid })
+            await self.channel_layer.group_send(self.user_group_name, {"type": "update_game", "game": GameAdapter(game), "id": requesting_player_uuid })
 
     async def join_game(self, event):
         message = event["message"]
@@ -52,8 +52,8 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         # update all players that game starts
         player_group = user_groups[player.uuid]
         opponent_group = user_groups[opponent.uuid]
-        await self.channel_layer.group_send(opponent_group, {"type": "update_game", "game": game, "id": opponent.uuid})
-        await self.channel_layer.group_send(player_group, {"type": "update_game", "game": game, "id": player.uuid})
+        await self.channel_layer.group_send(opponent_group, {"type": "update_game", "game": GameAdapter(game), "id": opponent.uuid})
+        await self.channel_layer.group_send(player_group, {"type": "update_game", "game": GameAdapter(game), "id": player.uuid})
     
     async def start_game(self, event):
         message = event["message"]
@@ -61,7 +61,7 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         player = Player(message.get("player1Name"), message.get("player1Id"))
         game.add_player(player, multiplayer=message.get("multiPlayer"))
         games.append(game)
-        feedback = json.dumps(self.translate_game_object(game, player_id=player.uuid))
+        feedback = json.dumps(self.translate_game_object(GameAdapter(game), player_id=player.uuid))
         print(feedback)
         await self.send(text_data=feedback)
     
@@ -125,7 +125,7 @@ class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
                 await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(game, status="joining"))
             else:
                 print(game, requesting_player_uuid)
-                await self.channel_layer.group_send(self.temp_user_group, {"type": "update_game", "game": game, "id": requesting_player_uuid})
+                await self.channel_layer.group_send(self.temp_user_group, {"type": "update_game", "game": GameAdapter(game), "id": requesting_player_uuid})
         else:
             await self.channel_layer.group_send(
                 self.temp_user_group, self.generate_error_message(self.error_messages["not_ex"]))

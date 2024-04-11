@@ -199,3 +199,14 @@ class Game:
             sleep(1)
         self.__status = "ended"
     
+class GameAdapter:
+    """a serialiable copy of the game, without reference to websocket"""
+    def __init__(self, game):
+         self.uuid = game.uuid
+         self.letterset = game.letterset
+         self.players = game.players
+         self.solutions = game.solutions
+         self.guesses_left = game.guesses_left
+         self.multiplayer = game.multiplayer
+         self.status = game.status
+         self.timeout = timeout
