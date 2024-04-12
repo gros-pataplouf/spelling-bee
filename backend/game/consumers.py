@@ -79,9 +79,9 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         }
 
         await self.channel_layer.group_send(self.user_group_name, {'type': 'send_message', "message": message_for_player, "reset_input": guess_result["points"] > 0})
-        await self.channel_layer.group_send(self.user_group_name, {'type': 'update_game', 'game': game, 'id': player.uuid})
+        await self.channel_layer.group_send(self.user_group_name, {'type': 'update_game', 'game': GameAdapter(game), 'id': player.uuid})
         if opponent:
-             await self.channel_layer.group_send(user_groups[opponent.uuid], {'type': 'update_game', 'game': game, 'id': opponent.uuid})
+             await self.channel_layer.group_send(user_groups[opponent.uuid], {'type': 'update_game', 'game': GameAdapter(game), 'id': opponent.uuid})
     
     async def send_message(self, event):
         message = {"message": event["message"]}

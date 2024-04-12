@@ -196,11 +196,12 @@ class Game:
         if self.guesses_left == 0:
             self.__status = "ended"
         for i in range(0, self.__timeout):
+            print("tick", i) if i%10 == 0 else None
             sleep(1)
         self.__status = "ended"
     
 class GameAdapter:
-    """a serialiable copy of the game, without reference to websocket"""
+    """a copy of the game with serializable attributes, without reference to websocket and without any methods"""
     def __init__(self, game):
          self.uuid = game.uuid
          self.letterset = game.letterset
