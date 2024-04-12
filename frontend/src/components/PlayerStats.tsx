@@ -7,7 +7,8 @@ export default function PlayerStats (props: PlayerStatsProps): React.JSX.Element
 
   return <div className="card m-4">
       <p className="text-center">
-        <span id="points">You have {stateOfGame.player1Points}</span> points, {stateOfGame.guessesLeft} left!
+        <span id="points">{stateOfGame.player1Points}</span> points, {stateOfGame.guessesLeft} words left! &nbsp;
+        <span className="text-red-700 font-bold">{stateOfGame.secondsLeft != null && Math.floor(stateOfGame.secondsLeft / 60)}:{stateOfGame.secondsLeft != null && stateOfGame.secondsLeft % 60}</span>
       </p>
       {stateOfGame.player1GuessedWords?.length > 0 && (
         <ul id="words" className="flex flex-wrap">

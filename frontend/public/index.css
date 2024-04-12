@@ -1235,26 +1235,6 @@ html {
   color: rgb(255 255 255/var(--tw-text-opacity));
 }
 
-.btn-sm {
-  border-radius: .5rem;
-  height: 2rem;
-  min-height: 2rem;
-  padding-left: .75rem;
-  padding-right: .75rem;
-}
-
-.btn-md,.btn-sm {
-  font-size: .875rem;
-  line-height: 1.25rem;
-}
-
-.btn-md {
-  height: 2.5rem;
-  min-height: 2.5rem;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
 .btn-lg {
   font-size: 1.125rem;
   height: 3rem;
@@ -1673,17 +1653,6 @@ html {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@keyframes ping {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
-  }
-}
-
-.animate-ping {
-  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
 .cursor-copy {
   cursor: copy;
 }
@@ -1717,11 +1686,6 @@ html {
 .bg-black {
   --tw-bg-opacity: 1;
   background-color: rgb(0 0 0 / var(--tw-bg-opacity));
-}
-
-.bg-gray-200 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
 }
 
 .bg-yellow-400 {
@@ -1770,59 +1734,56 @@ html {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.text-red-700 {
+  --tw-text-opacity: 1;
+  color: rgb(185 28 28 / var(--tw-text-opacity));
+}
+
 /* npx tailwindcss -i ./src/index.css -o ./public/index.css --watch */
 
+:root {
+  --cellHeight: 60px;
+  --tangens: 1.7320508075688767;
+  /*tangens 60° to get x offsets*/
+}
+
 .middleLetter {
-  top: calc(50% - 25px);
-  left: calc(50% - 28.865px);
+  top: calc(50% - var(--cellHeight)/2);
+  left: calc(50% - var(--cellHeight)/var(--tangens));
 }
 
 .otherLetter:nth-child(2) {
-  top: calc(50% - 50px);
-  left: calc(50% + 14.4325px);
+  top: calc(50% - var(--cellHeight));
+  left: calc(50% + var(--cellHeight)/(2*var(--tangens)));
+  /*=14.4235*6/5*/
 }
 
 .otherLetter:nth-child(3) {
   top: calc(50%);
-  left: calc(50% + 14.4325px);
+  left: calc(50% + var(--cellHeight)/(2*var(--tangens)));
 }
 
 .otherLetter:nth-child(4) {
-  top: calc(50% + 25px);
-  left: calc(50% - 28.865px);
+  top: calc(50% + var(--cellHeight)/2);
+  left: calc(50% - var(--cellHeight)/var(--tangens));
 }
 
 .otherLetter:nth-child(5) {
   top: calc(50%);
-  left: calc(50% - 57.73px - 14.4325px);
+  left: calc(50% - 5*var(--cellHeight)/(2*var(--tangens)));
 }
 
 .otherLetter:nth-child(6) {
-  top: calc(50% - 50px);
-  left: calc(50% - 57.73px - 14.4325px);
+  top: calc(50% - var(--cellHeight));
+  left: calc(50% - 5*var(--cellHeight)/(2*var(--tangens)));
 }
 
 .otherLetter:nth-child(7) {
-  top: calc(50% - 75px);
-  left: calc(50% - 28.865px);
+  top: calc(50% - 1.5*var(--cellHeight));
+  left: calc(50% - var(--cellHeight)/var(--tangens));
 }
 
 @media (prefers-color-scheme: dark) {
-  .dark\:bg-black {
-    --tw-bg-opacity: 1;
-    background-color: rgb(0 0 0 / var(--tw-bg-opacity));
-  }
-
-  .dark\:bg-gray-950 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(3 7 18 / var(--tw-bg-opacity));
-  }
-
-  .dark\:bg-gray-800 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(31 41 55 / var(--tw-bg-opacity));
-  }
-
   .dark\:bg-gray-700 {
     --tw-bg-opacity: 1;
     background-color: rgb(55 65 81 / var(--tw-bg-opacity));
@@ -1833,11 +1794,6 @@ html {
     color: rgb(0 0 0 / var(--tw-text-opacity));
   }
 
-  .dark\:text-red-900 {
-    --tw-text-opacity: 1;
-    color: rgb(127 29 29 / var(--tw-text-opacity));
-  }
-
   .dark\:text-gray-100 {
     --tw-text-opacity: 1;
     color: rgb(243 244 246 / var(--tw-text-opacity));
@@ -1846,5 +1802,10 @@ html {
   .dark\:text-red-800 {
     --tw-text-opacity: 1;
     color: rgb(153 27 27 / var(--tw-text-opacity));
+  }
+
+  .dark\:text-red-900 {
+    --tw-text-opacity: 1;
+    color: rgb(127 29 29 / var(--tw-text-opacity));
   }
 }

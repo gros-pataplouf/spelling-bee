@@ -25,7 +25,6 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
             await self.close()
 
     async def disconnect(self, close_code):
-        print("running disconnect", close_code)
         await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
     
     async def receive(self, text_data):
@@ -125,7 +124,6 @@ class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
             elif game.multiplayer and not plays_game:
                 await self.channel_layer.group_send(self.temp_user_group, self.generate_status_message(game, status="joining"))
             else:
-                print(game, requesting_player_uuid)
                 await self.channel_layer.group_send(self.temp_user_group, {"type": "update_game", "game": GameAdapter(game), "id": requesting_player_uuid})
         else:
             await self.channel_layer.group_send(
