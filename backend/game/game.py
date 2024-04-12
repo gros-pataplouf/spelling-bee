@@ -17,7 +17,7 @@ message_reference = {
     7: "rockstar"
 }
 
-timeout = 15 if "pytest" not in sys.argv[0] else 5
+timeout = 300 if "pytest" not in sys.argv[0] else 5
 
 
 
@@ -29,7 +29,8 @@ def threaded(fn):
     return wrapper
 
 class GameAdapter:
-    """a copy of the game with serializable attributes, without reference to websocket and without any methods"""
+    """a copy of the game with only serializable attributes, without any reference to a websocket consumer.
+    Needed for transforming the game into a JSON string to be sent via wss://"""
     def __init__(self, game):
          self.uuid = game.uuid
          self.letterset = game.letterset
@@ -96,7 +97,7 @@ class Game:
          self.observers = []
     @property
     def timeout(self):
-        return str(self.__timeout)
+        return self.__timeout
     @property
     def uuid(self):
         return str(self.__uuid)
@@ -212,7 +213,9 @@ class Game:
     def countdown(self):
         for i in range(0, self.__timeout):
             print("tick", i) if i%10 == 0 else None
+            print(self.timeout)
             sleep(1)
+            self.__timeout -= 1
             if self.guesses_left == 0:
                 self.__status = "ended"
                 for obs in self.observers:

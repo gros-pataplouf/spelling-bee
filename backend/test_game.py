@@ -177,3 +177,8 @@ def test_game_end_if_all_solutions_guessed(game, player):
     sleep(2) #to allow the countdown function to call the check function
     assert game.status == "ended"
 
+def test_timeout_decreases_every_second(player):
+    new_game = Game(timeout = 5)
+    new_game.add_player(player)
+    sleep(5)
+    assert new_game.timeout == 1

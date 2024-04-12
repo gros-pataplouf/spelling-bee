@@ -2,7 +2,7 @@
 import pytest, os, django, re, json
 from time import sleep
 from game.consumers import GameConsumer, QueryConsumer, games
-from game.game import Player, Game, message_reference, timeout
+from game.game import Player, Game, message_reference
 from uuid import uuid4
 from channels.testing import WebsocketCommunicator
 from game.mixins import GameMixin
