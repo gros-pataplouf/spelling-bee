@@ -48,6 +48,7 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         game = self.get_game(message.get("gameId"), games)
         player = Player(message.get("player1Name") or "Testplayer", message.get("player1Id"))
         opponent: Player = game.players[0]
+        game.observers.append(self)
         game.add_player(player)
         # update all players that game starts
         player_group = user_groups[player.uuid]
@@ -59,10 +60,10 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         message = event["message"]
         game = Game(message.get("gameId"))
         player = Player(message.get("player1Name"), message.get("player1Id"))
+        game.observers.append(self)
         game.add_player(player, multiplayer=message.get("multiPlayer"))
         games.append(game)
         feedback = json.dumps(self.translate_game_object(GameAdapter(game), player_id=player.uuid))
-        print(feedback)
         await self.send(text_data=feedback)
     
     async def check_guess(self, event):

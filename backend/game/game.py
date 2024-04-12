@@ -1,7 +1,11 @@
-import re, random, json, sys, threading
+import re, random, json, sys, threading, asyncio
+from asgiref.sync import async_to_sync
 from uuid import uuid4
 from pathlib import Path
 from time import sleep
+
+from channels.layers import get_channel_layer
+channel_layer = get_channel_layer()
 
 message_reference = {
     1: "correct", 
@@ -13,7 +17,7 @@ message_reference = {
     7: "rockstar"
 }
 
-timeout = 180 if "pytest" not in sys.argv[0] else 5
+timeout = 15 if "pytest" not in sys.argv[0] else 5
 
 
 
@@ -23,6 +27,18 @@ def threaded(fn):
         thread.start()
         return thread
     return wrapper
+
+class GameAdapter:
+    """a copy of the game with serializable attributes, without reference to websocket and without any methods"""
+    def __init__(self, game):
+         self.uuid = game.uuid
+         self.letterset = game.letterset
+         self.players = game.players
+         self.solutions = game.solutions
+         self.guesses_left = game.guesses_left
+         self.multiplayer = game.multiplayer
+         self.status = game.status
+         self.timeout = timeout
 
 
 class GameException(Exception):
@@ -77,6 +93,7 @@ class Game:
          self.__multiplayer = False
          self.__status = 'playing'
          self.__timeout = timeout
+         self.observers = []
     @property
     def timeout(self):
         return str(self.__timeout)
@@ -193,21 +210,15 @@ class Game:
     
     @threaded
     def countdown(self):
-        if self.guesses_left == 0:
-            self.__status = "ended"
         for i in range(0, self.__timeout):
             print("tick", i) if i%10 == 0 else None
             sleep(1)
+            if self.guesses_left == 0:
+                self.__status = "ended"
+                for obs in self.observers:
+                    async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
+
         self.__status = "ended"
+        for obs in self.observers:
+            async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
     
-class GameAdapter:
-    """a copy of the game with serializable attributes, without reference to websocket and without any methods"""
-    def __init__(self, game):
-         self.uuid = game.uuid
-         self.letterset = game.letterset
-         self.players = game.players
-         self.solutions = game.solutions
-         self.guesses_left = game.guesses_left
-         self.multiplayer = game.multiplayer
-         self.status = game.status
-         self.timeout = timeout

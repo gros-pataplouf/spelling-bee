@@ -41,6 +41,7 @@ class GameMixin:
         return None
 
     def translate_game_object(self, game: Game, player_id):
+        print("player id", player_id)
         player = self.get_player(player_id, game)
         opponent = self.get_opponent(player_id, game)
         return {
@@ -60,8 +61,12 @@ class GameMixin:
                 "player2Points": opponent.points if opponent else None
             }
     async def update_game(self, event):
+        print("updating game", event["game"], event["id"])
         game = event["game"]
         id = event["id"]
         feedback = json.dumps(self.translate_game_object(game, player_id=id))
         await self.send(text_data=feedback)
+    
+    def test(self, event):
+        print("testing")
 
