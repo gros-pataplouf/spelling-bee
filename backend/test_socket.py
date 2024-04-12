@@ -9,7 +9,6 @@ from game.mixins import GameMixin
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.dev')
-
 django.setup()
 
 def create_game_state( #a game state message as the client would send it
@@ -17,7 +16,7 @@ def create_game_state( #a game state message as the client would send it
         player1Id: str,
         multiPlayer: bool = False,
         guess: str = None,
-        gameTimeStamp: int = 0,
+        secondsLeft: int = 0,
         letters: list = list(7*"?"),
         input: list = [],
         player1GuessedWords: list = [],
@@ -31,7 +30,7 @@ def create_game_state( #a game state message as the client would send it
         player2Points: int = 0):
     return {
         "gameId": gameId,
-        "gameTimeStamp": gameTimeStamp,
+        "secondsLeft": secondsLeft,
         "letters": letters,
         "phaseOfGame": phaseOfGame,
         "player1Id": player1Id,
@@ -236,8 +235,8 @@ async def test_game_notifies_consumer_when_ended():
     response = await communicator.receive_from()
     sleep(timeout + 1)
     response_end = await communicator.receive_from()
-    assert True
     assert json.loads(response_end)["phaseOfGame"] == "ended"
+
     await communicator.disconnect()
 """
 # BUG: the following test only passes when running alone

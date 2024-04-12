@@ -12,7 +12,7 @@ export enum PhaseOfGame {
 
 export interface GameState {
   gameId: string | null
-  gameTimeStamp: number | null
+  secondsLeft: number | null
   phaseOfGame: PhaseOfGame
   letters: string[]
   player1Id: string | null

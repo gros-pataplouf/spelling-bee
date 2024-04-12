@@ -20,7 +20,7 @@ import.meta.env.VITE_REACT_ENV === 'production'
 
 export const initialStateOfGame: GameState = {
   gameId: null,
-  gameTimeStamp: null,
+  secondsLeft: null,
   phaseOfGame: PhaseOfGame.welcome,
   letters: import.meta.env.VITE_REACT_ENV === 'test' ? Array.from('ILOQUST') : Array.from('???????'),
   player1Id: null,

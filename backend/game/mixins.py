@@ -46,7 +46,7 @@ class GameMixin:
         opponent = self.get_opponent(player_id, game)
         return {
                 "gameId": game.uuid,
-                "gameTimeStamp": game.timeout,
+                "secondsLeft": game.timeout,
                 "letters": game.letterset,
                 "phaseOfGame": game.status,
                 "guessesLeft": game.guesses_left,

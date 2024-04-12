@@ -39,7 +39,7 @@ class GameAdapter:
          self.guesses_left = game.guesses_left
          self.multiplayer = game.multiplayer
          self.status = game.status
-         self.timeout = timeout
+         self.timeout = game.timeout
 
 
 class GameException(Exception):
@@ -214,12 +214,16 @@ class Game:
         for i in range(0, self.__timeout):
             print("tick", i) if i%10 == 0 else None
             print(self.timeout)
+            for obs in self.observers:
+                async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
+
             sleep(1)
             self.__timeout -= 1
             if self.guesses_left == 0:
                 self.__status = "ended"
                 for obs in self.observers:
                     async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
+
 
         self.__status = "ended"
         for obs in self.observers:

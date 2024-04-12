@@ -76,6 +76,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
 
   return (
     <div className="flex flex-col items-center">
+      {stateOfGame.secondsLeft}
       <Notification stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />
 
       <input
