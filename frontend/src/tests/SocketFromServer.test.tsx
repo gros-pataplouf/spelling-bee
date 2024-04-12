@@ -193,4 +193,32 @@ describe('<Game/>', () => {
       )
     })
   })
+  test('Game ends when Backend decides so', async () => {
+    const game = render(
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    )
+    const button = game.container.querySelector('button') as HTMLElement
+    fireEvent(
+      getByText(button, 'Play alone'),
+      new MouseEvent('click', {
+        bubbles: true
+      })
+    )
+    const enterButton = game.container.querySelector(
+      'button#enter'
+    )
+    if (enterButton === null) {
+      throw new Error('enter button or input form null')
+    }
+
+    websocketServer.emit(
+      'message',
+      JSON.stringify({ phaseOfGame: 'ended' })
+    )
+    await waitFor(async () => {
+      expect(screen.getByText('Game over')).toBeInTheDocument()
+    })
+  })
 })
