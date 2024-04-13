@@ -7,7 +7,8 @@ class GameMixin:
     """
     error_messages = {
             "not_ex": "this game does not exist.", 
-            "full": "you cannot join this game."
+            "full": "you cannot join this game.",
+            "force_end": "your partner has ended the game."
             }
 
     def generate_error_message(self, text):

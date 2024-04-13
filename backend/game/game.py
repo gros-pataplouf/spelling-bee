@@ -104,6 +104,10 @@ class Game:
     @property
     def status(self):
         return str(self.__status)
+    @status.setter
+    def status(self, new_status):
+        self.__status = new_status
+
     @property
     def letterset(self):
         if self.__multiplayer and len(self.__players) < 2:
@@ -217,6 +221,9 @@ class Game:
     @threaded
     def countdown(self):
         for i in range(0, self.__timeout):
+            if not self.observers:
+                self.__status = "ended"
+                break
             print("tick", i) if i%10 == 0 else None
             print(self.timeout)
             for obs in self.observers:
@@ -224,10 +231,12 @@ class Game:
 
             sleep(1)
             self.__timeout -= 1
+
             if self.guesses_left == 0:
                 self.__status = "ended"
                 for obs in self.observers:
                     async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
+
 
 
         self.__status = "ended"

@@ -18,13 +18,6 @@ export default function End (props: NotificationProps): React.JSX.Element {
         className="btn btn-rounded text-white font-bold text-xl bg-black block mx-auto"
         onClick={reset}
         >
-        Play again with {stateOfGame.player2Name}
-      </button>
-      <p>or</p>
-      <button
-        className="btn btn-rounded text-white font-bold text-xl bg-black block mx-auto"
-        onClick={reset}
-        >
         Reset
       </button>
     </div>

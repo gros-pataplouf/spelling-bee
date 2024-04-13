@@ -7,7 +7,8 @@ export enum PhaseOfGame {
   waiting = 'waiting',
   inviting = 'inviting',
   error = 'error',
-  ended = 'ended'
+  ended = 'ended',
+  discarded = 'discarded'
 }
 
 export interface GameState {

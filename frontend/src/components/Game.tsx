@@ -4,11 +4,10 @@ import { type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import PlayerStats from './PlayerStats'
 import Notification from './Notification'
-import { type GameProps } from '../types/types'
+import { PhaseOfGame, type GameProps } from '../types/types'
 
 function Game ({ props }: GameProps): React.JSX.Element {
   const { stateOfGame, setStateOfGame } = props
-
   function handleChange (e: BaseSyntheticEvent): void {
     const inputEvent = e.nativeEvent as InputEvent
     if (
@@ -67,6 +66,9 @@ function Game ({ props }: GameProps): React.JSX.Element {
   function submitWord (): void {
     setStateOfGame((draft) => { return { ...draft, guess: draft.input.join('') } })
   }
+  function discardGame (): void {
+    setStateOfGame((draft) => { return { ...draft, phaseOfGame: PhaseOfGame.discarded } })
+  }
 
   function handleKeyDown (event: React.KeyboardEvent<HTMLInputElement>): void {
     if (event.code === 'Enter') {
@@ -120,6 +122,9 @@ function Game ({ props }: GameProps): React.JSX.Element {
         >
           Enter
         </button>
+        <div>
+          <button className='btn' onClick={discardGame}>Stop</button>
+        </div>
       </div>
         <PlayerStats stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>
     </div>

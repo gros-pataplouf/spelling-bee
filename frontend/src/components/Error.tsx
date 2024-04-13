@@ -18,7 +18,7 @@ export default function Error (props: NotificationProps): React.JSX.Element {
         className="btn btn-rounded text-white font-bold text-xl bg-black block mx-auto"
         onClick={reset}
         >
-        Reset game
+        Reset
       </button>
     </div>
 }

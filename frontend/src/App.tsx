@@ -43,7 +43,7 @@ function App (): React.JSX.Element {
   useEffect(() => {
     console.log(isValidUuid(location.pathname.slice(1)))
     console.log(location.pathname.slice(1))
-    console.log(localStorage.gameId)
+    console.log(localStorageReact.gameId)
     let socket: WebSocket | null = null
     let gameId: string
     let player1Id: string | null
@@ -56,7 +56,7 @@ function App (): React.JSX.Element {
       }
     } else if (location.pathname.slice(1) !== '') {
       gameId = location.pathname.slice(1)
-      player1Id = localStorage.player1Id
+      player1Id = localStorageReact.player1Id
       socket = new WebSocket(`${BASE_URL}/query`)
     }
 
@@ -78,7 +78,6 @@ function App (): React.JSX.Element {
         if (connection.current != null) {
           setStateOfGame((draft) => { return { ...draft, loading: false } })
           const incoming = JSON.parse(message.data as string)
-          console.log(incoming)
           setStateOfGame((draft) => { return { ...draft, ...incoming } })
         }
       }
@@ -90,7 +89,7 @@ function App (): React.JSX.Element {
       }
     }
   }, [stateOfGame.gameId, stateOfGame.guess, stateOfGame.player1Name, stateOfGame.phaseOfGame])
-  const [localStorage, setLocalStorage] = useLocalStorage('spellingBee', {
+  const [localStorageReact, setLocalStorageReact] = useLocalStorage('spellingBee', {
     gameId: '',
     player1Id: ''
   })
@@ -109,7 +108,7 @@ function App (): React.JSX.Element {
         gameId = uuidv4()
       }
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-      player1Id = (isValidUuid(localStorage.player1Id) && localStorage.player1Id) || uuidv4()
+      player1Id = (isValidUuid(localStorageReact.player1Id) && localStorageReact.player1Id) || uuidv4()
       navigate(`/${gameId}`)
       console.log(mode, stateOfGame.multiPlayer)
       const multiPlayerMode: boolean = stateOfGame.multiPlayer || mode === 'inviting'
@@ -122,7 +121,8 @@ function App (): React.JSX.Element {
           multiPlayer: multiPlayerMode
         }
       })
-      setLocalStorage({
+      localStorage.clear()
+      setLocalStorageReact({
         gameId,
         player1Id
       })
@@ -135,6 +135,7 @@ function App (): React.JSX.Element {
     <div className="bg-yellow-400 h-screen flex flex-col justify-center items-cente">
       <h1 className="font-semibold text-center pb-6 dark:text-black text-4xl">Spelling Bee</h1>
       {stateOfGame.phaseOfGame === PhaseOfGame.error && < Error stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>}
+      {stateOfGame.phaseOfGame === PhaseOfGame.discarded && < End stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>}
       {stateOfGame.phaseOfGame === PhaseOfGame.ended && < End stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>}
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome && < Welcome startGame={startGame}/>}
       {(stateOfGame.phaseOfGame === PhaseOfGame.inviting || stateOfGame.phaseOfGame === PhaseOfGame.waiting) && < Invite startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
