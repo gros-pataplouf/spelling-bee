@@ -145,7 +145,12 @@ class Game:
             raise ValueError
         else:
             return input
-        
+
+    def discard(self):
+        self.observers = []
+        del self
+
+
     def add_player(self, player, multiplayer=False):
         if len(self.players) > 0:
             multiplayer = self.multiplayer

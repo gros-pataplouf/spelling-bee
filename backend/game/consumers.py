@@ -59,6 +59,12 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         message = event["message"]
         game = Game(message.get("gameId"))
         player = Player(message.get("player1Name"), message.get("player1Id"))
+        old_games = list(filter(lambda g: player.uuid in [p.uuid for p in g.players], games))
+        print("found old games", old_games)
+        for old in old_games:
+            print("old", old)
+            old.discard()
+
         game.observers.append(self)
         game.add_player(player, multiplayer=message.get("multiPlayer"))
         games.append(game)
