@@ -125,7 +125,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
           Enter
         </button>
         <div>
-          <button className='btn' onClick={discardGame}>Stop</button>
+          <button className='btn absolute top-8 left-9' onClick={discardGame}>Stop</button>
         </div>
       </div>
         <PlayerStats stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>
