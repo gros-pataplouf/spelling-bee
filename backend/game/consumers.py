@@ -49,26 +49,25 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         game = self.get_game(event["game"].uuid, games)
         id = event["id"]
         opponent_to_notify = self.get_opponent(id, game)
-        print("opponent_to_notify", opponent_to_notify, user_groups[opponent_to_notify.uuid])
         if opponent_to_notify:
             message =  {
             "category": "error",
             "content": f"{self.get_player(id, game).name} has ended the game",
             "points": None}
         
-        game.status = "error"
-        await self.channel_layer.group_send(
-                user_groups[opponent_to_notify.uuid],
-                {"type": "update_game",
-                 "game": GameAdapter(game),
-                 "id": opponent_to_notify.uuid      
-        })
+            game.status = "error"
+            await self.channel_layer.group_send(
+                    user_groups[opponent_to_notify.uuid],
+                    {"type": "update_game",
+                    "game": GameAdapter(game),
+                    "id": opponent_to_notify.uuid      
+            })
 
-        await self.channel_layer.group_send(
-                user_groups[opponent_to_notify.uuid],
-                {"type": "send_message",
-                 "message": message        
-        })
+            await self.channel_layer.group_send(
+                    user_groups[opponent_to_notify.uuid],
+                    {"type": "send_message",
+                    "message": message        
+            })
         game.discard()
 
 

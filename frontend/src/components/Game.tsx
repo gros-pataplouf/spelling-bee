@@ -4,6 +4,7 @@ import { type BaseSyntheticEvent } from 'react'
 import Cell from './Cell'
 import PlayerStats from './PlayerStats'
 import Notification from './Notification'
+import Timer from './Timer'
 import { PhaseOfGame, type GameProps } from '../types/types'
 
 function Game ({ props }: GameProps): React.JSX.Element {
@@ -78,6 +79,7 @@ function Game ({ props }: GameProps): React.JSX.Element {
 
   return (
     <div className="flex flex-col items-center">
+      <Timer stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>
       <Notification stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />
 
       <input
