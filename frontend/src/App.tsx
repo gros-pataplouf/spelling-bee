@@ -78,6 +78,12 @@ function App (): React.JSX.Element {
         if (connection.current != null) {
           setStateOfGame((draft) => { return { ...draft, loading: false } })
           const incoming = JSON.parse(message.data as string)
+          const allLetters = Array.from(document.querySelectorAll('text')).map(elt => elt.textContent) as string[]
+          const sortedLetterString = allLetters.toSorted().join('')
+          const incomingLetters = incoming.letters.toSorted().join('')
+          if (incomingLetters === sortedLetterString) {
+            delete incoming.letters // prevent overwriting order of shuffeled letters
+          }
           setStateOfGame((draft) => { return { ...draft, ...incoming } })
         }
       }
