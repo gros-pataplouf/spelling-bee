@@ -91,17 +91,24 @@ function Game ({ props }: GameProps): React.JSX.Element {
         onKeyDown={handleKeyDown}
         value={stateOfGame?.input.join('')}
       />
-      <div id="hive" className="relative h-[33vh] w-full">
-        {stateOfGame.letters.map((letter: string) => (
-          <Cell
-            letter={letter}
-            middleLetter={letter === stateOfGame.letters[0]}
-            key={uuidv4()}
-            stateOfGame={stateOfGame}
-            setStateOfGame={setStateOfGame}
-          />
-        ))}
-      </div>
+      {stateOfGame.letters[0] === '?'
+        ? <div className="relative h-[33vh] flex justify-center items-center">
+        <div className="spinner-dot-intermittent [--spinner-color:var(--red-8)]"></div>
+        </div>
+        : <div id="hive" className="relative h-[33vh] w-full">
+      {stateOfGame.letters.map((letter: string) => (
+        <Cell
+          letter={letter}
+          middleLetter={letter === stateOfGame.letters[0]}
+          key={uuidv4()}
+          stateOfGame={stateOfGame}
+          setStateOfGame={setStateOfGame}
+        />
+      ))}
+    </div>
+
+      }
+
       <div className="flex justify-center">
         <button
           className="btn rounded-full mx-2"

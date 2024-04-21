@@ -137,7 +137,7 @@ function App (): React.JSX.Element {
       {stateOfGame.phaseOfGame === PhaseOfGame.error && < Error stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>}
       {stateOfGame.phaseOfGame === PhaseOfGame.discarded && < End stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>}
       {stateOfGame.phaseOfGame === PhaseOfGame.ended && < End stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>}
-      {stateOfGame.phaseOfGame === PhaseOfGame.welcome && < Welcome startGame={startGame}/>}
+      {stateOfGame.phaseOfGame === PhaseOfGame.welcome && < Welcome startGame={startGame} stateOfGame={stateOfGame}/>}
       {(stateOfGame.phaseOfGame === PhaseOfGame.inviting || stateOfGame.phaseOfGame === PhaseOfGame.waiting) && < Invite startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
       {stateOfGame.phaseOfGame === PhaseOfGame.joining && <Join startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
       {stateOfGame.phaseOfGame === PhaseOfGame.playing && <Game props={{ stateOfGame, setStateOfGame }}/>}

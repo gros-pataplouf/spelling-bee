@@ -1525,6 +1525,39 @@ html {
   }
 }
 
+.spinner-circle {
+  --spinner-size: 40px;
+  --stroke-width: calc(var(--spinner-size)/7);
+  --accent-opacity: 0.25;
+  --spinner-color: var(--primary);
+  --spinner-speed: 1s;
+  height: var(--spinner-size);
+  position: relative;
+  width: var(--spinner-size);
+}
+
+.spinner-circle:after,.spinner-circle:before {
+  --tw-rotate: 0deg;
+  --tw-content: "";
+  animation: linear var(--spinner-speed) infinite circle-spin;
+  border-radius: 50%;
+  border-style: solid;
+  border-width: var(--stroke-width);
+  content: var(--tw-content);
+  inset: 0;
+  position: absolute;
+  transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.spinner-circle:before {
+  border-color: rgb(var(--spinner-color)) rgb(var(--spinner-color)) rgb(var(--spinner-color)) transparent;
+  opacity: var(--accent-opacity);
+}
+
+.spinner-circle:after {
+  border-color: transparent transparent transparent rgb(var(--spinner-color));
+}
+
 @keyframes circle-spin {
   0% {
     transform: rotate(0deg);
@@ -1533,6 +1566,22 @@ html {
   to {
     transform: rotate(1turn);
   }
+}
+
+.spinner-dot-intermittent {
+  --spinner-size: 40px;
+  --spinner-color: var(--primary);
+  --spinner-color-opacity: rgb(var(--spinner-color)/0.25);
+  --spinner-speed: 0.7s;
+  --calculation-1: calc(var(--spinner-size)*2/3);
+  --calculation-2: calc(var(--spinner-size)*-2/3);
+  animation: flash var(--spinner-speed) ease-out infinite alternate;
+  border-radius: 50%;
+  height: calc(var(--spinner-size)/4);
+  margin-left: var(--calculation-1);
+  margin-right: var(--calculation-1);
+  position: relative;
+  width: calc(var(--spinner-size)/4);
 }
 
 @keyframes flash {
@@ -1751,10 +1800,18 @@ html {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.\[--spinner-color\:var\(--pink-8\)\] {
+  --spinner-color: var(--pink-8);
+}
+
+.\[--spinner-color\:var\(--red-8\)\] {
+  --spinner-color: var(--red-8);
+}
+
 /* npx tailwindcss -i ./src/index.css -o ./public/index.css --watch */
 
 :root {
-  --cellHeight: 60px;
+  --cellHeight: 65px;
   --tangens: 1.7320508075688767;
   /*tangens 60° to get x offsets*/
 }

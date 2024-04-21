@@ -60,6 +60,8 @@ export interface WelcomeProps {
   // TO DO construct proper function signature for startGame
   // eslint-disable-next-line @typescript-eslint/ban-types
   startGame: Function
+  stateOfGame: GameState
+
 }
 
 export interface JoinProps {
