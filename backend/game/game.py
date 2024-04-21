@@ -165,11 +165,9 @@ class Game:
             raise GameException("Player name must be unique.")
         self.__players.append(player)
         if multiplayer and len(self.__players) == 1:
-            print("1 player joined, status set to")
             self.__multiplayer = multiplayer
             self.__status = 'waiting'
         elif self.__multiplayer and len(self.__players) == 2:
-            print('joining multiplayer, set status to playing')
             self.__status = 'playing'
             self.countdown()
         else:
@@ -177,7 +175,6 @@ class Game:
         return player
     
     def guess(self, player_uuid, guess) -> int:
-        #print("guessing", guess, player_uuid)
         added_points = 0
         message = None
         guess = guess.upper()
@@ -224,8 +221,6 @@ class Game:
             if not self.observers and "pytest" not in sys.argv[0]:
                 self.__status = "ended"
                 break
-            print("tick", i) if i%10 == 0 else None
-            print(self.timeout)
             for obs in self.observers:
                 async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
 

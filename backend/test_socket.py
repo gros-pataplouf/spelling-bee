@@ -1,7 +1,7 @@
 
 import pytest, os, django, re, json
 from time import sleep
-from game.consumers import GameConsumer, QueryConsumer, games
+from game.consumers import GameConsumer, QueryConsumer, games, throttler
 from game.game import Player, Game, message_reference
 from uuid import uuid4
 from channels.testing import WebsocketCommunicator
@@ -220,9 +220,23 @@ async def test_user_can_guess_mono(monoplayer_game):
     assert json.loads(response)["message"] == {"category": "result", "content": message_reference[1], "points": 1}
     await communicator.disconnect()
 
+@pytest.mark.asyncio
+async def test_throttle():
+    throttler.max_requests = 0.1
+    communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), f"ws://localhost/query")
+    connected, subprotocol = await communicator.connect()
+    await communicator.send_to(text_data=json.dumps({"gameId": str(uuid4())}))
+    await communicator.send_to(text_data=json.dumps({"gameId": str(uuid4())}))
+    await communicator.send_to(text_data=json.dumps({"gameId": str(uuid4())}))
+    response = await communicator.receive_from()
+    print(response)
+    assert not connected
+    throttler.max_requests = 3
+    await communicator.disconnect()
 
 
-# BUG: the following test only passes when running alone
+
+# BUG: the following test only passes when running in isolation
 """
 @pytest.mark.asyncio
 async def test_game_notifies_consumer_when_ended():

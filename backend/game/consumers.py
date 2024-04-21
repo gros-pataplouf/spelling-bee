@@ -1,23 +1,24 @@
-import json
+import json, sys
 from uuid import uuid4
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .game import Game, Player, GameAdapter
 from .mixins import GameMixin
+from core.security import RateLimiter
+
 
 games = []
 user_groups = {}
-
+throttler = RateLimiter(1, 2, 3)
 
 class GameConsumer(AsyncWebsocketConsumer, GameMixin):
-
+    @throttler.throttle
     async def connect(self):
+        print("connecting")
         self.game_uuid = self.scope["path"].strip("/")
         self.user_uuid = self.scope["query_string"].decode("utf-8")
         try:
-            print("try validating player")
             Player.validate_uuid(self.user_uuid)
             self.user_group_name = f"user_uuid_{self.user_uuid}"
-            print(self.user_group_name)
             user_groups[self.user_uuid] = self.user_group_name
             await self.channel_layer.group_add(self.user_group_name, self.channel_name)
             await self.accept()
@@ -25,8 +26,12 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
             await self.close()
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
+        try:
+            await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
+        except Exception as e:
+            print(e)
     
+    @throttler.throttle
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json
@@ -37,7 +42,6 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         elif game and message.get("input"):
                 await self.channel_layer.group_send(self.user_group_name, {"type": "check_guess", "message": message})
         elif not game and message.get("phaseOfGame") != "inviting":
-            print("starting game")
             await self.channel_layer.group_send(self.user_group_name, {"type": "start_game", "message": message})
         elif game and message.get("phaseOfGame") == "joining":
             await self.channel_layer.group_send(self.user_group_name, {"type": "join_game", "message": message})
@@ -127,14 +131,13 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
 
 
 class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
-
+    @throttler.throttle
     async def connect(self):
         self.temp_user_group = None
         await self.accept()
     
     async def receive(self, text_data):
         message = json.loads(text_data)
-        print(message)
         game = self.get_game(message.get("gameId"), games)
 
         [all_player_uuids, requesting_player_uuid, plays_game] = [None for i in range(3)]
