@@ -10,11 +10,11 @@ def is_valid_uuid(input):
 
 @pytest.fixture
 def player():
-    return Player("Plouf", uuid4())
+    yield Player("Plouf", uuid4())
 
 @pytest.fixture
 def game():
-    return Game(timeout=2)
+    yield Game()
 
 def test_player_has_name(player):
     assert player.name == "Plouf"
@@ -178,7 +178,7 @@ def test_game_end_if_all_solutions_guessed(game, player):
     assert game.status == "ended"
 
 def test_timeout_decreases_every_second(player):
-    new_game = Game(timeout = 5)
+    new_game = Game()
     new_game.add_player(player)
     sleep(5)
     assert new_game.timeout == 1

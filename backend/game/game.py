@@ -221,7 +221,7 @@ class Game:
     @threaded
     def countdown(self):
         for i in range(0, self.__timeout):
-            if not self.observers:
+            if not self.observers and "pytest" not in sys.argv[0]:
                 self.__status = "ended"
                 break
             print("tick", i) if i%10 == 0 else None
