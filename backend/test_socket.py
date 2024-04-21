@@ -1,10 +1,11 @@
 
-import pytest, os, django, re, json
+import pytest, os, django, re, json, io
 from time import sleep
 from game.consumers import GameConsumer, QueryConsumer, games, throttler
 from game.game import Player, Game, message_reference
 from uuid import uuid4
 from channels.testing import WebsocketCommunicator
+from channels.exceptions import DenyConnection
 from game.mixins import GameMixin
 
 
@@ -233,6 +234,17 @@ async def test_throttle():
     assert not connected
     throttler.max_requests = 3
     await communicator.disconnect()
+
+@pytest.mark.asyncio
+async def test_refuse_large_payload():
+    large_payload = {key: value for key, value in enumerate(range(1000))}
+    communicator = WebsocketCommunicator(QueryConsumer.as_asgi(), f"ws://localhost/query")
+    await communicator.connect()
+    with pytest.raises(DenyConnection):
+        await communicator.send_to(text_data=json.dumps(large_payload))
+        await communicator.receive_from()
+
+
 
 
 

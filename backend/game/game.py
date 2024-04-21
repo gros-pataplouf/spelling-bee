@@ -231,9 +231,6 @@ class Game:
                 self.__status = "ended"
                 for obs in self.observers:
                     async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
-
-
-
         self.__status = "ended"
         for obs in self.observers:
             async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})

@@ -1,6 +1,7 @@
 import json, sys
 from uuid import uuid4
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.exceptions import DenyConnection
 from .game import Game, Player, GameAdapter
 from .mixins import GameMixin
 from core.security import RateLimiter
@@ -8,12 +9,11 @@ from core.security import RateLimiter
 
 games = []
 user_groups = {}
-throttler = RateLimiter(1, 2, 3)
+throttler = RateLimiter(1, 2, 10)
 
 class GameConsumer(AsyncWebsocketConsumer, GameMixin):
     @throttler.throttle
     async def connect(self):
-        print("connecting")
         self.game_uuid = self.scope["path"].strip("/")
         self.user_uuid = self.scope["query_string"].decode("utf-8")
         try:
@@ -33,6 +33,8 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
     
     @throttler.throttle
     async def receive(self, text_data):
+        if len(text_data) > self.MAX_PAYLOAD:
+            raise DenyConnection
         text_data_json = json.loads(text_data)
         message = text_data_json
         game = self.get_game(message.get("gameId"), games)
@@ -137,6 +139,8 @@ class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
         await self.accept()
     
     async def receive(self, text_data):
+        if len(text_data) > self.MAX_PAYLOAD:
+            raise DenyConnection
         message = json.loads(text_data)
         game = self.get_game(message.get("gameId"), games)
 

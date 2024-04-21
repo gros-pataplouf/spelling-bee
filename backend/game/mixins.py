@@ -5,6 +5,7 @@ class GameMixin:
     """
     things shared by Gameconsumer and QueryConsumer
     """
+    MAX_PAYLOAD = 555
     error_messages = {
             "not_ex": "this game does not exist.", 
             "full": "you cannot join this game.",
