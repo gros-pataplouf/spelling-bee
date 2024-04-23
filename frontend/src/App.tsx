@@ -1,27 +1,24 @@
-import { useEffect, useRef, type MouseEventHandler } from 'react'
-import { useImmer } from 'use-immer'
 import type React from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { PhaseOfGame, type GameState } from './types/types'
-import { v4 as uuidv4 } from 'uuid'
+import { useEffect, useRef, type MouseEventHandler } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useImmer } from 'use-immer'
 import { useLocalStorage } from 'usehooks-ts'
-import { isValidUuid } from './helpers/helpers'
-import Game from './components/Game'
-import Welcome from './components/Welcome'
-import Join from './components/Join'
-import Invite from './components/Invite'
-import Error from './components/Error'
+import { v4 as uuidv4 } from 'uuid'
 import End from './components/End'
-const BASE_URL: string =
-import.meta.env.VITE_REACT_ENV === 'production'
-  ? import.meta.env.VITE_PRODUCTION_URL
-  : 'ws://localhost:8000'
+import Error from './components/Error'
+import Game from './components/Game'
+import Invite from './components/Invite'
+import Join from './components/Join'
+import Welcome from './components/Welcome'
+import { isValidUuid } from './helpers/helpers'
+import { PhaseOfGame, type GameState } from './types/types'
+import { BASE_URL, INITIAL_LETTERS } from './helpers/constants'
 
 export const initialStateOfGame: GameState = {
   gameId: null,
   secondsLeft: null,
   phaseOfGame: PhaseOfGame.welcome,
-  letters: import.meta.env.VITE_REACT_ENV === 'test' ? Array.from('ILOQUST') : Array.from('???????'),
+  letters: INITIAL_LETTERS,
   player1Id: null,
   player1Name: null,
   player1GuessedWords: [],
