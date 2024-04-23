@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type React from 'react'
 // import { useEffect, type BaseSyntheticEvent } from 'react'
-import { type PlayerStatsProps } from '../types/types'
+import { type GameProps } from '../types/types'
 
-export default function Timer (props: PlayerStatsProps): React.JSX.Element {
+export default function Timer (props: GameProps): React.JSX.Element {
   function formatTime (seconds: number): string {
     const displayedMinutes = (Math.floor(seconds / 60)).toString()
     let displayedSeconds = (seconds % 60).toString()
@@ -14,8 +13,9 @@ export default function Timer (props: PlayerStatsProps): React.JSX.Element {
   }
 
   const { stateOfGame } = props
+  const secondsLeft = stateOfGame.secondsLeft ?? 0
 
   return (
-      <div className="text-red-700 text-2xl font-bold absolute top-8 right-8">{formatTime(stateOfGame.secondsLeft!)}</div>
+      <div className="text-red-700 text-2xl font-bold absolute top-8 right-8">{formatTime(secondsLeft)}</div>
   )
 }

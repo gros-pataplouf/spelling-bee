@@ -33,25 +33,13 @@ export interface GameState {
 }
 
 export interface GameProps {
-  props: {
-    stateOfGame: GameState
-    setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
-  }
+  stateOfGame: GameState
+  setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
 }
 
 export interface CellProps {
   letter: string
   middleLetter: boolean
-  stateOfGame: GameState
-  setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
-}
-
-export interface NotificationProps {
-  stateOfGame: GameState
-  setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
-}
-
-export interface PlayerStatsProps {
   stateOfGame: GameState
   setStateOfGame: React.Dispatch<React.SetStateAction<GameState>>
 }

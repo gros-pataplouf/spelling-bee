@@ -1,9 +1,8 @@
 import type React from 'react'
 import { useEffect } from 'react'
-import { type NotificationProps } from '../types/types'
+import { type GameProps } from '../types/types'
 
-export default function Notification (props: NotificationProps): React.JSX.Element {
-  // eslint-disable-next-line no-unused-vars
+export default function Notification (props: GameProps): React.JSX.Element {
   const { stateOfGame, setStateOfGame } = props
   useEffect(() => {
     setTimeout(() => {

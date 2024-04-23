@@ -1525,39 +1525,6 @@ html {
   }
 }
 
-.spinner-circle {
-  --spinner-size: 40px;
-  --stroke-width: calc(var(--spinner-size)/7);
-  --accent-opacity: 0.25;
-  --spinner-color: var(--primary);
-  --spinner-speed: 1s;
-  height: var(--spinner-size);
-  position: relative;
-  width: var(--spinner-size);
-}
-
-.spinner-circle:after,.spinner-circle:before {
-  --tw-rotate: 0deg;
-  --tw-content: "";
-  animation: linear var(--spinner-speed) infinite circle-spin;
-  border-radius: 50%;
-  border-style: solid;
-  border-width: var(--stroke-width);
-  content: var(--tw-content);
-  inset: 0;
-  position: absolute;
-  transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
-.spinner-circle:before {
-  border-color: rgb(var(--spinner-color)) rgb(var(--spinner-color)) rgb(var(--spinner-color)) transparent;
-  opacity: var(--accent-opacity);
-}
-
-.spinner-circle:after {
-  border-color: transparent transparent transparent rgb(var(--spinner-color));
-}
-
 @keyframes circle-spin {
   0% {
     transform: rotate(0deg);
@@ -1798,10 +1765,6 @@ html {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-.\[--spinner-color\:var\(--pink-8\)\] {
-  --spinner-color: var(--pink-8);
 }
 
 .\[--spinner-color\:var\(--red-8\)\] {

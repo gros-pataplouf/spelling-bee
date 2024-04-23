@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { useEffect, useRef, type MouseEventHandler } from 'react'
 import { useImmer } from 'use-immer'
 import type React from 'react'
@@ -41,14 +40,10 @@ function App (): React.JSX.Element {
   const [stateOfGame, setStateOfGame] = useImmer(initialStateOfGame)
   const location = useLocation()
   useEffect(() => {
-    console.log(isValidUuid(location.pathname.slice(1)))
-    console.log(location.pathname.slice(1))
-    console.log(localStorageReact.gameId)
     let socket: WebSocket | null = null
     let gameId: string
     let player1Id: string | null
     if (stateOfGame?.gameId !== null) {
-      console.log('we have a game id')
       if (import.meta.env.VITE_REACT_ENV === 'test') {
         socket = new WebSocket(BASE_URL)
       } else {
@@ -61,15 +56,12 @@ function App (): React.JSX.Element {
     }
 
     if (socket != null) {
-      console.log(socket.url)
       socket.onopen = () => {
         setStateOfGame((draft) => { return { ...draft, loading: true } })
         if (connection.current !== null) {
           if (stateOfGame.gameId !== null) {
-            console.log('sending message', stateOfGame)
             connection.current.send(JSON.stringify(stateOfGame))
           } else {
-            console.log('connecting')
             connection.current.send(JSON.stringify({ gameId, player1Id }))
           }
         }
@@ -79,9 +71,8 @@ function App (): React.JSX.Element {
           setStateOfGame((draft) => { return { ...draft, loading: false } })
           const incoming = JSON.parse(message.data as string)
           const allLetters = Array.from(document.querySelectorAll('text')).map(elt => elt.textContent) as string[]
-          const sortedLetterString = allLetters.toSorted().join('')
-          const incomingLetters = incoming.letters.toSorted().join('')
-          if (incomingLetters === sortedLetterString) {
+          // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
+          if (allLetters.length > 0 && incoming.letters?.length > 0 && [...incoming.letters].sort().join('') === [...allLetters].sort().join('')) {
             delete incoming.letters // prevent overwriting order of shuffeled letters
           }
           setStateOfGame((draft) => { return { ...draft, ...incoming } })
@@ -116,7 +107,6 @@ function App (): React.JSX.Element {
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       player1Id = (isValidUuid(localStorageReact.player1Id) && localStorageReact.player1Id) || uuidv4()
       navigate(`/${gameId}`)
-      console.log(mode, stateOfGame.multiPlayer)
       const multiPlayerMode: boolean = stateOfGame.multiPlayer || mode === 'inviting'
       setStateOfGame((draft) => {
         return {
@@ -146,7 +136,7 @@ function App (): React.JSX.Element {
       {stateOfGame.phaseOfGame === PhaseOfGame.welcome && < Welcome startGame={startGame} stateOfGame={stateOfGame}/>}
       {(stateOfGame.phaseOfGame === PhaseOfGame.inviting || stateOfGame.phaseOfGame === PhaseOfGame.waiting) && < Invite startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
       {stateOfGame.phaseOfGame === PhaseOfGame.joining && <Join startGame={startGame} stateOfGame={stateOfGame} setStateOfGame={setStateOfGame} />}
-      {stateOfGame.phaseOfGame === PhaseOfGame.playing && <Game props={{ stateOfGame, setStateOfGame }}/>}
+      {stateOfGame.phaseOfGame === PhaseOfGame.playing && <Game stateOfGame={stateOfGame} setStateOfGame={setStateOfGame}/>}
     </div>
   )
 }

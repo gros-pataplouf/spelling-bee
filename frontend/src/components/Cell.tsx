@@ -29,7 +29,7 @@ function Cell (props: CellProps): React.JSX.Element {
   return (
     <svg
       onClick={selectLetter}
-      height="60"
+      height="64"
       viewBox="0 0 120 103.92304845413263"
       className={`${sortOfLetter} absolute`}
       key={props.letter}
