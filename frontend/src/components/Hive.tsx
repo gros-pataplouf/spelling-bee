@@ -6,7 +6,7 @@ import Cell from './Cell'
 export default function Hive (props: GameProps): React.JSX.Element {
   const { stateOfGame, setStateOfGame } = props
   return (
-        <div id="hive" className="relative h-[33vh] w-full">
+        <div id="hive" className="relative h-[33vh] w-full my-4">
       {stateOfGame.letters.map((letter: string) => (
         <Cell
           letter={letter}
