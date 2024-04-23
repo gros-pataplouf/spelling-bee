@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import React from 'react'
-import { type NotificationProps } from '../types/types'
+import { type GameProps } from '../types/types'
 import { useNavigate } from 'react-router-dom'
 import { initialStateOfGame } from '../App'
 
-export default function End (props: NotificationProps): React.JSX.Element {
+export default function End (props: GameProps): React.JSX.Element {
   const { stateOfGame, setStateOfGame } = props
   const navigate = useNavigate()
   function reset (): void {

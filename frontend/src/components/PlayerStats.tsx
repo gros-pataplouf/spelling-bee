@@ -1,8 +1,7 @@
 import type React from 'react'
-// import { useEffect, type BaseSyntheticEvent } from 'react'
-import { type PlayerStatsProps } from '../types/types'
+import { type GameProps } from '../types/types'
 
-export default function PlayerStats (props: PlayerStatsProps): React.JSX.Element {
+export default function PlayerStats (props: GameProps): React.JSX.Element {
   const { stateOfGame } = props
 
   return <div className="card m-4">
