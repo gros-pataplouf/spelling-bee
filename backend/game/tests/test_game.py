@@ -1,8 +1,9 @@
-import pytest, re, random, json, asyncio
+import pytest, re, random, json
 from pathlib import Path
 from uuid import uuid4
 from game.game import Game, Player, GameException
 from time import sleep
+
 
 def is_valid_uuid(input):
     uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")

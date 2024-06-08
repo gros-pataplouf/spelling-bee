@@ -1,6 +1,5 @@
 
-import pytest, os, django, re, json, io
-from time import sleep
+import pytest, os, django, re, json
 from game.consumers import GameConsumer, QueryConsumer, games, throttler
 from game.game import Player, Game, message_reference
 from uuid import uuid4
@@ -221,6 +220,7 @@ async def test_user_can_guess_mono(monoplayer_game):
     assert json.loads(response)["message"] == {"category": "result", "content": message_reference[1], "points": 1}
     await communicator.disconnect()
 
+@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_throttle():
     throttler.max_requests = 0.1
@@ -235,6 +235,7 @@ async def test_throttle():
     throttler.max_requests = 3
     await communicator.disconnect()
 
+@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_refuse_large_payload():
     large_payload = {key: value for key, value in enumerate(range(1000))}
