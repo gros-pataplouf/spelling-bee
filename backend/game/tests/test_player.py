@@ -1,6 +1,6 @@
 import pytest
 from uuid import uuid4
-from game.game import Player
+from game.player import Player
 from game.helpers import is_valid_uuid
 
 

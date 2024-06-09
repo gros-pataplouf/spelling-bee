@@ -2,7 +2,8 @@
 import pytest, os, django, json
 from time import sleep
 from game.consumers import GameConsumer, QueryConsumer, games, throttler
-from game.game import Player, Game
+from game.game import Game
+from game.player import Player
 from uuid import uuid4
 from channels.testing import WebsocketCommunicator
 from channels.exceptions import DenyConnection

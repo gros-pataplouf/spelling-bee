@@ -1,6 +1,7 @@
 import pytest, random, json
 from uuid import uuid4
-from game.game import Game, Player
+from game.game import Game
+from game.player import Player
 from time import sleep
 from game.helpers import is_valid_uuid
 from core.settings.dev import BASE_DIR

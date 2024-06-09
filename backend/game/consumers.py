@@ -1,9 +1,10 @@
-import json, sys
+import json
 from uuid import uuid4
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.exceptions import DenyConnection
-
-from game.game import Game, Player, GameAdapter
+from game.game import Game
+from game.helpers import GameAdapter
+from game.player import Player
 from game.mixins import GameMixin
 from core.security import RateLimiter
 
