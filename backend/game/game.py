@@ -1,15 +1,13 @@
-import re, random, json, sys
+import random, json, sys
 from asgiref.sync import async_to_sync
 from uuid import uuid4
 from time import sleep
 from channels.layers import get_channel_layer
 from game.helpers import threaded, GameAdapter, is_valid_uuid
-from core.settings.prod import BASE_DIR #also ok for dev, is the same dir
+from core.settings.prod import BASE_DIR, TIMEOUT #also ok for dev, is the same dir
 
 channel_layer = get_channel_layer()
 
-
-timeout = 300 if "pytest" not in sys.argv[0] else 5
 
 class Player:
     def __init__(self, name, uuid) -> None:
@@ -48,7 +46,7 @@ class Player:
             return input
 
 class Game:
-    points_feedback = {
+    POINTS_FEEDBACK = {
         1: "correct", 
         2: "good",
         3: "not too bad",
@@ -57,7 +55,7 @@ class Game:
         6: "amazing",
         7: "rockstar"
     }
-    def __init__(self, uuid=None, timeout=timeout) -> None:
+    def __init__(self, uuid=None, timeout=TIMEOUT) -> None:
          self.__uuid = uuid4() if not uuid else self.validate_uuid(uuid)
          self.__letterset = self.get_letterset()
          self.__players = []
@@ -173,7 +171,7 @@ class Game:
             player_in_game[0].points = added_points
             player_in_game[0].guessed_words = guess
             self.__guesses_left -= 1
-            message = self.points_feedback.get(added_points) or self.points_feedback.get(max(self.points_feedback.keys()))
+            message = self.POINTS_FEEDBACK.get(added_points) or self.POINTS_FEEDBACK.get(max(self.POINTS_FEEDBACK.keys()))
         if self.__is_pangram(guess):
             added_points += 7
             player_in_game[0].points =  7
@@ -205,4 +203,3 @@ class Game:
         for obs in self.observers:
             async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
         self.observers = []
-    
