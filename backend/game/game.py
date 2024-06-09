@@ -1,10 +1,9 @@
 import re, random, json, sys
 from asgiref.sync import async_to_sync
 from uuid import uuid4
-from pathlib import Path
 from time import sleep
 from channels.layers import get_channel_layer
-from game.helpers import threaded, GameAdapter
+from game.helpers import threaded, GameAdapter, is_valid_uuid
 from core.settings.prod import BASE_DIR #also ok for dev, is the same dir
 
 channel_layer = get_channel_layer()
@@ -43,8 +42,7 @@ class Player:
         self.__name = new_name
     @classmethod
     def validate_uuid(self, input):
-        uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
-        if not uuid_regex.match(str(input)):
+        if not is_valid_uuid(str(input)):
             raise ValueError
         else:
             return input
@@ -117,9 +115,9 @@ class Game:
             solutions_with_middleletter = list(filter(lambda word: letterset[0] in word, solutions))
             return solutions_with_middleletter
         
+    @classmethod
     def validate_uuid(self, input):
-        uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
-        if not uuid_regex.match(str(input)):
+        if not is_valid_uuid(str(input)):
             raise ValueError
         else:
             return input
