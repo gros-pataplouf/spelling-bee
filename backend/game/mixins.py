@@ -1,7 +1,7 @@
 import json
-from game.game import Game
+from game.logic.game import Game
 
-class GameMixin:
+class ConsumerMixin:
     """
     things shared by Gameconsumer and QueryConsumer
     """

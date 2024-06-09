@@ -3,7 +3,7 @@ from asgiref.sync import async_to_sync
 from uuid import uuid4
 from time import sleep
 from channels.layers import get_channel_layer
-from game.helpers import threaded, GameAdapter, is_valid_uuid
+from game.logic.helpers import threaded, GameAdapter, is_valid_uuid
 from core.settings.prod import BASE_DIR, TIMEOUT #also ok for dev, is the same dir
 
 channel_layer = get_channel_layer()
@@ -63,7 +63,7 @@ class Game:
     
     def get_letterset(self):
         letterset = []
-        with open(f"{BASE_DIR.parent.joinpath('game/lettersets.json')}", "r", encoding="utf-8") as f:
+        with open(f"{BASE_DIR.parent.joinpath('game/logic/lettersets.json')}", "r", encoding="utf-8") as f:
             lettersets =  json.load(f)
             if 'pytest' in sys.argv[0]:
                 random.seed(3)
@@ -71,7 +71,7 @@ class Game:
         return letterset
 
     def get_solutions(self, letterset):
-        with open(f"{BASE_DIR.parent.joinpath('game/solutions.json')}", "r", encoding="utf-8") as s:
+        with open(f"{BASE_DIR.parent.joinpath('game/logic/solutions.json')}", "r", encoding="utf-8") as s:
             all_solutions = [solution.upper() for solution in json.load(s)]
             solutions = list(filter(lambda word: set(word).issubset(set(letterset)), all_solutions))
             solutions_with_middleletter = list(filter(lambda word: letterset[0] in word, solutions))

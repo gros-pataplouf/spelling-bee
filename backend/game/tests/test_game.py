@@ -1,9 +1,9 @@
 import pytest, random, json
 from uuid import uuid4
-from game.game import Game
-from game.player import Player
+from game.logic.game import Game
+from game.logic.player import Player
 from time import sleep
-from game.helpers import is_valid_uuid
+from game.logic.helpers import is_valid_uuid
 from core.settings.dev import BASE_DIR
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def test_game_has_random_letterset():
     game = Game()
     random.seed(3)
     letterset = []
-    with open(f"{BASE_DIR.parent.joinpath('game/lettersets.json')}", "r", encoding="utf-8") as f:
+    with open(f"{BASE_DIR.parent.joinpath('game/logic/lettersets.json')}", "r", encoding="utf-8") as f:
         lettersets =  json.load(f)
         letterset = [letter.upper() for letter in list(lettersets[random.randint(0,len(lettersets)-1)])]
     assert game.letterset == letterset

@@ -1,4 +1,4 @@
-from game.helpers import is_valid_uuid
+from game.logic.helpers import is_valid_uuid
 
 class Player:
     def __init__(self, name, uuid) -> None:

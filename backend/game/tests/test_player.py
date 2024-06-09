@@ -1,7 +1,7 @@
 import pytest
 from uuid import uuid4
-from game.player import Player
-from game.helpers import is_valid_uuid
+from game.logic.player import Player
+from game.logic.helpers import is_valid_uuid
 
 
 def test_player_has_name():

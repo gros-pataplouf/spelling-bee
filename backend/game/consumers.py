@@ -2,10 +2,10 @@ import json
 from uuid import uuid4
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.exceptions import DenyConnection
-from game.game import Game
-from game.helpers import GameAdapter
-from game.player import Player
-from game.mixins import GameMixin
+from game.logic.game import Game
+from game.logic.helpers import GameAdapter
+from game.logic.player import Player
+from game.mixins import ConsumerMixin
 from core.security import RateLimiter
 
 
@@ -13,7 +13,7 @@ games = []
 user_groups = {}
 throttler = RateLimiter(1, 2, 10)
 
-class GameConsumer(AsyncWebsocketConsumer, GameMixin):
+class GameConsumer(AsyncWebsocketConsumer, ConsumerMixin):
     @throttler.throttle
     async def connect(self):
         self.game_uuid = self.scope["path"].strip("/")
@@ -131,10 +131,7 @@ class GameConsumer(AsyncWebsocketConsumer, GameMixin):
         await self.send(text_data=json.dumps(message))
 
 
-
-
-
-class QueryConsumer(AsyncWebsocketConsumer, GameMixin):
+class QueryConsumer(AsyncWebsocketConsumer, ConsumerMixin):
     @throttler.throttle
     async def connect(self):
         self.temp_user_group = None
