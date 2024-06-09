@@ -2,7 +2,7 @@
 import pytest, os, django, json
 from time import sleep
 from game.consumers import GameConsumer, QueryConsumer, games, throttler
-from game.game import Player, Game, message_reference
+from game.game import Player, Game
 from uuid import uuid4
 from channels.testing import WebsocketCommunicator
 from channels.exceptions import DenyConnection
@@ -67,7 +67,7 @@ async def test_user_can_guess_mono(monoplayer_game):
     assert connected
     await communicator.send_to(text_data=json.dumps(create_game_state(monoplayer_game.uuid, monoplayer_game.players[0].uuid, input=['T','E','A','M'])))
     response = await communicator.receive_from()
-    assert json.loads(response)["message"] == {"category": "result", "content": message_reference[1], "points": 1}
+    assert json.loads(response)["message"] == {"category": "result", "content": Game.message_reference[1], "points": 1}
     await communicator.disconnect()
 
 @pytest.mark.asyncio

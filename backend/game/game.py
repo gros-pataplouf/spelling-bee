@@ -1,22 +1,13 @@
-import re, random, json, sys, threading, asyncio
+import re, random, json, sys, threading
 from asgiref.sync import async_to_sync
 from uuid import uuid4
 from pathlib import Path
 from time import sleep
 from channels.layers import get_channel_layer
-from core.settings.prod import BASE_DIR
+from core.settings.prod import BASE_DIR #also ok for dev, is the same dir
 
 channel_layer = get_channel_layer()
 
-message_reference = {
-    1: "correct", 
-    2: "good",
-    3: "not too bad",
-    4: "respect",
-    5: "awesome",
-    6: "amazing",
-    7: "rockstar"
-}
 
 timeout = 300 if "pytest" not in sys.argv[0] else 5
 
@@ -40,7 +31,6 @@ class GameAdapter:
          self.guesses_left = game.guesses_left
          self.multiplayer = game.multiplayer
          self.status = game.status
-         self.phaseOfGame = game.status
          self.timeout = game.timeout
 
 
@@ -82,6 +72,15 @@ class Player:
             return input
 
 class Game:
+    message_reference = {
+        1: "correct", 
+        2: "good",
+        3: "not too bad",
+        4: "respect",
+        5: "awesome",
+        6: "amazing",
+        7: "rockstar"
+    }
     def __init__(self, uuid=None, timeout=timeout) -> None:
          self.__uuid = uuid4() if not uuid else self.validate_uuid(uuid)
          self.__letterset = self.get_letterset()
@@ -198,7 +197,7 @@ class Game:
             player_in_game[0].points = added_points
             player_in_game[0].guessed_words = guess
             self.__guesses_left -= 1
-            message = message_reference.get(added_points) or message_reference.get(max(message_reference.keys()))
+            message = self.message_reference.get(added_points) or self.message_reference.get(max(self.message_reference.keys()))
         if self.__is_pangram(guess):
             added_points += 7
             player_in_game[0].points =  7

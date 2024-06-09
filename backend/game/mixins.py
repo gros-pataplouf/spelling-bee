@@ -1,5 +1,5 @@
 import json
-from .game import Game, Player
+from .game import Game
 
 class GameMixin:
     """
@@ -11,6 +11,7 @@ class GameMixin:
             "full": "you cannot join this game.",
             "force_end": "your partner has ended the game."
             }
+    
 
     def generate_error_message(self, text):
         template = {
