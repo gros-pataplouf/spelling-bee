@@ -1,7 +1,7 @@
 import pytest
 from uuid import uuid4
 from game.game import Player
-from .helpers import is_valid_uuid
+from game.helpers import is_valid_uuid
 
 
 def test_player_has_name():

@@ -1,4 +1,4 @@
-import threading
+import threading, re
 
 def threaded(fn):
     def wrapper(*args, **kwargs):
@@ -6,6 +6,11 @@ def threaded(fn):
         thread.start()
         return thread
     return wrapper
+
+def is_valid_uuid(input):
+    uuid_regex = re.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+    return uuid_regex.match(input)
+
 
 class GameAdapter:
     """a copy of the game with only serializable attributes, without any reference to a websocket consumer.

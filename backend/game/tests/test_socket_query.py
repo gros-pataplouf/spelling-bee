@@ -1,4 +1,3 @@
-
 import pytest, os, django, json
 from game.consumers import QueryConsumer, games
 from game.game import Player, Game

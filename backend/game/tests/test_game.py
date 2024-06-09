@@ -1,9 +1,9 @@
 import pytest, random, json
-from pathlib import Path
 from uuid import uuid4
 from game.game import Game, Player
 from time import sleep
-from .helpers import is_valid_uuid
+from game.helpers import is_valid_uuid
+from core.settings.dev import BASE_DIR
 
 @pytest.fixture
 def player1():
@@ -26,7 +26,7 @@ def test_game_has_random_letterset():
     game = Game()
     random.seed(3)
     letterset = []
-    with open(f"{Path.cwd()}/game/lettersets.json", "r", encoding="utf-8") as f:
+    with open(f"{BASE_DIR.parent.joinpath('game/lettersets.json')}", "r", encoding="utf-8") as f:
         lettersets =  json.load(f)
         letterset = [letter.upper() for letter in list(lettersets[random.randint(0,len(lettersets)-1)])]
     assert game.letterset == letterset

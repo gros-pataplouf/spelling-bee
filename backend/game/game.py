@@ -4,7 +4,7 @@ from uuid import uuid4
 from pathlib import Path
 from time import sleep
 from channels.layers import get_channel_layer
-from .helpers import threaded, GameAdapter
+from game.helpers import threaded, GameAdapter
 from core.settings.prod import BASE_DIR #also ok for dev, is the same dir
 
 channel_layer = get_channel_layer()
@@ -111,7 +111,7 @@ class Game:
         return letterset
 
     def get_solutions(self, letterset):
-        with open(f"{Path.cwd()}//game/solutions.json", "r", encoding="utf-8") as s:
+        with open(f"{BASE_DIR.parent.joinpath('game/solutions.json')}", "r", encoding="utf-8") as s:
             all_solutions = [solution.upper() for solution in json.load(s)]
             solutions = list(filter(lambda word: set(word).issubset(set(letterset)), all_solutions))
             solutions_with_middleletter = list(filter(lambda word: letterset[0] in word, solutions))

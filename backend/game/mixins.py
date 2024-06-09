@@ -1,5 +1,5 @@
 import json
-from .game import Game
+from game.game import Game
 
 class GameMixin:
     """
