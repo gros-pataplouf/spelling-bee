@@ -13,10 +13,6 @@ django.setup()
 
 
 @pytest.fixture
-def player():
-    yield Player("Plouf", uuid4())
-
-@pytest.fixture
 def monoplayer_game():
     new_player = Player("Plouf", uuid4())
     monoplayer_game = Game()
@@ -39,6 +35,7 @@ async def test_rejects_invalid_player_id():
     communicator = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{uuid4()}?{new_player_id}")
     connected, subprotocol = await communicator.connect()
     assert not connected
+    await communicator.disconnect()
 
 @pytest.mark.asyncio
 async def test_accepts_valid_player_id():
@@ -46,6 +43,7 @@ async def test_accepts_valid_player_id():
     communicator = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{uuid4()}?{new_player_id}")
     connected, subprotocol = await communicator.connect()
     assert connected
+    await communicator.disconnect()
 
 @pytest.mark.asyncio
 async def test_creates_new_game_if_not_exists_mono():
@@ -72,7 +70,6 @@ async def test_user_can_guess_mono(monoplayer_game):
     assert json.loads(response)["message"] == {"category": "result", "content": message_reference[1], "points": 1}
     await communicator.disconnect()
 
-@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_throttle():
     throttler.max_requests = 0.1
@@ -86,7 +83,7 @@ async def test_throttle():
     throttler.max_requests = 3
     await communicator.disconnect()
 
-@pytest.mark.skip
+
 @pytest.mark.asyncio
 async def test_refuse_large_payload():
     large_payload = {key: value for key, value in enumerate(range(1000))}
@@ -95,6 +92,7 @@ async def test_refuse_large_payload():
     with pytest.raises(DenyConnection):
         await communicator.send_to(text_data=json.dumps(large_payload))
         await communicator.receive_from()
+        await communicator.disconnect()
 
 
 @pytest.mark.asyncio
