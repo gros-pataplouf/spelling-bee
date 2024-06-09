@@ -67,7 +67,7 @@ async def test_user_can_guess_mono(monoplayer_game):
     assert connected
     await communicator.send_to(text_data=json.dumps(create_game_state(monoplayer_game.uuid, monoplayer_game.players[0].uuid, input=['T','E','A','M'])))
     response = await communicator.receive_from()
-    assert json.loads(response)["message"] == {"category": "result", "content": Game.message_reference[1], "points": 1}
+    assert json.loads(response)["message"] == {"category": "result", "content": Game.points_feedback[1], "points": 1}
     await communicator.disconnect()
 
 @pytest.mark.asyncio

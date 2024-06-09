@@ -1,38 +1,16 @@
-import re, random, json, sys, threading
+import re, random, json, sys
 from asgiref.sync import async_to_sync
 from uuid import uuid4
 from pathlib import Path
 from time import sleep
 from channels.layers import get_channel_layer
+from .helpers import threaded, GameAdapter
 from core.settings.prod import BASE_DIR #also ok for dev, is the same dir
 
 channel_layer = get_channel_layer()
 
 
 timeout = 300 if "pytest" not in sys.argv[0] else 5
-
-
-
-def threaded(fn):
-    def wrapper(*args, **kwargs):
-        thread = threading.Thread(target=fn, args=args, kwargs=kwargs)
-        thread.start()
-        return thread
-    return wrapper
-
-class GameAdapter:
-    """a copy of the game with only serializable attributes, without any reference to a websocket consumer.
-    Needed for transforming the game into a JSON string to be sent via wss://"""
-    def __init__(self, game):
-         self.uuid = game.uuid
-         self.letterset = game.letterset
-         self.players = game.players
-         self.solutions = game.solutions
-         self.guesses_left = game.guesses_left
-         self.multiplayer = game.multiplayer
-         self.status = game.status
-         self.timeout = game.timeout
-
 
 class Player:
     def __init__(self, name, uuid) -> None:
@@ -72,7 +50,7 @@ class Player:
             return input
 
 class Game:
-    message_reference = {
+    points_feedback = {
         1: "correct", 
         2: "good",
         3: "not too bad",
@@ -197,7 +175,7 @@ class Game:
             player_in_game[0].points = added_points
             player_in_game[0].guessed_words = guess
             self.__guesses_left -= 1
-            message = self.message_reference.get(added_points) or self.message_reference.get(max(self.message_reference.keys()))
+            message = self.points_feedback.get(added_points) or self.points_feedback.get(max(self.points_feedback.keys()))
         if self.__is_pangram(guess):
             added_points += 7
             player_in_game[0].points =  7
