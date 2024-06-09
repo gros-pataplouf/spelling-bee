@@ -1,7 +1,7 @@
 import pytest, random, json
 from pathlib import Path
 from uuid import uuid4
-from game.game import Game, Player, GameException
+from game.game import Game, Player
 from time import sleep
 from .helpers import is_valid_uuid
 
@@ -39,7 +39,7 @@ def test_player_can_join_game(player1):
 def test_if_not_multiplayer_only_one_can_join(player1, player2):
     game = Game()
     game.add_player(player1)
-    with pytest.raises(GameException):
+    with pytest.raises(ValueError):
         game.add_player(player2, multiplayer=True)
     assert game.multiplayer == False
 
@@ -55,7 +55,7 @@ def test_player_name_unique(player1, player2):
     game = Game()
     game.add_player(player1, multiplayer=True)
     player2.name = player1.name
-    with pytest.raises(GameException):
+    with pytest.raises(ValueError):
         game.add_player(player2)
     assert len(game.players) == 1
 

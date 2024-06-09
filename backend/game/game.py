@@ -44,11 +44,6 @@ class GameAdapter:
          self.timeout = game.timeout
 
 
-class GameException(Exception):
-    def __init__(self, message: str) -> None:
-        super().__init__()
-        self.message = message
-
 class Player:
     def __init__(self, name, uuid) -> None:
         self.__name = name
@@ -162,9 +157,9 @@ class Game:
             multiplayer = self.multiplayer
         max_players = 2 if multiplayer else 1
         if len(self.players) == max_players:
-            raise GameException(f"Only {max_players} player(s) can join game.")
+            raise ValueError(f"Only {max_players} player(s) can join game.")
         if list(filter(lambda x: x.name == player.name, self.__players)):
-            raise GameException("Player name must be unique.")
+            raise ValueError("Player name must be unique.")
         self.__players.append(player)
         if multiplayer and len(self.__players) == 1:
             self.__multiplayer = multiplayer
