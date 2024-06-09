@@ -3,8 +3,9 @@ from asgiref.sync import async_to_sync
 from uuid import uuid4
 from pathlib import Path
 from time import sleep
-
 from channels.layers import get_channel_layer
+from core.settings.prod import BASE_DIR
+
 channel_layer = get_channel_layer()
 
 message_reference = {
@@ -39,6 +40,7 @@ class GameAdapter:
          self.guesses_left = game.guesses_left
          self.multiplayer = game.multiplayer
          self.status = game.status
+         self.phaseOfGame = game.status
          self.timeout = game.timeout
 
 
@@ -129,7 +131,7 @@ class Game:
     
     def get_letterset(self):
         letterset = []
-        with open(f"{Path.cwd()}/game/lettersets.json", "r", encoding="utf-8") as f:
+        with open(f"{BASE_DIR.parent.joinpath('game/lettersets.json')}", "r", encoding="utf-8") as f:
             lettersets =  json.load(f)
             if 'pytest' in sys.argv[0]:
                 random.seed(3)
@@ -223,10 +225,8 @@ class Game:
                 break
             for obs in self.observers:
                 async_to_sync(channel_layer.group_send)(obs.user_group_name, {"type": "update_game", "game": GameAdapter(self), "id": obs.user_group_name[10:]})
-
             sleep(1)
             self.__timeout -= 1
-
             if self.guesses_left == 0:
                 self.__status = "ended"
                 for obs in self.observers:

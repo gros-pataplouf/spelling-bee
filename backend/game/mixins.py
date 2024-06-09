@@ -67,6 +67,4 @@ class GameMixin:
         feedback = json.dumps(self.translate_game_object(game, player_id=id))
         await self.send(text_data=feedback)
     
-    def test(self, event):
-        print("testing")
 

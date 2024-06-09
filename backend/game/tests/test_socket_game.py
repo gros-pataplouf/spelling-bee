@@ -1,5 +1,6 @@
 
 import pytest, os, django, json
+from time import sleep
 from game.consumers import GameConsumer, QueryConsumer, games, throttler
 from game.game import Player, Game, message_reference
 from uuid import uuid4
@@ -81,7 +82,6 @@ async def test_throttle():
     await communicator.send_to(text_data=json.dumps({"gameId": str(uuid4())}))
     await communicator.send_to(text_data=json.dumps({"gameId": str(uuid4())}))
     response = await communicator.receive_from()
-    print(response)
     assert not connected
     throttler.max_requests = 3
     await communicator.disconnect()
@@ -97,11 +97,6 @@ async def test_refuse_large_payload():
         await communicator.receive_from()
 
 
-
-
-
-# BUG: the following test only passes when running in isolation
-"""
 @pytest.mark.asyncio
 async def test_game_notifies_consumer_when_ended():
     new_game_id = str(uuid4())
@@ -110,22 +105,21 @@ async def test_game_notifies_consumer_when_ended():
     connected, subprotocol = await communicator.connect()
     assert connected
     await communicator.send_to(text_data=json.dumps(create_game_state(new_game_id, new_player_id)))
-    response = await communicator.receive_from()
-    sleep(timeout + 1)
-    response_end = await communicator.receive_from()
-    assert json.loads(response_end)["phaseOfGame"] == "ended"
-
+    response_queue = []
+    for i in range(0, 7):
+        sleep(1)
+        response = await communicator.receive_from()
+    sleep(7)
+    assert json.loads(response)["phaseOfGame"] == "ended"
     await communicator.disconnect()
-"""
-# BUG: the following test only passes when running alone
-""" => RuntimeError: <Queue at 0x7f25fd3b4e90 maxsize=0 _getters[1]> is bound to a different event loop
+
+
 @pytest.mark.asyncio
 async def test_creates_new_game_if_not_exists_multi():
     num_of_games = len(games)
     new_game_id = str(uuid4())
     new_player_id = str(uuid4())
     new_player_id2 = str(uuid4())
-    print(new_player_id, new_player_id2)
     communicator = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{new_game_id}?{new_player_id}")
     communicator2 = WebsocketCommunicator(GameConsumer.as_asgi(), f"ws://localhost/{new_game_id}?{new_player_id2}")
     connected, subprotocol = await communicator.connect()
@@ -148,5 +142,3 @@ async def test_creates_new_game_if_not_exists_multi():
     assert json.loads(response)["letters"] == ['A', 'E', 'L', 'M', 'S', 'T', 'X']
     await communicator.disconnect()
     await communicator2.disconnect()
-"""
-
